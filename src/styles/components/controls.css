@@ -1,0 +1,178 @@
+/* Chips, control segmentado, campos y acordeones */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 16px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line-strong);
+  background: rgb(255 255 255 / 0.4);
+  font-size: var(--fs-sm);
+  font-weight: 400;
+  white-space: nowrap;
+  transition: background-color var(--dur) var(--ease-out), color var(--dur) var(--ease-out), border-color var(--dur), transform 0.4s var(--ease-spring);
+}
+.chip:active { transform: scale(0.95); }
+.chip[aria-pressed="true"], .chip.is-active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--on-ink);
+}
+@media (hover: hover) {
+  .chip:not([aria-pressed="true"]):not(.is-active):hover { border-color: var(--ink); }
+}
+.chip__count { opacity: 0.55; font-variant-numeric: tabular-nums; }
+
+/* Fila desplazable horizontal con desvanecido en los bordes */
+.scroller {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  -webkit-mask: linear-gradient(90deg, transparent, #000 16px, #000 calc(100% - 16px), transparent);
+  mask: linear-gradient(90deg, transparent, #000 16px, #000 calc(100% - 16px), transparent);
+  padding: 4px 16px;
+  margin-inline: -16px;
+}
+.scroller::-webkit-scrollbar { display: none; }
+
+/* Control segmentado iOS con "lente" de vidrio que se desliza */
+.segmented {
+  --pad: 4px;
+  position: relative;
+  display: inline-flex;
+  padding: var(--pad);
+  border-radius: var(--r-pill);
+  max-width: 100%;
+}
+.segmented__thumb {
+  position: absolute;
+  top: var(--pad);
+  bottom: var(--pad);
+  left: 0;
+  width: var(--w, 0px);
+  transform: translateX(var(--x, 0px));
+  border-radius: var(--r-pill);
+  background: var(--ink);
+  box-shadow: 0 6px 16px -6px rgb(23 21 19 / 0.55), inset 0 1px 0 rgb(255 255 255 / 0.14);
+  transition: transform 0.55s var(--ease-spring), width 0.55s var(--ease-spring);
+  pointer-events: none;
+}
+.segmented__btn {
+  position: relative;
+  z-index: 1;
+  height: 38px;
+  padding: 0 18px;
+  border-radius: var(--r-pill);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--ink-soft);
+  transition: color 0.35s var(--ease-out);
+}
+.segmented__btn[aria-selected="true"], .segmented__btn[aria-pressed="true"] { color: var(--on-ink); }
+.segmented--scroll { overflow-x: auto; scrollbar-width: none; }
+.segmented--scroll::-webkit-scrollbar { display: none; }
+
+/* Campos de formulario */
+.field { display: grid; gap: 8px; min-width: 0; }
+.field__label {
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mocha);
+}
+.field__label .opt { text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--muted); }
+.input {
+  width: 100%;
+  height: 50px;
+  padding: 0 16px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line-strong);
+  background: rgb(255 255 255 / 0.7);
+  font-size: 16px; /* evita el zoom automático en iOS */
+  transition: border-color var(--dur), box-shadow var(--dur), background-color var(--dur);
+}
+textarea.input { height: auto; min-height: 96px; padding: 14px 16px; resize: vertical; }
+.input::placeholder { color: #a99e90; }
+.input:focus { outline: none; border-color: var(--ink); background: #fff; box-shadow: 0 0 0 4px rgb(23 21 19 / 0.08); }
+.field.is-invalid .input { border-color: var(--sale); box-shadow: 0 0 0 4px rgb(154 63 44 / 0.1); }
+.field__error { font-size: var(--fs-xs); color: var(--sale); }
+.field:not(.is-invalid) .field__error { display: none; }
+
+.choice-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.choice {
+  position: relative;
+  display: inline-flex;
+}
+.choice input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+.choice span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 8px 16px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line-strong);
+  font-size: var(--fs-sm);
+  background: rgb(255 255 255 / 0.5);
+  transition: all var(--dur) var(--ease-out);
+}
+.choice input:checked + span { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+.choice input:focus-visible + span { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* Selector de cantidad */
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line-strong);
+  background: rgb(255 255 255 / 0.55);
+}
+.stepper button { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; }
+.stepper button .icon { width: 16px; height: 16px; }
+.stepper button:disabled { opacity: 0.3; }
+.stepper output { min-width: 26px; text-align: center; font-variant-numeric: tabular-nums; font-weight: 500; }
+
+/* Acordeón */
+.accordion { border-top: 1px solid var(--line); }
+.accordion details { border-bottom: 1px solid var(--line); }
+.accordion summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 0;
+  cursor: pointer;
+  list-style: none;
+  font-weight: 500;
+}
+.accordion summary::-webkit-details-marker { display: none; }
+.accordion summary .icon { width: 18px; height: 18px; transition: transform 0.5s var(--ease-spring); }
+.accordion details[open] summary .icon { transform: rotate(45deg); }
+.accordion .accordion__body { padding: 0 0 22px; color: var(--ink-soft); max-width: 62ch; }
+@supports (interpolate-size: allow-keywords) {
+  .accordion { interpolate-size: allow-keywords; }
+  .accordion details::details-content {
+    height: 0;
+    overflow: clip;
+    transition: height 0.5s var(--ease-out), content-visibility 0.5s allow-discrete;
+  }
+  .accordion details[open]::details-content { height: auto; }
+}
+
+/* Muestras de color */
+.swatch {
+  --c: #ccc;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: inset 0 0 0 1px rgb(23 21 19 / 0.14);
+  flex: none;
+}
+.swatch--pattern { background: conic-gradient(#c98b73 0 25%, #e9dfcf 0 50%, #5f7fa3 0 75%, #1b1a19 0); }

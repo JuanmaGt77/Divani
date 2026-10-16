@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Divani · Ropa americana premium</title>
+  <meta name="description" content="Divani: ropa americana premium con etiqueta original para mujer, niñas, niños y hombre. Compra fácil y segura por WhatsApp con envíos a todo México." />
+  <meta property="og:title" content="Divani · Fashion in you" />
+  <meta property="og:description" content="Ropa americana premium con etiqueta original. Compra fácil por WhatsApp." />
+  <!-- @include partials/head.html -->
+  <script type="module" src="./src/pages/home.js"></script>
+</head>
+<body class="page-home">
+  <!-- @include partials/sprite.html -->
+  <!-- @include partials/header.html -->
+
+  <main id="contenido">
+    <!-- ============ HERO: video de marca ============ -->
+    <section class="hero" aria-label="Divani, ropa americana premium">
+      <div class="hero__media">
+        <video class="hero__video" data-hero-video autoplay muted loop playsinline preload="auto"
+          aria-label="Video de presentación de Divani: una tela de seda se desliza y aparece el logotipo.">
+          <source src="/media/video/divani-hero-portrait.webm" type="video/webm" media="(max-width: 767px)" />
+          <source src="/media/video/divani-hero-portrait.mp4" type="video/mp4" media="(max-width: 767px)" />
+          <source src="/media/video/divani-hero.webm" type="video/webm" />
+          <source src="/media/video/divani-hero.mp4" type="video/mp4" />
+        </video>
+        <picture class="hero__poster" data-hero-poster>
+          <source media="(max-width: 767px)" srcset="/media/video/divani-hero-portrait-poster.webp" />
+          <img src="/media/video/divani-hero-poster.webp" alt="" width="1280" height="720" fetchpriority="high" decoding="async" />
+        </picture>
+        <div class="hero__veil" aria-hidden="true"></div>
+      </div>
+
+      <div class="hero__content container">
+        <div class="hero__panel glass glass--live" data-glass-live>
+          <p class="eyebrow rise" style="--i: 0">Otoño · Invierno 2026</p>
+          <h1 class="hero__title rise" style="--i: 1">Moda americana, <em>elegida para ti.</em></h1>
+          <p class="hero__sub rise" style="--i: 2">Prendas con etiqueta original, seleccionadas para mujer, niñas, niños y hombre.</p>
+          <div class="hero__actions rise" style="--i: 3">
+            <a class="btn btn--ink btn--lg" href="tienda.html">
+              Comprar ahora
+              <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+            </a>
+            <a class="btn btn--glass btn--wa btn--lg glass" href="#" data-wa="greeting" target="_blank" rel="noopener">
+              <svg class="icon" aria-hidden="true"><use href="#i-whatsapp"></use></svg>
+              Pedir por WhatsApp
+            </a>
+          </div>
+        </div>
+
+        <div class="hero__controls rise" style="--i: 4">
+          <div class="hero__progress" aria-hidden="true"><span data-hero-progress></span></div>
+          <button class="icon-btn glass round" type="button" data-video-toggle aria-label="Pausar video">
+            <svg class="icon" aria-hidden="true"><use href="#i-pause"></use></svg>
+          </button>
+          <button class="icon-btn glass round" type="button" data-video-sound aria-label="Activar sonido">
+            <svg class="icon" aria-hidden="true"><use href="#i-volume-off"></use></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CINTAS CRUZADAS ============ -->
+    <section class="ribbons" aria-label="Divani en pocas palabras">
+      <div class="ribbon ribbon--ink">
+        <div class="ribbon__track" data-ribbon>
+          <span>Nueva temporada</span><span><em>Divani</em></span><span>Ropa americana</span><span><em>Fashion in you</em></span><span>Etiqueta original</span><span><em>Divani</em></span><span>Piezas limitadas</span>
+        </div>
+      </div>
+      <div class="ribbon ribbon--glass glass">
+        <div class="ribbon__track ribbon__track--rev" data-ribbon>
+          <span>Compra por WhatsApp</span><span><em>Mujer</em></span><span>Envíos a todo México</span><span><em>Niñas &amp; niños</em></span><span>Atención personal</span><span><em>Hombre</em></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CATEGORÍAS ============ -->
+    <section class="section" id="categorias">
+      <div class="container">
+        <header class="section-head">
+          <div class="section-head__text">
+            <p class="eyebrow">Compra por categoría</p>
+            <h2 class="h-2">Encuentra <em>tu estilo</em></h2>
+          </div>
+          <a class="link" href="tienda.html?depto=mujer">
+            Ver toda la colección
+            <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+          </a>
+        </header>
+        <div class="bento" data-categories aria-busy="true">
+          <div class="tile skeleton"></div><div class="tile skeleton"></div><div class="tile skeleton"></div>
+          <div class="tile skeleton"></div><div class="tile skeleton"></div><div class="tile skeleton"></div><div class="tile skeleton"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ NOVEDADES ============ -->
+    <section class="section section--linen" id="novedades">
+      <div class="container">
+        <header class="section-head">
+          <div class="section-head__text">
+            <p class="eyebrow">Recién llegado</p>
+            <h2 class="h-2">Lo <em>nuevo</em> en Divani</h2>
+          </div>
+          <div class="segmented segmented--scroll glass pill" role="tablist" aria-label="Filtrar novedades" data-new-filter>
+            <span class="segmented__thumb" aria-hidden="true"></span>
+            <button class="segmented__btn" role="tab" aria-selected="true" data-cat="">Todo</button>
+            <button class="segmented__btn" role="tab" aria-selected="false" data-cat="vestidos">Vestidos</button>
+            <button class="segmented__btn" role="tab" aria-selected="false" data-cat="blusas-y-tops">Tops</button>
+            <button class="segmented__btn" role="tab" aria-selected="false" data-cat="jeans-y-pantalones">Pantalones</button>
+            <button class="segmented__btn" role="tab" aria-selected="false" data-cat="abrigos-y-chamarras">Abrigos</button>
+          </div>
+        </header>
+        <div class="product-grid" data-new-grid aria-live="polite"></div>
+        <div class="section-cta">
+          <a class="btn btn--outline" href="tienda.html?orden=nuevo">Ver todas las novedades</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ BANNERS PROMOCIONALES ============ -->
+    <section class="section section--tight" aria-label="Promociones">
+      <div class="container">
+        <div class="promo" data-promo aria-roledescription="carrusel">
+          <div class="promo__track" data-promo-track>
+            <div class="promo__slide skeleton"></div>
+          </div>
+          <div class="promo__nav glass pill" data-promo-nav>
+            <button class="icon-btn icon-btn--sm" type="button" data-promo-prev aria-label="Promoción anterior">
+              <svg class="icon" aria-hidden="true"><use href="#i-chevron-left"></use></svg>
+            </button>
+            <div class="promo__dots" data-promo-dots></div>
+            <button class="icon-btn icon-btn--sm" type="button" data-promo-next aria-label="Siguiente promoción">
+              <svg class="icon" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LO MÁS DESEADO ============ -->
+    <section class="section" id="favoritas">
+      <div class="container">
+        <header class="section-head">
+          <div class="section-head__text">
+            <p class="eyebrow">Las favoritas</p>
+            <h2 class="h-2">Lo más <em>deseado</em></h2>
+          </div>
+          <div class="rail-arrows" data-rail-arrows="bestsellers">
+            <button class="icon-btn glass round" type="button" data-rail-prev aria-label="Anterior">
+              <svg class="icon" aria-hidden="true"><use href="#i-chevron-left"></use></svg>
+            </button>
+            <button class="icon-btn glass round" type="button" data-rail-next aria-label="Siguiente">
+              <svg class="icon" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+            </button>
+          </div>
+        </header>
+      </div>
+      <div class="rail" data-rail="bestsellers"><div class="rail__track" data-rail-track></div></div>
+    </section>
+
+    <!-- ============ ARMA TU LOOK ============ -->
+    <section class="section section--linen" id="look">
+      <div class="container look" data-look></div>
+    </section>
+
+    <!-- ============ EDITORIAL ============ -->
+    <section class="editorial" aria-label="Divani">
+      <div class="container">
+        <div class="editorial__frame" data-reveal="scale">
+          <img class="editorial__img" src="/media/editorial/silk-02.webp" alt="Tela de seda color marfil en movimiento" loading="lazy" width="1280" height="720" />
+          <div class="editorial__copy">
+            <p class="eyebrow">Divani · Fashion in you</p>
+            <h2 class="editorial__title">Ropa americana. <em>Etiqueta original.</em></h2>
+            <a class="btn btn--glass glass" href="#nosotros">
+              Conoce nuestra historia
+              <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ NIÑAS Y NIÑOS ============ -->
+    <section class="section kids" id="kids">
+      <div class="container">
+        <header class="section-head">
+          <div class="section-head__text">
+            <p class="eyebrow">Divani Kids</p>
+            <h2 class="h-2">Para los <em>más pequeños</em></h2>
+            <p class="lead">Vestidos de fiesta, mezclilla y básicos suaves en tallas americanas de 2T a 12.</p>
+          </div>
+        </header>
+        <div class="kids__tiles">
+          <a class="kids-tile" href="tienda.html?depto=ninas" data-reveal>
+            <img src="/images/categories/ninas.webp" alt="Vestidos y jumper de niña colgados en un riel dorado" loading="lazy" width="800" height="1000" />
+            <span class="kids-tile__label glass">
+              <span class="kids-tile__name">Niñas</span>
+              <span class="kids-tile__cta">Ver colección <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span>
+            </span>
+          </a>
+          <a class="kids-tile" href="tienda.html?depto=ninos" data-reveal style="--d: 1">
+            <img src="/images/categories/ninos.webp" alt="Playera, overol y sudadera de niño colgados en un riel dorado" loading="lazy" width="800" height="1000" />
+            <span class="kids-tile__label glass">
+              <span class="kids-tile__name">Niños</span>
+              <span class="kids-tile__cta">Ver colección <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span>
+            </span>
+          </a>
+        </div>
+        <div class="kids__shop">
+          <div class="segmented glass pill" role="tablist" aria-label="Elegir departamento infantil" data-kids-filter>
+            <span class="segmented__thumb" aria-hidden="true"></span>
+            <button class="segmented__btn" role="tab" aria-selected="true" data-dept="ninas">Niñas</button>
+            <button class="segmented__btn" role="tab" aria-selected="false" data-dept="ninos">Niños</button>
+          </div>
+          <div class="rail-arrows" data-rail-arrows="kids">
+            <button class="icon-btn glass round" type="button" data-rail-prev aria-label="Anterior">
+              <svg class="icon" aria-hidden="true"><use href="#i-chevron-left"></use></svg>
+            </button>
+            <button class="icon-btn glass round" type="button" data-rail-next aria-label="Siguiente">
+              <svg class="icon" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="rail" data-rail="kids"><div class="rail__track" data-rail-track></div></div>
+    </section>
+
+    <!-- ============ ACERCA DE NOSOTROS ============ -->
+    <section class="section about" id="nosotros">
+      <div class="container about__grid">
+        <div class="about__intro">
+          <p class="eyebrow">Acerca de nosotros</p>
+          <h2 class="h-2 about__title">Moda americana <em>premium</em>, elegida pieza por pieza.</h2>
+          <figure class="about__visual" data-reveal="scale">
+            <img src="/media/editorial/silk-03.webp" alt="Seda color marfil sobre fondo beige" loading="lazy" width="1280" height="720" />
+            <figcaption class="about__seal glass" data-monogram>
+              <svg class="about__mark" viewBox="0 0 418 443" aria-hidden="true"><use href="#logo-mark"></use></svg>
+              <span>Fashion in you</span>
+            </figcaption>
+          </figure>
+        </div>
+        <div class="about__body">
+          <div class="prose about__text">
+            <p class="lead">Divani nació de una idea sencilla: que vestir bien no dependa de cruzar la frontera. Traemos desde Estados Unidos prendas con su etiqueta original y las seleccionamos con cuidado, pensando en cómo te van a quedar y en cuánto las vas a usar.</p>
+            <p>Buscamos cortes que favorecen, telas que se sienten bien y detalles que hacen la diferencia: un satín con buena caída, una mezclilla que dura, un blazer que estructura. Cada modelo llega en pocas piezas, así que lo que encuentras aquí no lo vas a ver en todos lados.</p>
+            <p>Y como la ropa se elige mejor platicando, te atendemos por WhatsApp: te damos medidas, te ayudamos con la talla y te acompañamos hasta que tu pedido llegue a tus manos.</p>
+          </div>
+          <ul class="pillars list-reset">
+            <li class="pillar glass" data-reveal>
+              <svg class="icon" aria-hidden="true"><use href="#i-tag"></use></svg>
+              <h3 class="pillar__title">Etiqueta original</h3>
+              <p>Cada prenda llega desde Estados Unidos con su etiqueta original.</p>
+            </li>
+            <li class="pillar glass" data-reveal style="--d: 1">
+              <svg class="icon" aria-hidden="true"><use href="#i-sparkle"></use></svg>
+              <h3 class="pillar__title">Selección premium</h3>
+              <p>Revisamos tela, acabados y calidad antes de publicar cada pieza.</p>
+            </li>
+            <li class="pillar glass" data-reveal style="--d: 2">
+              <svg class="icon" aria-hidden="true"><use href="#i-hanger"></use></svg>
+              <h3 class="pillar__title">Piezas limitadas</h3>
+              <p>Pocas piezas por modelo: un estilo que no se repite.</p>
+            </li>
+            <li class="pillar glass" data-reveal style="--d: 3">
+              <svg class="icon" aria-hidden="true"><use href="#i-chat"></use></svg>
+              <h3 class="pillar__title">Atención personal</h3>
+              <p>Te asesoramos por WhatsApp con tallas, medidas y combinaciones.</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CÓMO COMPRAR ============ -->
+    <section class="section section--linen howto" id="como-comprar">
+      <div class="container howto__grid">
+        <div class="howto__text">
+          <header class="section-head__text">
+            <p class="eyebrow">Compra por WhatsApp</p>
+            <h2 class="h-2">Comprar es <em>así de fácil</em></h2>
+          </header>
+          <ol class="steps list-reset">
+            <li class="step" data-reveal>
+              <span class="step__n">1</span>
+              <div><h3 class="step__title">Elige tus favoritas</h3><p>Explora la tienda, elige color y talla y agrégalas a tu bolsa.</p></div>
+            </li>
+            <li class="step" data-reveal style="--d: 1">
+              <span class="step__n">2</span>
+              <div><h3 class="step__title">Envía tu pedido por WhatsApp</h3><p>Con un toque se arma un mensaje con tus prendas, tallas y total.</p></div>
+            </li>
+            <li class="step" data-reveal style="--d: 2">
+              <span class="step__n">3</span>
+              <div><h3 class="step__title">Confirma pago y envío</h3><p>Te confirmamos disponibilidad, costo de envío y datos de pago.</p></div>
+            </li>
+            <li class="step" data-reveal style="--d: 3">
+              <span class="step__n">4</span>
+              <div><h3 class="step__title">Recíbelo en casa</h3><p>Preparamos tu pedido con cuidado y te avisamos cuando va en camino.</p></div>
+            </li>
+          </ol>
+          <a class="btn btn--ink btn--wa" href="#" data-wa="greeting" target="_blank" rel="noopener">
+            <svg class="icon" aria-hidden="true"><use href="#i-whatsapp"></use></svg>
+            Empezar por WhatsApp
+          </a>
+        </div>
+
+        <figure class="phone" aria-label="Ejemplo de un pedido enviado por WhatsApp" data-phone>
+          <div class="phone__frame">
+            <div class="phone__island" aria-hidden="true"></div>
+            <div class="phone__screen">
+              <div class="phone__bar glass">
+                <span class="phone__avatar"><svg viewBox="0 0 418 443" aria-hidden="true"><use href="#logo-mark"></use></svg></span>
+                <span class="phone__who"><strong>Divani</strong><small>en línea</small></span>
+              </div>
+              <div class="chat">
+                <p class="chat__day">Hoy</p>
+                <div class="bubble bubble--out" style="--d: 0">
+                  <p>Hola Divani, quiero hacer este pedido:</p>
+                  <p><strong>Pedido DV-1016-K7Q2</strong></p>
+                  <p>1. Vestido slip satinado<br /><span>Champagne · Talla M · $899</span></p>
+                  <p>2. Jeans wide leg tiro alto<br /><span>Azul claro · Talla 6 · $799</span></p>
+                  <p><strong>Total: $1,698 MXN</strong></p>
+                  <time>12:41</time>
+                </div>
+                <div class="bubble bubble--in" style="--d: 1">
+                  <p>¡Hola! Gracias por tu pedido. Las dos prendas están disponibles; te compartimos el costo de envío y los datos de pago.</p>
+                  <time>12:43</time>
+                </div>
+                <div class="bubble bubble--out" style="--d: 2">
+                  <p>¡Perfecto! Envío a Guadalajara, por favor.</p>
+                  <time>12:44</time>
+                </div>
+              </div>
+            </div>
+          </div>
+          <figcaption class="visually-hidden">Ejemplo ilustrativo de una conversación de compra.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ============ HOMBRE ============ -->
+    <section class="section men" id="hombre">
+      <div class="container">
+        <header class="section-head">
+          <div class="section-head__text">
+            <p class="eyebrow">Hombre</p>
+            <h2 class="h-2">Básicos <em>para él</em></h2>
+          </div>
+          <a class="link" href="tienda.html?depto=hombre">
+            Ver todo hombre
+            <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+          </a>
+        </header>
+        <div class="men__grid">
+          <a class="men__banner" href="tienda.html?depto=hombre" data-reveal>
+            <img src="/images/categories/hombre.webp" alt="Polo, camisa Oxford y chamarra de mezclilla colgados en un riel dorado" loading="lazy" width="800" height="1000" />
+            <span class="men__label glass">
+              <span class="eyebrow eyebrow--plain">Para él</span>
+              <span class="men__title">Camisas, polos, chinos y mezclilla índigo</span>
+            </span>
+          </a>
+          <div class="men__products" data-men-grid></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PREGUNTAS FRECUENTES ============ -->
+    <section class="section section--linen faq" id="preguntas">
+      <div class="container faq__grid">
+        <div class="faq__intro">
+          <p class="eyebrow">Ayuda</p>
+          <h2 class="h-2">Preguntas <em>frecuentes</em></h2>
+          <p class="lead">¿Tienes otra duda? Escríbenos y te respondemos en horario de atención.</p>
+          <a class="btn btn--outline btn--wa" href="#" data-wa="greeting" target="_blank" rel="noopener">
+            <svg class="icon" aria-hidden="true"><use href="#i-whatsapp"></use></svg>
+            Preguntar por WhatsApp
+          </a>
+        </div>
+        <div class="accordion" data-faq></div>
+      </div>
+    </section>
+
+    <!-- ============ LISTA VIP ============ -->
+    <section class="vip">
+      <div class="container">
+        <div class="vip__card" data-reveal="scale">
+          <img class="vip__bg" src="/media/editorial/silk-01.webp" alt="" loading="lazy" width="1280" height="720" />
+          <div class="vip__content glass">
+            <p class="eyebrow">Lista VIP</p>
+            <h2 class="h-2">Entérate <em>primero</em></h2>
+            <p>Únete a nuestra lista de difusión y recibe por WhatsApp los nuevos ingresos en cuanto llegan.</p>
+            <a class="btn btn--ink btn--wa" href="#" data-wa="vip" target="_blank" rel="noopener">
+              <svg class="icon" aria-hidden="true"><use href="#i-whatsapp"></use></svg>
+              Unirme a la lista VIP
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- @include partials/footer.html -->
+  <!-- @include partials/overlays.html -->
+</body>
+</html>

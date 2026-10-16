@@ -1,0 +1,143 @@
+<!-- ===================== Hojas (diálogos) ===================== -->
+
+<!-- Menú móvil -->
+<dialog class="sheet sheet--menu" id="sheet-menu" aria-label="Menú" data-sheet>
+  <div class="sheet__panel glass glass--strong">
+    <header class="sheet__head">
+      <a class="sheet__logo" href="index.html" aria-label="Divani — inicio">
+        <svg viewBox="0 0 805 247" aria-hidden="true"><use href="#logo-wordmark"></use></svg>
+      </a>
+      <button class="icon-btn glass round" type="button" data-close aria-label="Cerrar menú">
+        <svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg>
+      </button>
+    </header>
+    <nav class="menu" aria-label="Menú principal">
+      <ul class="menu__main list-reset">
+        <li><a href="tienda.html?depto=mujer"><span>Mujer</span><svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></a></li>
+        <li><a href="tienda.html?depto=ninas"><span>Niñas</span><svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></a></li>
+        <li><a href="tienda.html?depto=ninos"><span>Niños</span><svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></a></li>
+        <li><a href="tienda.html?depto=hombre"><span>Hombre</span><svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></a></li>
+        <li><a href="tienda.html?orden=nuevo"><span>Novedades</span><svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></a></li>
+        <li><a href="tienda.html?oferta=1"><span><em>Ofertas</em></span><svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></a></li>
+      </ul>
+      <ul class="menu__sub list-reset">
+        <li><a href="index.html#nosotros">Acerca de nosotros</a></li>
+        <li><a href="index.html#como-comprar">Cómo comprar</a></li>
+        <li><button type="button" data-open="sizes">Guía de tallas</button></li>
+        <li><a href="index.html#preguntas">Preguntas frecuentes</a></li>
+      </ul>
+    </nav>
+    <footer class="menu__foot">
+      <a class="btn btn--ink btn--wa btn--block" href="#" data-wa="greeting" target="_blank" rel="noopener">
+        <svg class="icon" aria-hidden="true"><use href="#i-whatsapp"></use></svg>
+        Asesoría por WhatsApp
+      </a>
+      <div class="menu__social" data-social></div>
+    </footer>
+  </div>
+</dialog>
+
+<!-- Búsqueda -->
+<dialog class="sheet sheet--top" id="sheet-search" aria-label="Buscar" data-sheet>
+  <div class="sheet__panel glass glass--strong">
+    <form class="search" role="search" data-search-form action="tienda.html">
+      <svg class="icon search__icon" aria-hidden="true"><use href="#i-search"></use></svg>
+      <label class="visually-hidden" for="search-input">Buscar en la tienda</label>
+      <input class="search__input" id="search-input" name="q" type="search" placeholder="Busca vestidos, mezclilla, blazer…" autocomplete="off" enterkeyhint="search" />
+      <button class="icon-btn" type="button" data-close aria-label="Cerrar búsqueda">
+        <svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg>
+      </button>
+    </form>
+    <div class="search__body" data-search-body></div>
+  </div>
+</dialog>
+
+<!-- Bolsa de compras + pedido por WhatsApp -->
+<dialog class="sheet sheet--side" id="sheet-cart" aria-labelledby="cart-title" data-sheet>
+  <div class="sheet__panel glass glass--strong">
+    <div class="sheet__grabber" data-grabber aria-hidden="true"></div>
+    <header class="sheet__head">
+      <button class="icon-btn" type="button" data-cart-back hidden aria-label="Volver a la bolsa">
+        <svg class="icon" aria-hidden="true"><use href="#i-chevron-left"></use></svg>
+      </button>
+      <h2 class="sheet__title" id="cart-title">Tu bolsa</h2>
+      <button class="icon-btn glass round" type="button" data-close aria-label="Cerrar bolsa">
+        <svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg>
+      </button>
+    </header>
+    <div class="cart" data-cart></div>
+  </div>
+</dialog>
+
+<!-- Favoritos -->
+<dialog class="sheet sheet--side" id="sheet-favorites" aria-labelledby="fav-title" data-sheet>
+  <div class="sheet__panel glass glass--strong">
+    <div class="sheet__grabber" data-grabber aria-hidden="true"></div>
+    <header class="sheet__head">
+      <h2 class="sheet__title" id="fav-title">Favoritos</h2>
+      <button class="icon-btn glass round" type="button" data-close aria-label="Cerrar favoritos">
+        <svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg>
+      </button>
+    </header>
+    <div class="favs" data-favorites></div>
+  </div>
+</dialog>
+
+<!-- Vista rápida de producto -->
+<dialog class="sheet sheet--center sheet--product" id="sheet-product" aria-label="Detalle del producto" data-sheet>
+  <div class="sheet__panel glass glass--strong">
+    <div class="sheet__grabber" data-grabber aria-hidden="true"></div>
+    <button class="icon-btn glass round sheet__close-float" type="button" data-close aria-label="Cerrar">
+      <svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg>
+    </button>
+    <div class="pdp" data-product></div>
+  </div>
+</dialog>
+
+<!-- Guía de tallas -->
+<dialog class="sheet sheet--center sheet--sizes" id="sheet-sizes" aria-labelledby="sizes-title" data-sheet>
+  <div class="sheet__panel glass glass--strong">
+    <div class="sheet__grabber" data-grabber aria-hidden="true"></div>
+    <header class="sheet__head">
+      <h2 class="sheet__title" id="sizes-title">Guía de tallas</h2>
+      <button class="icon-btn glass round" type="button" data-close aria-label="Cerrar guía de tallas">
+        <svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg>
+      </button>
+    </header>
+    <div class="sizes" data-sizes></div>
+  </div>
+</dialog>
+
+<!-- Notificación tipo Dynamic Island -->
+<div class="island" data-island role="status" aria-live="polite">
+  <div class="island__content" data-island-content></div>
+</div>
+
+<!-- Barra inferior (celular) estilo iOS 26 -->
+<nav class="tabbar" aria-label="Navegación rápida" data-tabbar>
+  <div class="tabbar__bar glass pill">
+    <a class="tabbar__item" href="index.html" data-tab="inicio">
+      <svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg><span>Inicio</span>
+    </a>
+    <a class="tabbar__item" href="tienda.html" data-tab="tienda">
+      <svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg><span>Tienda</span>
+    </a>
+    <button class="tabbar__item" type="button" data-open="favorites" data-tab="favoritos">
+      <svg class="icon" aria-hidden="true"><use href="#i-heart"></use></svg><span>Favoritos</span>
+      <span class="count-badge" data-fav-count></span>
+    </button>
+    <button class="tabbar__item" type="button" data-open="cart" data-tab="bolsa">
+      <svg class="icon" aria-hidden="true"><use href="#i-bag"></use></svg><span>Bolsa</span>
+      <span class="count-badge" data-cart-count></span>
+    </button>
+  </div>
+  <a class="tabbar__wa glass round" href="#" data-wa="greeting" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
+    <svg class="icon" aria-hidden="true"><use href="#i-whatsapp"></use></svg>
+  </a>
+</nav>
+
+<!-- Botón flotante de WhatsApp (escritorio) -->
+<a class="wa-fab glass pill" href="#" data-wa="greeting" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
+  <span class="wa-fab__icon"><svg class="icon" aria-hidden="true"><use href="#i-whatsapp"></use></svg></span>
+  <span class="wa-fab__text">¿Te ayudamos?</span>
+</a>

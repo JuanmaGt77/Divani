@@ -1,0 +1,49 @@
+{
+  "whatsapp": "",
+  "whatsappNote": "Opcional: tu número con lada (52 + 10 dígitos). Si lo dejas vacío se usa VITE_WHATSAPP_NUMBER del archivo .env.",
+  "announcements": [
+    "Ropa americana con etiqueta original",
+    "Compra fácil por WhatsApp",
+    "Envíos a todo México",
+    "Piezas limitadas por modelo",
+    "Atención personalizada"
+  ],
+  "checkout": {
+    "deliveryMethods": [
+      {
+        "id": "envio",
+        "label": "Envío a domicilio",
+        "requiresAddress": true
+      },
+      {
+        "id": "entrega",
+        "label": "Entrega en punto acordado",
+        "requiresAddress": false
+      }
+    ],
+    "paymentMethods": [
+      {
+        "id": "transferencia",
+        "label": "Transferencia"
+      },
+      {
+        "id": "deposito",
+        "label": "Depósito"
+      },
+      {
+        "id": "efectivo",
+        "label": "Efectivo al entregar"
+      }
+    ],
+    "freeShippingFrom": null,
+    "note": "El costo y tiempo de envío te los confirmamos por WhatsApp según tu ciudad."
+  },
+  "popularSearches": [
+    "Vestidos",
+    "Mezclilla",
+    "Satín",
+    "Blazer",
+    "Niñas",
+    "Bolsas"
+  ]
+}

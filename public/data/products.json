@@ -1,0 +1,2974 @@
+[
+  {
+    "id": "DV-0001",
+    "sku": "DV-MUJ-001",
+    "slug": "vestido-slip-satinado",
+    "name": "Vestido slip satinado",
+    "department": "mujer",
+    "category": "vestidos",
+    "price": 899,
+    "compareAtPrice": 1190,
+    "currency": "MXN",
+    "description": "Corte al bies con caída líquida y escote en V. El vestido que va de la cena al evento sin esfuerzo.",
+    "details": [
+      "Tirantes ajustables",
+      "Corte al bies, largo midi",
+      "Forro ligero",
+      "Satín con brillo suave"
+    ],
+    "material": "Satín de poliéster",
+    "care": "Lavar a mano en agua fría. Planchar a baja temperatura por el revés.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Champagne",
+        "hex": "#E3CFAE",
+        "images": [
+          "images/products/vestido-slip-satinado-champagne-1.webp",
+          "images/products/vestido-slip-satinado-champagne-2.webp"
+        ],
+        "family": "beige"
+      },
+      {
+        "name": "Negro",
+        "hex": "#1D1B1A",
+        "images": [
+          "images/products/vestido-slip-satinado-negro-1.webp",
+          "images/products/vestido-slip-satinado-negro-2.webp"
+        ],
+        "family": "negro"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "XS",
+        "stock": 1
+      },
+      {
+        "label": "S",
+        "stock": 3
+      },
+      {
+        "label": "M",
+        "stock": 2
+      },
+      {
+        "label": "L",
+        "stock": 1
+      },
+      {
+        "label": "XL",
+        "stock": 0
+      }
+    ],
+    "isNew": true,
+    "isBestseller": false,
+    "isFeatured": true,
+    "tags": [
+      "satín",
+      "fiesta",
+      "midi"
+    ],
+    "createdAt": "2026-10-12"
+  },
+  {
+    "id": "DV-0002",
+    "sku": "DV-MUJ-002",
+    "slug": "vestido-cruzado-floral",
+    "name": "Vestido cruzado floral",
+    "department": "mujer",
+    "category": "vestidos",
+    "price": 949,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Silueta cruzada que marca la cintura, mangas 3/4 y lazo lateral. Estampado floral en tonos terracota.",
+    "details": [
+      "Escote en V cruzado",
+      "Lazo ajustable en la cintura",
+      "Mangas 3/4",
+      "Largo midi"
+    ],
+    "material": "Viscosa ligera",
+    "care": "Lavar a máquina en ciclo delicado. Secar a la sombra.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Marfil floral",
+        "hex": "#F3EDE2",
+        "images": [
+          "images/products/vestido-cruzado-floral-marfil-floral-1.webp",
+          "images/products/vestido-cruzado-floral-marfil-floral-2.webp"
+        ],
+        "family": "estampado"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "XS",
+        "stock": 0
+      },
+      {
+        "label": "S",
+        "stock": 2
+      },
+      {
+        "label": "M",
+        "stock": 3
+      },
+      {
+        "label": "L",
+        "stock": 2
+      },
+      {
+        "label": "XL",
+        "stock": 1
+      }
+    ],
+    "isNew": false,
+    "isBestseller": true,
+    "isFeatured": false,
+    "tags": [
+      "floral",
+      "midi",
+      "día"
+    ],
+    "createdAt": "2026-09-28"
+  },
+  {
+    "id": "DV-0003",
+    "sku": "DV-MUJ-003",
+    "slug": "vestido-camisero-cuadros",
+    "name": "Vestido camisero de cuadros",
+    "department": "mujer",
+    "category": "vestidos",
+    "price": 829,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Clásico camisero con cinturón de hebilla dorada y botones al frente. Fresco, pulido y fácil de llevar.",
+    "details": [
+      "Cuello camisero",
+      "Botones al frente",
+      "Cinturón con hebilla dorada",
+      "Manga corta"
+    ],
+    "material": "Algodón",
+    "care": "Lavar a máquina en frío.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Moka",
+        "hex": "#8A6E55",
+        "images": [
+          "images/products/vestido-camisero-cuadros-moka-1.webp",
+          "images/products/vestido-camisero-cuadros-moka-2.webp"
+        ],
+        "family": "estampado"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "XS",
+        "stock": 0
+      },
+      {
+        "label": "S",
+        "stock": 2
+      },
+      {
+        "label": "M",
+        "stock": 2
+      },
+      {
+        "label": "L",
+        "stock": 1
+      },
+      {
+        "label": "XL",
+        "stock": 0
+      }
+    ],
+    "isNew": false,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "cuadros",
+      "casual"
+    ],
+    "createdAt": "2026-09-15"
+  },
+  {
+    "id": "DV-0004",
+    "sku": "DV-MUJ-004",
+    "slug": "vestido-punto-midi",
+    "name": "Vestido de punto midi",
+    "department": "mujer",
+    "category": "vestidos",
+    "price": 879,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Punto acanalado que estiliza la figura. Cuello redondo, manga larga y largo a media pierna.",
+    "details": [
+      "Punto acanalado con elasticidad",
+      "Cuello redondo",
+      "Manga larga",
+      "Largo midi"
+    ],
+    "material": "Punto acanalado de viscosa con elastano",
+    "care": "Lavar a mano. Secar en horizontal.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Camel",
+        "hex": "#B88F68",
+        "images": [
+          "images/products/vestido-punto-midi-camel-1.webp",
+          "images/products/vestido-punto-midi-camel-2.webp"
+        ],
+        "family": "cafe"
+      },
+      {
+        "name": "Moka",
+        "hex": "#6B5443",
+        "images": [
+          "images/products/vestido-punto-midi-moka-1.webp",
+          "images/products/vestido-punto-midi-moka-2.webp"
+        ],
+        "family": "cafe"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "XS",
+        "stock": 1
+      },
+      {
+        "label": "S",
+        "stock": 2
+      },
+      {
+        "label": "M",
+        "stock": 2
+      },
+      {
+        "label": "L",
+        "stock": 1
+      },
+      {
+        "label": "XL",
+        "stock": 0
+      }
+    ],
+    "isNew": false,
+    "isBestseller": true,
+    "isFeatured": false,
+    "tags": [
+      "punto",
+      "otoño"
+    ],
+    "createdAt": "2026-09-02"
+  },
+  {
+    "id": "DV-0005",
+    "sku": "DV-MUJ-005",
+    "slug": "mini-vestido-lunares",
+    "name": "Mini vestido de lunares",
+    "department": "mujer",
+    "category": "vestidos",
+    "price": 749,
+    "compareAtPrice": 990,
+    "currency": "MXN",
+    "description": "Mangas abullonadas, escote cuadrado y falda con vuelo. Un clásico con actitud.",
+    "details": [
+      "Escote cuadrado",
+      "Mangas abullonadas",
+      "Falda con vuelo",
+      "Cierre posterior"
+    ],
+    "material": "Crepé ligero",
+    "care": "Lavar a mano en agua fría.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Negro",
+        "hex": "#1E1C1B",
+        "images": [
+          "images/products/mini-vestido-lunares-negro-1.webp",
+          "images/products/mini-vestido-lunares-negro-2.webp"
+        ],
+        "family": "estampado"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "XS",
+        "stock": 1
+      },
+      {
+        "label": "S",
+        "stock": 1
+      },
+      {
+        "label": "M",
+        "stock": 2
+      },
+      {
+        "label": "L",
+        "stock": 0
+      },
+      {
+        "label": "XL",
+        "stock": 0
+      }
+    ],
+    "isNew": false,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "lunares",
+      "mini"
+    ],
+    "createdAt": "2026-08-20"
+  },
+  {
+    "id": "DV-0006",
+    "sku": "DV-MUJ-006",
+    "slug": "vestido-negro-clasico",
+    "name": "Vestido negro clásico",
+    "department": "mujer",
+    "category": "vestidos",
+    "price": 799,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "El little black dress definitivo: cuello barco, corte entallado y largo a la rodilla.",
+    "details": [
+      "Cuello barco",
+      "Corte entallado con pinzas",
+      "Largo a la rodilla",
+      "Cierre invisible"
+    ],
+    "material": "Crepé con elastano",
+    "care": "Lavar a mano. No usar secadora.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Negro",
+        "hex": "#1B1A19",
+        "images": [
+          "images/products/vestido-negro-clasico-negro-1.webp",
+          "images/products/vestido-negro-clasico-negro-2.webp"
+        ],
+        "family": "negro"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "XS",
+        "stock": 0
+      },
+      {
+        "label": "S",
+        "stock": 1
+      },
+      {
+        "label": "M",
+        "stock": 1
+      },
+      {
+        "label": "L",
+        "stock": 0
+      },
+      {
+        "label": "XL",
+        "stock": 0
+      }
+    ],
+    "isNew": false,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "básico",
+      "noche"
+    ],
+    "createdAt": "2026-08-05"
+  },
+  {
+    "id": "DV-0007",
+    "sku": "DV-MUJ-007",
+    "slug": "blusa-satinada-botones",
+    "name": "Blusa satinada de botones",
+    "department": "mujer",
+    "category": "blusas-y-tops",
+    "price": 649,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Satín con caída fluida, cuello camisero y puños con botón. Fajada o suelta, siempre impecable.",
+    "details": [
+      "Cuello camisero",
+      "Botones al frente",
+      "Puños con botón",
+      "Caída fluida"
+    ],
+    "material": "Satín de poliéster",
+    "care": "Lavar a mano. Planchar a baja temperatura.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Marfil",
+        "hex": "#F4EEE3",
+        "images": [
+          "images/products/blusa-satinada-botones-marfil-1.webp",
+          "images/products/blusa-satinada-botones-marfil-2.webp"
+        ],
+        "family": "blanco"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "XS",
+        "stock": 1
+      },
+      {
+        "label": "S",
+        "stock": 2
+      },
+      {
+        "label": "M",
+        "stock": 3
+      },
+      {
+        "label": "L",
+        "stock": 2
+      },
+      {
+        "label": "XL",
+        "stock": 1
+      }
+    ],
+    "isNew": true,
+    "isBestseller": false,
+    "isFeatured": true,
+    "tags": [
+      "satín",
+      "oficina"
+    ],
+    "createdAt": "2026-10-08"
+  },
+  {
+    "id": "DV-0008",
+    "sku": "DV-MUJ-008",
+    "slug": "top-manga-abullonada",
+    "name": "Top de manga abullonada",
+    "department": "mujer",
+    "category": "blusas-y-tops",
+    "price": 549,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Bordado de ojal, escote cuadrado y mangas abullonadas. Romántico y fresco.",
+    "details": [
+      "Bordado de ojal",
+      "Escote cuadrado",
+      "Mangas abullonadas con elástico",
+      "Corte corto"
+    ],
+    "material": "Algodón bordado",
+    "care": "Lavar a mano en agua fría.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Blanco",
+        "hex": "#FBF9F4",
+        "images": [
+          "images/products/top-manga-abullonada-blanco-1.webp",
+          "images/products/top-manga-abullonada-blanco-2.webp"
+        ],
+        "family": "blanco"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "XS",
+        "stock": 1
+      },
+      {
+        "label": "S",
+        "stock": 2
+      },
+      {
+        "label": "M",
+        "stock": 2
+      },
+      {
+        "label": "L",
+        "stock": 1
+      },
+      {
+        "label": "XL",
+        "stock": 0
+      }
+    ],
+    "isNew": true,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "bordado",
+      "romántico"
+    ],
+    "createdAt": "2026-10-04"
+  },
+  {
+    "id": "DV-0009",
+    "sku": "DV-MUJ-009",
+    "slug": "sueter-trenzado",
+    "name": "Suéter trenzado",
+    "department": "mujer",
+    "category": "blusas-y-tops",
+    "price": 699,
+    "compareAtPrice": 890,
+    "currency": "MXN",
+    "description": "Tejido de ochos, hombro caído y puños acanalados. Abrigador sin perder ligereza.",
+    "details": [
+      "Tejido de ochos",
+      "Hombro caído",
+      "Puños y bajo acanalados",
+      "Corte relajado"
+    ],
+    "material": "Mezcla de algodón y acrílico",
+    "care": "Lavar a mano. Secar en horizontal.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Avena",
+        "hex": "#D8C8AE",
+        "images": [
+          "images/products/sueter-trenzado-avena-1.webp",
+          "images/products/sueter-trenzado-avena-2.webp"
+        ],
+        "family": "beige"
+      },
+      {
+        "name": "Marfil",
+        "hex": "#EFE8DA",
+        "images": [
+          "images/products/sueter-trenzado-marfil-1.webp",
+          "images/products/sueter-trenzado-marfil-2.webp"
+        ],
+        "family": "blanco"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "XS",
+        "stock": 1
+      },
+      {
+        "label": "S",
+        "stock": 2
+      },
+      {
+        "label": "M",
+        "stock": 2
+      },
+      {
+        "label": "L",
+        "stock": 2
+      },
+      {
+        "label": "XL",
+        "stock": 1
+      }
+    ],
+    "isNew": false,
+    "isBestseller": true,
+    "isFeatured": false,
+    "tags": [
+      "punto",
+      "otoño"
+    ],
+    "createdAt": "2026-09-20"
+  },
+  {
+    "id": "DV-0010",
+    "sku": "DV-MUJ-010",
+    "slug": "top-acanalado",
+    "name": "Top acanalado",
+    "department": "mujer",
+    "category": "blusas-y-tops",
+    "price": 349,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "El básico que lo combina todo: tela acanalada que se ajusta al cuerpo y escote redondo profundo.",
+    "details": [
+      "Tela acanalada elástica",
+      "Escote redondo profundo",
+      "Sin mangas",
+      "Corte ajustado"
+    ],
+    "material": "Algodón con elastano",
+    "care": "Lavar a máquina en frío.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Negro",
+        "hex": "#1D1C1B",
+        "images": [
+          "images/products/top-acanalado-negro-1.webp",
+          "images/products/top-acanalado-negro-2.webp"
+        ],
+        "family": "negro"
+      },
+      {
+        "name": "Marfil",
+        "hex": "#F2ECE1",
+        "images": [
+          "images/products/top-acanalado-marfil-1.webp",
+          "images/products/top-acanalado-marfil-2.webp"
+        ],
+        "family": "blanco"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "XS",
+        "stock": 2
+      },
+      {
+        "label": "S",
+        "stock": 3
+      },
+      {
+        "label": "M",
+        "stock": 3
+      },
+      {
+        "label": "L",
+        "stock": 2
+      },
+      {
+        "label": "XL",
+        "stock": 1
+      }
+    ],
+    "isNew": false,
+    "isBestseller": true,
+    "isFeatured": false,
+    "tags": [
+      "básico"
+    ],
+    "createdAt": "2026-09-10"
+  },
+  {
+    "id": "DV-0011",
+    "sku": "DV-MUJ-011",
+    "slug": "playera-marinera",
+    "name": "Playera marinera",
+    "department": "mujer",
+    "category": "blusas-y-tops",
+    "price": 449,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Rayas clásicas, cuello barco y manga larga. Un ícono atemporal.",
+    "details": [
+      "Cuello barco",
+      "Manga larga",
+      "Rayas tejidas",
+      "Corte recto"
+    ],
+    "material": "Algodón",
+    "care": "Lavar a máquina en frío.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Crema y marino",
+        "hex": "#1F2A44",
+        "images": [
+          "images/products/playera-marinera-crema-y-marino-1.webp",
+          "images/products/playera-marinera-crema-y-marino-2.webp"
+        ],
+        "family": "estampado"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "XS",
+        "stock": 1
+      },
+      {
+        "label": "S",
+        "stock": 2
+      },
+      {
+        "label": "M",
+        "stock": 2
+      },
+      {
+        "label": "L",
+        "stock": 1
+      },
+      {
+        "label": "XL",
+        "stock": 1
+      }
+    ],
+    "isNew": false,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "rayas",
+      "básico"
+    ],
+    "createdAt": "2026-08-28"
+  },
+  {
+    "id": "DV-0012",
+    "sku": "DV-MUJ-012",
+    "slug": "sueter-cuello-tortuga",
+    "name": "Suéter cuello tortuga",
+    "department": "mujer",
+    "category": "blusas-y-tops",
+    "price": 599,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Punto fino de canalé con cuello alto. Perfecto para capas en temporada fría.",
+    "details": [
+      "Cuello alto doblado",
+      "Punto de canalé",
+      "Manga larga",
+      "Corte entallado"
+    ],
+    "material": "Punto de viscosa",
+    "care": "Lavar a mano. Secar en horizontal.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Moka",
+        "hex": "#6B5443",
+        "images": [
+          "images/products/sueter-cuello-tortuga-moka-1.webp",
+          "images/products/sueter-cuello-tortuga-moka-2.webp"
+        ],
+        "family": "cafe"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "XS",
+        "stock": 1
+      },
+      {
+        "label": "S",
+        "stock": 2
+      },
+      {
+        "label": "M",
+        "stock": 1
+      },
+      {
+        "label": "L",
+        "stock": 1
+      },
+      {
+        "label": "XL",
+        "stock": 0
+      }
+    ],
+    "isNew": false,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "punto",
+      "otoño"
+    ],
+    "createdAt": "2026-09-25"
+  },
+  {
+    "id": "DV-0013",
+    "sku": "DV-MUJ-013",
+    "slug": "jeans-wide-leg",
+    "name": "Jeans wide leg tiro alto",
+    "department": "mujer",
+    "category": "jeans-y-pantalones",
+    "price": 799,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Tiro alto, pierna amplia y mezclilla rígida. Alarga la silueta al instante.",
+    "details": [
+      "Tiro alto",
+      "Pierna amplia",
+      "Cinco bolsillos",
+      "Cierre con botón y bragueta"
+    ],
+    "material": "Mezclilla 100% algodón",
+    "care": "Lavar al revés en agua fría.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Azul claro",
+        "hex": "#9DB3CB",
+        "images": [
+          "images/products/jeans-wide-leg-azul-claro-1.webp",
+          "images/products/jeans-wide-leg-azul-claro-2.webp"
+        ],
+        "family": "azul"
+      },
+      {
+        "name": "Azul medio",
+        "hex": "#5F7FA3",
+        "images": [
+          "images/products/jeans-wide-leg-azul-medio-1.webp",
+          "images/products/jeans-wide-leg-azul-medio-2.webp"
+        ],
+        "family": "azul"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "2",
+        "stock": 1
+      },
+      {
+        "label": "4",
+        "stock": 2
+      },
+      {
+        "label": "6",
+        "stock": 3
+      },
+      {
+        "label": "8",
+        "stock": 2
+      },
+      {
+        "label": "10",
+        "stock": 1
+      },
+      {
+        "label": "12",
+        "stock": 0
+      }
+    ],
+    "isNew": true,
+    "isBestseller": true,
+    "isFeatured": true,
+    "tags": [
+      "mezclilla"
+    ],
+    "createdAt": "2026-10-10"
+  },
+  {
+    "id": "DV-0014",
+    "sku": "DV-MUJ-014",
+    "slug": "jeans-rectos",
+    "name": "Jeans rectos clásicos",
+    "department": "mujer",
+    "category": "jeans-y-pantalones",
+    "price": 749,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Corte recto de tiro medio con cinco bolsillos. El jean que usarás todos los días.",
+    "details": [
+      "Tiro medio",
+      "Pierna recta",
+      "Cinco bolsillos",
+      "Costuras contrastantes"
+    ],
+    "material": "Mezclilla de algodón con elastano",
+    "care": "Lavar al revés en agua fría.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Azul medio",
+        "hex": "#5F7FA3",
+        "images": [
+          "images/products/jeans-rectos-azul-medio-1.webp",
+          "images/products/jeans-rectos-azul-medio-2.webp"
+        ],
+        "family": "azul"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "2",
+        "stock": 0
+      },
+      {
+        "label": "4",
+        "stock": 2
+      },
+      {
+        "label": "6",
+        "stock": 2
+      },
+      {
+        "label": "8",
+        "stock": 2
+      },
+      {
+        "label": "10",
+        "stock": 1
+      },
+      {
+        "label": "12",
+        "stock": 1
+      }
+    ],
+    "isNew": false,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "mezclilla",
+      "básico"
+    ],
+    "createdAt": "2026-08-30"
+  },
+  {
+    "id": "DV-0015",
+    "sku": "DV-MUJ-015",
+    "slug": "pantalon-sastre-pinzas",
+    "name": "Pantalón sastre de pinzas",
+    "department": "mujer",
+    "category": "jeans-y-pantalones",
+    "price": 829,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Pinzas al frente, raya marcada y pierna amplia. Elegancia relajada para la oficina o el fin de semana.",
+    "details": [
+      "Pinzas al frente",
+      "Raya marcada",
+      "Pierna amplia",
+      "Bolsillos laterales"
+    ],
+    "material": "Sarga de poliéster y viscosa",
+    "care": "Lavar en seco o a mano.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Arena",
+        "hex": "#D7C6AA",
+        "images": [
+          "images/products/pantalon-sastre-pinzas-arena-1.webp",
+          "images/products/pantalon-sastre-pinzas-arena-2.webp"
+        ],
+        "family": "beige"
+      },
+      {
+        "name": "Negro",
+        "hex": "#1C1B1A",
+        "images": [
+          "images/products/pantalon-sastre-pinzas-negro-1.webp",
+          "images/products/pantalon-sastre-pinzas-negro-2.webp"
+        ],
+        "family": "negro"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "XS",
+        "stock": 1
+      },
+      {
+        "label": "S",
+        "stock": 2
+      },
+      {
+        "label": "M",
+        "stock": 2
+      },
+      {
+        "label": "L",
+        "stock": 1
+      },
+      {
+        "label": "XL",
+        "stock": 1
+      }
+    ],
+    "isNew": false,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "sastre",
+      "oficina"
+    ],
+    "createdAt": "2026-09-18"
+  },
+  {
+    "id": "DV-0016",
+    "sku": "DV-MUJ-016",
+    "slug": "pantalon-palazzo-satinado",
+    "name": "Pantalón palazzo satinado",
+    "department": "mujer",
+    "category": "jeans-y-pantalones",
+    "price": 779,
+    "compareAtPrice": 960,
+    "currency": "MXN",
+    "description": "Satín fluido con pierna extra amplia y pretina elástica. Comodidad con brillo.",
+    "details": [
+      "Pierna extra amplia",
+      "Pretina elástica",
+      "Caída fluida",
+      "Tiro alto"
+    ],
+    "material": "Satín de poliéster",
+    "care": "Lavar a mano en agua fría.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Negro",
+        "hex": "#1D1B1A",
+        "images": [
+          "images/products/pantalon-palazzo-satinado-negro-1.webp",
+          "images/products/pantalon-palazzo-satinado-negro-2.webp"
+        ],
+        "family": "negro"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "XS",
+        "stock": 0
+      },
+      {
+        "label": "S",
+        "stock": 1
+      },
+      {
+        "label": "M",
+        "stock": 2
+      },
+      {
+        "label": "L",
+        "stock": 1
+      },
+      {
+        "label": "XL",
+        "stock": 0
+      }
+    ],
+    "isNew": false,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "satín",
+      "noche"
+    ],
+    "createdAt": "2026-08-12"
+  },
+  {
+    "id": "DV-0017",
+    "sku": "DV-MUJ-017",
+    "slug": "falda-midi-plisada",
+    "name": "Falda midi plisada",
+    "department": "mujer",
+    "category": "faldas",
+    "price": 699,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Plisado fino que se mueve contigo, con brillo satinado y pretina elástica.",
+    "details": [
+      "Plisado fino",
+      "Pretina elástica",
+      "Largo midi",
+      "Forro interior"
+    ],
+    "material": "Satín de poliéster",
+    "care": "Lavar a mano. No planchar los pliegues.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Champagne",
+        "hex": "#C9B08A",
+        "images": [
+          "images/products/falda-midi-plisada-champagne-1.webp",
+          "images/products/falda-midi-plisada-champagne-2.webp"
+        ],
+        "family": "beige"
+      },
+      {
+        "name": "Oliva",
+        "hex": "#77714F",
+        "images": [
+          "images/products/falda-midi-plisada-oliva-1.webp",
+          "images/products/falda-midi-plisada-oliva-2.webp"
+        ],
+        "family": "verde"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "XS",
+        "stock": 1
+      },
+      {
+        "label": "S",
+        "stock": 2
+      },
+      {
+        "label": "M",
+        "stock": 2
+      },
+      {
+        "label": "L",
+        "stock": 1
+      },
+      {
+        "label": "XL",
+        "stock": 1
+      }
+    ],
+    "isNew": true,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "plisado",
+      "satín"
+    ],
+    "createdAt": "2026-10-06"
+  },
+  {
+    "id": "DV-0018",
+    "sku": "DV-MUJ-018",
+    "slug": "falda-mini-mezclilla",
+    "name": "Falda mini de mezclilla",
+    "department": "mujer",
+    "category": "faldas",
+    "price": 499,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Mezclilla con dobladillo deshilachado, cinco bolsillos y tiro alto.",
+    "details": [
+      "Tiro alto",
+      "Dobladillo deshilachado",
+      "Cinco bolsillos",
+      "Cierre con botón"
+    ],
+    "material": "Mezclilla de algodón",
+    "care": "Lavar al revés en agua fría.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Azul medio",
+        "hex": "#7F9BBB",
+        "images": [
+          "images/products/falda-mini-mezclilla-azul-medio-1.webp",
+          "images/products/falda-mini-mezclilla-azul-medio-2.webp"
+        ],
+        "family": "azul"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "2",
+        "stock": 1
+      },
+      {
+        "label": "4",
+        "stock": 1
+      },
+      {
+        "label": "6",
+        "stock": 2
+      },
+      {
+        "label": "8",
+        "stock": 1
+      },
+      {
+        "label": "10",
+        "stock": 0
+      },
+      {
+        "label": "12",
+        "stock": 0
+      }
+    ],
+    "isNew": false,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "mezclilla",
+      "mini"
+    ],
+    "createdAt": "2026-08-18"
+  },
+  {
+    "id": "DV-0019",
+    "sku": "DV-MUJ-019",
+    "slug": "falda-slip-satinada",
+    "name": "Falda slip satinada",
+    "department": "mujer",
+    "category": "faldas",
+    "price": 629,
+    "compareAtPrice": 790,
+    "currency": "MXN",
+    "description": "Corte al bies con caída impecable. Combínala con suéter o con playera básica.",
+    "details": [
+      "Corte al bies",
+      "Pretina elástica",
+      "Largo midi",
+      "Brillo suave"
+    ],
+    "material": "Satín de poliéster",
+    "care": "Lavar a mano en agua fría.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Moka",
+        "hex": "#7A5C46",
+        "images": [
+          "images/products/falda-slip-satinada-moka-1.webp",
+          "images/products/falda-slip-satinada-moka-2.webp"
+        ],
+        "family": "cafe"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "XS",
+        "stock": 0
+      },
+      {
+        "label": "S",
+        "stock": 2
+      },
+      {
+        "label": "M",
+        "stock": 1
+      },
+      {
+        "label": "L",
+        "stock": 1
+      },
+      {
+        "label": "XL",
+        "stock": 0
+      }
+    ],
+    "isNew": false,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "satín",
+      "midi"
+    ],
+    "createdAt": "2026-09-05"
+  },
+  {
+    "id": "DV-0020",
+    "sku": "DV-MUJ-020",
+    "slug": "gabardina-clasica",
+    "name": "Gabardina clásica",
+    "department": "mujer",
+    "category": "abrigos-y-chamarras",
+    "price": 1490,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Doble botonadura, cinturón y charreteras. La pieza clave de toda temporada.",
+    "details": [
+      "Doble botonadura",
+      "Cinturón con hebilla",
+      "Charreteras y presillas en puños",
+      "Largo midi"
+    ],
+    "material": "Gabardina de algodón",
+    "care": "Lavar en seco.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Camel",
+        "hex": "#C4A37A",
+        "images": [
+          "images/products/gabardina-clasica-camel-1.webp",
+          "images/products/gabardina-clasica-camel-2.webp"
+        ],
+        "family": "cafe"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "XS",
+        "stock": 0
+      },
+      {
+        "label": "S",
+        "stock": 1
+      },
+      {
+        "label": "M",
+        "stock": 2
+      },
+      {
+        "label": "L",
+        "stock": 1
+      },
+      {
+        "label": "XL",
+        "stock": 1
+      }
+    ],
+    "isNew": true,
+    "isBestseller": false,
+    "isFeatured": true,
+    "tags": [
+      "abrigo",
+      "otoño"
+    ],
+    "createdAt": "2026-10-14"
+  },
+  {
+    "id": "DV-0021",
+    "sku": "DV-MUJ-021",
+    "slug": "blazer-sastre",
+    "name": "Blazer sastre",
+    "department": "mujer",
+    "category": "abrigos-y-chamarras",
+    "price": 1190,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Hombros estructurados, solapa de muesca y botones dorados. Eleva cualquier look.",
+    "details": [
+      "Solapa de muesca",
+      "Hombros estructurados",
+      "Bolsillos con cartera",
+      "Botones dorados"
+    ],
+    "material": "Crepé estructurado",
+    "care": "Lavar en seco.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Negro",
+        "hex": "#1C1B1A",
+        "images": [
+          "images/products/blazer-sastre-negro-1.webp",
+          "images/products/blazer-sastre-negro-2.webp"
+        ],
+        "family": "negro"
+      },
+      {
+        "name": "Marfil",
+        "hex": "#EEE7DA",
+        "images": [
+          "images/products/blazer-sastre-marfil-1.webp",
+          "images/products/blazer-sastre-marfil-2.webp"
+        ],
+        "family": "blanco"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "XS",
+        "stock": 1
+      },
+      {
+        "label": "S",
+        "stock": 2
+      },
+      {
+        "label": "M",
+        "stock": 2
+      },
+      {
+        "label": "L",
+        "stock": 1
+      },
+      {
+        "label": "XL",
+        "stock": 0
+      }
+    ],
+    "isNew": false,
+    "isBestseller": true,
+    "isFeatured": false,
+    "tags": [
+      "sastre",
+      "oficina"
+    ],
+    "createdAt": "2026-09-22"
+  },
+  {
+    "id": "DV-0022",
+    "sku": "DV-MUJ-022",
+    "slug": "chamarra-mezclilla",
+    "name": "Chamarra de mezclilla",
+    "department": "mujer",
+    "category": "abrigos-y-chamarras",
+    "price": 899,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Corte clásico con bolsillos de parche, costuras contrastantes y botones metálicos.",
+    "details": [
+      "Bolsillos con cartera",
+      "Costuras contrastantes",
+      "Botones metálicos",
+      "Puños con botón"
+    ],
+    "material": "Mezclilla 100% algodón",
+    "care": "Lavar al revés en agua fría.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Azul medio",
+        "hex": "#5F7FA3",
+        "images": [
+          "images/products/chamarra-mezclilla-azul-medio-1.webp",
+          "images/products/chamarra-mezclilla-azul-medio-2.webp"
+        ],
+        "family": "azul"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "XS",
+        "stock": 1
+      },
+      {
+        "label": "S",
+        "stock": 1
+      },
+      {
+        "label": "M",
+        "stock": 2
+      },
+      {
+        "label": "L",
+        "stock": 1
+      },
+      {
+        "label": "XL",
+        "stock": 0
+      }
+    ],
+    "isNew": false,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "mezclilla"
+    ],
+    "createdAt": "2026-08-25"
+  },
+  {
+    "id": "DV-0023",
+    "sku": "DV-MUJ-023",
+    "slug": "conjunto-punto-cardigan-falda",
+    "name": "Conjunto de punto cárdigan y falda",
+    "department": "mujer",
+    "category": "conjuntos",
+    "price": 1190,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Cárdigan corto con botones y falda midi a juego. Un look completo, suave y elegante.",
+    "details": [
+      "Cárdigan con botones",
+      "Falda midi con pretina elástica",
+      "Punto acanalado",
+      "Se venden juntos"
+    ],
+    "material": "Punto de viscosa",
+    "care": "Lavar a mano. Secar en horizontal.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Avena",
+        "hex": "#E3D6BF",
+        "images": [
+          "images/products/conjunto-punto-cardigan-falda-avena-1.webp",
+          "images/products/conjunto-punto-cardigan-falda-avena-2.webp"
+        ],
+        "family": "beige"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "XS",
+        "stock": 0
+      },
+      {
+        "label": "S",
+        "stock": 1
+      },
+      {
+        "label": "M",
+        "stock": 2
+      },
+      {
+        "label": "L",
+        "stock": 1
+      },
+      {
+        "label": "XL",
+        "stock": 0
+      }
+    ],
+    "isNew": true,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "punto",
+      "conjunto"
+    ],
+    "createdAt": "2026-10-11"
+  },
+  {
+    "id": "DV-0024",
+    "sku": "DV-MUJ-024",
+    "slug": "conjunto-sastre-arena",
+    "name": "Conjunto sastre blazer y pantalón",
+    "department": "mujer",
+    "category": "conjuntos",
+    "price": 1890,
+    "compareAtPrice": 2290,
+    "currency": "MXN",
+    "description": "Blazer de solapa y pantalón de pinzas en el mismo tono arena. Poder absoluto.",
+    "details": [
+      "Blazer con botones dorados",
+      "Pantalón de pinzas",
+      "Mismo tejido",
+      "Se venden juntos"
+    ],
+    "material": "Sarga de poliéster y viscosa",
+    "care": "Lavar en seco.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Arena",
+        "hex": "#D9C9AE",
+        "images": [
+          "images/products/conjunto-sastre-arena-arena-1.webp",
+          "images/products/conjunto-sastre-arena-arena-2.webp"
+        ],
+        "family": "beige"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "XS",
+        "stock": 0
+      },
+      {
+        "label": "S",
+        "stock": 1
+      },
+      {
+        "label": "M",
+        "stock": 1
+      },
+      {
+        "label": "L",
+        "stock": 1
+      },
+      {
+        "label": "XL",
+        "stock": 0
+      }
+    ],
+    "isNew": false,
+    "isBestseller": false,
+    "isFeatured": true,
+    "tags": [
+      "sastre",
+      "conjunto"
+    ],
+    "createdAt": "2026-09-30"
+  },
+  {
+    "id": "DV-0025",
+    "sku": "DV-MUJ-025",
+    "slug": "bolsa-estructurada",
+    "name": "Bolsa de mano estructurada",
+    "department": "mujer",
+    "category": "bolsas",
+    "price": 899,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Silueta estructurada con asa superior y cierre de giro dorado.",
+    "details": [
+      "Asa superior",
+      "Cierre de giro dorado",
+      "Forro interior con bolsillo",
+      "Medidas aprox.: 26 × 19 × 10 cm"
+    ],
+    "material": "Piel sintética",
+    "care": "Limpiar con paño seco.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Negro",
+        "hex": "#1D1C1B",
+        "images": [
+          "images/products/bolsa-estructurada-negro-1.webp",
+          "images/products/bolsa-estructurada-negro-2.webp"
+        ],
+        "family": "negro"
+      },
+      {
+        "name": "Caramelo",
+        "hex": "#A9774C",
+        "images": [
+          "images/products/bolsa-estructurada-caramelo-1.webp",
+          "images/products/bolsa-estructurada-caramelo-2.webp"
+        ],
+        "family": "cafe"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "Única",
+        "stock": 3
+      }
+    ],
+    "isNew": false,
+    "isBestseller": true,
+    "isFeatured": false,
+    "tags": [
+      "bolsa"
+    ],
+    "createdAt": "2026-09-12"
+  },
+  {
+    "id": "DV-0026",
+    "sku": "DV-MUJ-026",
+    "slug": "bolsa-baguette",
+    "name": "Bolsa baguette",
+    "department": "mujer",
+    "category": "bolsas",
+    "price": 749,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Formato baguette para llevar al hombro, con solapa y broche dorado.",
+    "details": [
+      "Asa corta de hombro",
+      "Solapa con broche dorado",
+      "Forro interior",
+      "Medidas aprox.: 28 × 14 × 7 cm"
+    ],
+    "material": "Piel sintética",
+    "care": "Limpiar con paño seco.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Moka",
+        "hex": "#5E4636",
+        "images": [
+          "images/products/bolsa-baguette-moka-1.webp",
+          "images/products/bolsa-baguette-moka-2.webp"
+        ],
+        "family": "cafe"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "Única",
+        "stock": 2
+      }
+    ],
+    "isNew": true,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "bolsa"
+    ],
+    "createdAt": "2026-10-02"
+  },
+  {
+    "id": "DV-0027",
+    "sku": "DV-MUJ-027",
+    "slug": "bolsa-tote",
+    "name": "Tote de piel sintética",
+    "department": "mujer",
+    "category": "bolsas",
+    "price": 849,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Amplia, ligera y con asas largas. Para el trabajo, la universidad o el viaje.",
+    "details": [
+      "Asas largas",
+      "Interior amplio",
+      "Bolsillo interior",
+      "Medidas aprox.: 38 × 30 × 12 cm"
+    ],
+    "material": "Piel sintética",
+    "care": "Limpiar con paño seco.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Camel",
+        "hex": "#B8875A",
+        "images": [
+          "images/products/bolsa-tote-camel-1.webp",
+          "images/products/bolsa-tote-camel-2.webp"
+        ],
+        "family": "cafe"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "Única",
+        "stock": 2
+      }
+    ],
+    "isNew": false,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "bolsa"
+    ],
+    "createdAt": "2026-08-08"
+  },
+  {
+    "id": "DV-0028",
+    "sku": "DV-NNA-001",
+    "slug": "vestido-tul-fiesta",
+    "name": "Vestido de tul para fiesta",
+    "department": "ninas",
+    "category": "vestidos-ninas",
+    "price": 649,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Capas de tul, destellos sutiles y moño de satín en la cintura. Para su día especial.",
+    "details": [
+      "Falda de tul en capas",
+      "Moño de satín",
+      "Mangas de olán",
+      "Forro suave de algodón"
+    ],
+    "material": "Tul de poliéster con forro de algodón",
+    "care": "Lavar a mano en agua fría.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Rosa palo",
+        "hex": "#EBCFC6",
+        "images": [
+          "images/products/vestido-tul-fiesta-rosa-palo-1.webp",
+          "images/products/vestido-tul-fiesta-rosa-palo-2.webp"
+        ],
+        "family": "rosa"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "2T",
+        "stock": 1
+      },
+      {
+        "label": "3T",
+        "stock": 2
+      },
+      {
+        "label": "4T",
+        "stock": 2
+      },
+      {
+        "label": "5",
+        "stock": 1
+      },
+      {
+        "label": "6",
+        "stock": 1
+      },
+      {
+        "label": "8",
+        "stock": 0
+      },
+      {
+        "label": "10",
+        "stock": 1
+      },
+      {
+        "label": "12",
+        "stock": 0
+      }
+    ],
+    "isNew": true,
+    "isBestseller": false,
+    "isFeatured": true,
+    "tags": [
+      "fiesta"
+    ],
+    "createdAt": "2026-10-09"
+  },
+  {
+    "id": "DV-0029",
+    "sku": "DV-NNA-002",
+    "slug": "vestido-floral-tirantes",
+    "name": "Vestido floral de tirantes",
+    "department": "ninas",
+    "category": "vestidos-ninas",
+    "price": 499,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Estampado floral, tirantes con moño y falda de dos niveles. Fresco y alegre.",
+    "details": [
+      "Tirantes con moño",
+      "Falda de dos niveles",
+      "Estampado floral",
+      "Algodón suave"
+    ],
+    "material": "Algodón",
+    "care": "Lavar a máquina en frío.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Marfil floral",
+        "hex": "#F6F0E4",
+        "images": [
+          "images/products/vestido-floral-tirantes-marfil-floral-1.webp",
+          "images/products/vestido-floral-tirantes-marfil-floral-2.webp"
+        ],
+        "family": "estampado"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "2T",
+        "stock": 0
+      },
+      {
+        "label": "3T",
+        "stock": 1
+      },
+      {
+        "label": "4T",
+        "stock": 2
+      },
+      {
+        "label": "5",
+        "stock": 2
+      },
+      {
+        "label": "6",
+        "stock": 1
+      },
+      {
+        "label": "8",
+        "stock": 1
+      },
+      {
+        "label": "10",
+        "stock": 1
+      },
+      {
+        "label": "12",
+        "stock": 0
+      }
+    ],
+    "isNew": false,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "floral",
+      "verano"
+    ],
+    "createdAt": "2026-09-14"
+  },
+  {
+    "id": "DV-0030",
+    "sku": "DV-NNA-003",
+    "slug": "jumper-mezclilla-olanes",
+    "name": "Jumper de mezclilla con olanes",
+    "department": "ninas",
+    "category": "jumpers-ninas",
+    "price": 549,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Mezclilla suave con olanes en los tirantes y falda con vuelo.",
+    "details": [
+      "Tirantes con olán",
+      "Botones metálicos",
+      "Bolsillo al frente",
+      "Falda con vuelo"
+    ],
+    "material": "Mezclilla ligera de algodón",
+    "care": "Lavar al revés en agua fría.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Azul claro",
+        "hex": "#9DB3CB",
+        "images": [
+          "images/products/jumper-mezclilla-olanes-azul-claro-1.webp",
+          "images/products/jumper-mezclilla-olanes-azul-claro-2.webp"
+        ],
+        "family": "azul"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "2T",
+        "stock": 1
+      },
+      {
+        "label": "3T",
+        "stock": 1
+      },
+      {
+        "label": "4T",
+        "stock": 2
+      },
+      {
+        "label": "5",
+        "stock": 2
+      },
+      {
+        "label": "6",
+        "stock": 1
+      },
+      {
+        "label": "8",
+        "stock": 1
+      },
+      {
+        "label": "10",
+        "stock": 0
+      },
+      {
+        "label": "12",
+        "stock": 0
+      }
+    ],
+    "isNew": false,
+    "isBestseller": true,
+    "isFeatured": false,
+    "tags": [
+      "mezclilla"
+    ],
+    "createdAt": "2026-09-01"
+  },
+  {
+    "id": "DV-0031",
+    "sku": "DV-NNA-004",
+    "slug": "cardigan-botones-perla",
+    "name": "Cárdigan con botones perla",
+    "department": "ninas",
+    "category": "tops-ninas",
+    "price": 459,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Punto suave con botones tipo perla. Perfecto sobre vestidos o con jeans.",
+    "details": [
+      "Botones tipo perla",
+      "Punto suave",
+      "Puños acanalados",
+      "Escote en V"
+    ],
+    "material": "Algodón y acrílico",
+    "care": "Lavar a mano.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Crema",
+        "hex": "#F3E9DA",
+        "images": [
+          "images/products/cardigan-botones-perla-crema-1.webp",
+          "images/products/cardigan-botones-perla-crema-2.webp"
+        ],
+        "family": "beige"
+      },
+      {
+        "name": "Rosa",
+        "hex": "#E8CFC7",
+        "images": [
+          "images/products/cardigan-botones-perla-rosa-1.webp",
+          "images/products/cardigan-botones-perla-rosa-2.webp"
+        ],
+        "family": "rosa"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "2T",
+        "stock": 1
+      },
+      {
+        "label": "3T",
+        "stock": 1
+      },
+      {
+        "label": "4T",
+        "stock": 1
+      },
+      {
+        "label": "5",
+        "stock": 2
+      },
+      {
+        "label": "6",
+        "stock": 2
+      },
+      {
+        "label": "8",
+        "stock": 1
+      },
+      {
+        "label": "10",
+        "stock": 1
+      },
+      {
+        "label": "12",
+        "stock": 0
+      }
+    ],
+    "isNew": false,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "punto"
+    ],
+    "createdAt": "2026-09-24"
+  },
+  {
+    "id": "DV-0032",
+    "sku": "DV-NNA-005",
+    "slug": "blusa-cuello-bebe",
+    "name": "Blusa con cuello bebé",
+    "department": "ninas",
+    "category": "tops-ninas",
+    "price": 399,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Cuello redondo tipo bebé, mangas abullonadas y botones al frente.",
+    "details": [
+      "Cuello bebé",
+      "Mangas abullonadas",
+      "Botones al frente",
+      "Algodón ligero"
+    ],
+    "material": "Algodón",
+    "care": "Lavar a máquina en frío.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Blanco",
+        "hex": "#FBF9F4",
+        "images": [
+          "images/products/blusa-cuello-bebe-blanco-1.webp",
+          "images/products/blusa-cuello-bebe-blanco-2.webp"
+        ],
+        "family": "blanco"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "2T",
+        "stock": 1
+      },
+      {
+        "label": "3T",
+        "stock": 1
+      },
+      {
+        "label": "4T",
+        "stock": 2
+      },
+      {
+        "label": "5",
+        "stock": 1
+      },
+      {
+        "label": "6",
+        "stock": 1
+      },
+      {
+        "label": "8",
+        "stock": 1
+      },
+      {
+        "label": "10",
+        "stock": 0
+      },
+      {
+        "label": "12",
+        "stock": 0
+      }
+    ],
+    "isNew": true,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "blusa"
+    ],
+    "createdAt": "2026-10-01"
+  },
+  {
+    "id": "DV-0033",
+    "sku": "DV-NNA-006",
+    "slug": "vestido-lunares-nina",
+    "name": "Vestido de lunares con vuelo",
+    "department": "ninas",
+    "category": "vestidos-ninas",
+    "price": 529,
+    "compareAtPrice": 650,
+    "currency": "MXN",
+    "description": "Lunares clásicos, mangas abullonadas y una falda que gira y gira.",
+    "details": [
+      "Escote cuadrado",
+      "Mangas abullonadas",
+      "Falda con mucho vuelo",
+      "Cierre posterior"
+    ],
+    "material": "Algodón",
+    "care": "Lavar a máquina en frío.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Marino",
+        "hex": "#24324D",
+        "images": [
+          "images/products/vestido-lunares-nina-marino-1.webp",
+          "images/products/vestido-lunares-nina-marino-2.webp"
+        ],
+        "family": "estampado"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "2T",
+        "stock": 0
+      },
+      {
+        "label": "3T",
+        "stock": 1
+      },
+      {
+        "label": "4T",
+        "stock": 1
+      },
+      {
+        "label": "5",
+        "stock": 1
+      },
+      {
+        "label": "6",
+        "stock": 2
+      },
+      {
+        "label": "8",
+        "stock": 1
+      },
+      {
+        "label": "10",
+        "stock": 0
+      },
+      {
+        "label": "12",
+        "stock": 0
+      }
+    ],
+    "isNew": false,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "lunares"
+    ],
+    "createdAt": "2026-08-22"
+  },
+  {
+    "id": "DV-0034",
+    "sku": "DV-NNO-001",
+    "slug": "playera-rayas-nino",
+    "name": "Playera de rayas",
+    "department": "ninos",
+    "category": "playeras-ninos",
+    "price": 299,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Algodón suave con rayas clásicas y bolsillo al pecho.",
+    "details": [
+      "Cuello redondo",
+      "Manga corta",
+      "Bolsillo al pecho",
+      "Algodón suave"
+    ],
+    "material": "Algodón",
+    "care": "Lavar a máquina en frío.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Blanco y azul",
+        "hex": "#3E5F8A",
+        "images": [
+          "images/products/playera-rayas-nino-blanco-y-azul-1.webp",
+          "images/products/playera-rayas-nino-blanco-y-azul-2.webp"
+        ],
+        "family": "estampado"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "2T",
+        "stock": 1
+      },
+      {
+        "label": "3T",
+        "stock": 2
+      },
+      {
+        "label": "4T",
+        "stock": 2
+      },
+      {
+        "label": "5",
+        "stock": 2
+      },
+      {
+        "label": "6",
+        "stock": 2
+      },
+      {
+        "label": "8",
+        "stock": 1
+      },
+      {
+        "label": "10",
+        "stock": 1
+      },
+      {
+        "label": "12",
+        "stock": 1
+      }
+    ],
+    "isNew": false,
+    "isBestseller": true,
+    "isFeatured": false,
+    "tags": [
+      "rayas",
+      "básico"
+    ],
+    "createdAt": "2026-09-08"
+  },
+  {
+    "id": "DV-0035",
+    "sku": "DV-NNO-002",
+    "slug": "overol-mezclilla",
+    "name": "Overol de mezclilla",
+    "department": "ninos",
+    "category": "pantalones-ninos",
+    "price": 599,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Overol clásico con tirantes ajustables, botones metálicos y bolsillo al pecho.",
+    "details": [
+      "Tirantes ajustables",
+      "Botones laterales",
+      "Bolsillo al pecho",
+      "Mezclilla resistente"
+    ],
+    "material": "Mezclilla de algodón",
+    "care": "Lavar al revés en agua fría.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Azul medio",
+        "hex": "#5F7FA3",
+        "images": [
+          "images/products/overol-mezclilla-azul-medio-1.webp",
+          "images/products/overol-mezclilla-azul-medio-2.webp"
+        ],
+        "family": "azul"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "2T",
+        "stock": 1
+      },
+      {
+        "label": "3T",
+        "stock": 1
+      },
+      {
+        "label": "4T",
+        "stock": 2
+      },
+      {
+        "label": "5",
+        "stock": 1
+      },
+      {
+        "label": "6",
+        "stock": 1
+      },
+      {
+        "label": "8",
+        "stock": 1
+      },
+      {
+        "label": "10",
+        "stock": 0
+      },
+      {
+        "label": "12",
+        "stock": 0
+      }
+    ],
+    "isNew": true,
+    "isBestseller": false,
+    "isFeatured": true,
+    "tags": [
+      "mezclilla"
+    ],
+    "createdAt": "2026-10-07"
+  },
+  {
+    "id": "DV-0036",
+    "sku": "DV-NNO-003",
+    "slug": "polo-pique-nino",
+    "name": "Polo piqué",
+    "department": "ninos",
+    "category": "playeras-ninos",
+    "price": 349,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Piqué de algodón con cuello y botones. Arreglado sin dejar de ser cómodo.",
+    "details": [
+      "Cuello polo",
+      "Dos botones",
+      "Manga corta",
+      "Piqué de algodón"
+    ],
+    "material": "Piqué de algodón",
+    "care": "Lavar a máquina en frío.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Salvia",
+        "hex": "#8A9A7E",
+        "images": [
+          "images/products/polo-pique-nino-salvia-1.webp",
+          "images/products/polo-pique-nino-salvia-2.webp"
+        ],
+        "family": "verde"
+      },
+      {
+        "name": "Marino",
+        "hex": "#22304A",
+        "images": [
+          "images/products/polo-pique-nino-marino-1.webp",
+          "images/products/polo-pique-nino-marino-2.webp"
+        ],
+        "family": "azul"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "2T",
+        "stock": 1
+      },
+      {
+        "label": "3T",
+        "stock": 1
+      },
+      {
+        "label": "4T",
+        "stock": 1
+      },
+      {
+        "label": "5",
+        "stock": 2
+      },
+      {
+        "label": "6",
+        "stock": 2
+      },
+      {
+        "label": "8",
+        "stock": 1
+      },
+      {
+        "label": "10",
+        "stock": 1
+      },
+      {
+        "label": "12",
+        "stock": 1
+      }
+    ],
+    "isNew": false,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "polo"
+    ],
+    "createdAt": "2026-09-16"
+  },
+  {
+    "id": "DV-0037",
+    "sku": "DV-NNO-004",
+    "slug": "sudadera-capucha-nino",
+    "name": "Sudadera con capucha",
+    "department": "ninos",
+    "category": "sudaderas-ninos",
+    "price": 549,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Felpa suave por dentro, capucha con cordón y bolsillo canguro.",
+    "details": [
+      "Capucha con cordón",
+      "Bolsillo canguro",
+      "Puños y bajo acanalados",
+      "Felpa interior"
+    ],
+    "material": "Algodón y poliéster",
+    "care": "Lavar a máquina en frío.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Gris jaspe",
+        "hex": "#A9A7A2",
+        "images": [
+          "images/products/sudadera-capucha-nino-gris-jaspe-1.webp",
+          "images/products/sudadera-capucha-nino-gris-jaspe-2.webp"
+        ],
+        "family": "gris"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "2T",
+        "stock": 0
+      },
+      {
+        "label": "3T",
+        "stock": 1
+      },
+      {
+        "label": "4T",
+        "stock": 2
+      },
+      {
+        "label": "5",
+        "stock": 2
+      },
+      {
+        "label": "6",
+        "stock": 1
+      },
+      {
+        "label": "8",
+        "stock": 1
+      },
+      {
+        "label": "10",
+        "stock": 1
+      },
+      {
+        "label": "12",
+        "stock": 1
+      }
+    ],
+    "isNew": false,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "sudadera"
+    ],
+    "createdAt": "2026-09-27"
+  },
+  {
+    "id": "DV-0038",
+    "sku": "DV-NNO-005",
+    "slug": "camisa-franela-nino",
+    "name": "Camisa de franela a cuadros",
+    "department": "ninos",
+    "category": "sudaderas-ninos",
+    "price": 449,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Franela cálida a cuadros con botones al frente y bolsillo al pecho.",
+    "details": [
+      "Franela suave",
+      "Botones al frente",
+      "Bolsillo al pecho",
+      "Manga larga"
+    ],
+    "material": "Franela de algodón",
+    "care": "Lavar a máquina en frío.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Rojo",
+        "hex": "#9E3B32",
+        "images": [
+          "images/products/camisa-franela-nino-rojo-1.webp",
+          "images/products/camisa-franela-nino-rojo-2.webp"
+        ],
+        "family": "estampado"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "2T",
+        "stock": 1
+      },
+      {
+        "label": "3T",
+        "stock": 1
+      },
+      {
+        "label": "4T",
+        "stock": 1
+      },
+      {
+        "label": "5",
+        "stock": 1
+      },
+      {
+        "label": "6",
+        "stock": 2
+      },
+      {
+        "label": "8",
+        "stock": 1
+      },
+      {
+        "label": "10",
+        "stock": 1
+      },
+      {
+        "label": "12",
+        "stock": 0
+      }
+    ],
+    "isNew": false,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "cuadros",
+      "otoño"
+    ],
+    "createdAt": "2026-10-03"
+  },
+  {
+    "id": "DV-0039",
+    "sku": "DV-NNO-006",
+    "slug": "pantalon-jogger-nino",
+    "name": "Pantalón jogger",
+    "department": "ninos",
+    "category": "pantalones-ninos",
+    "price": 399,
+    "compareAtPrice": 490,
+    "currency": "MXN",
+    "description": "Cintura elástica con cordón y puños acanalados. Listo para correr y jugar.",
+    "details": [
+      "Cintura elástica con cordón",
+      "Puños acanalados",
+      "Bolsillos laterales",
+      "Tela resistente"
+    ],
+    "material": "Sarga de algodón",
+    "care": "Lavar a máquina en frío.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Caqui",
+        "hex": "#B5A27E",
+        "images": [
+          "images/products/pantalon-jogger-nino-caqui-1.webp",
+          "images/products/pantalon-jogger-nino-caqui-2.webp"
+        ],
+        "family": "beige"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "2T",
+        "stock": 1
+      },
+      {
+        "label": "3T",
+        "stock": 1
+      },
+      {
+        "label": "4T",
+        "stock": 2
+      },
+      {
+        "label": "5",
+        "stock": 1
+      },
+      {
+        "label": "6",
+        "stock": 1
+      },
+      {
+        "label": "8",
+        "stock": 1
+      },
+      {
+        "label": "10",
+        "stock": 1
+      },
+      {
+        "label": "12",
+        "stock": 0
+      }
+    ],
+    "isNew": false,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "jogger"
+    ],
+    "createdAt": "2026-08-15"
+  },
+  {
+    "id": "DV-0040",
+    "sku": "DV-HOM-001",
+    "slug": "camisa-oxford",
+    "name": "Camisa Oxford",
+    "department": "hombre",
+    "category": "camisas-hombre",
+    "price": 749,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Tejido Oxford con cuello abotonado y bolsillo al pecho. El básico de todo guardarropa.",
+    "details": [
+      "Cuello abotonado",
+      "Bolsillo al pecho",
+      "Puños con botón",
+      "Corte regular"
+    ],
+    "material": "Algodón Oxford",
+    "care": "Lavar a máquina en frío. Planchar a temperatura media.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Azul cielo",
+        "hex": "#BFD3E6",
+        "images": [
+          "images/products/camisa-oxford-azul-cielo-1.webp",
+          "images/products/camisa-oxford-azul-cielo-2.webp"
+        ],
+        "family": "azul"
+      },
+      {
+        "name": "Blanco",
+        "hex": "#F6F4EF",
+        "images": [
+          "images/products/camisa-oxford-blanco-1.webp",
+          "images/products/camisa-oxford-blanco-2.webp"
+        ],
+        "family": "blanco"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "S",
+        "stock": 1
+      },
+      {
+        "label": "M",
+        "stock": 3
+      },
+      {
+        "label": "L",
+        "stock": 2
+      },
+      {
+        "label": "XL",
+        "stock": 1
+      }
+    ],
+    "isNew": false,
+    "isBestseller": true,
+    "isFeatured": true,
+    "tags": [
+      "camisa"
+    ],
+    "createdAt": "2026-09-19"
+  },
+  {
+    "id": "DV-0041",
+    "sku": "DV-HOM-002",
+    "slug": "polo-pique-hombre",
+    "name": "Polo piqué",
+    "department": "hombre",
+    "category": "camisas-hombre",
+    "price": 599,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Piqué de algodón con cuello acanalado y tres botones. Casual con un toque pulido.",
+    "details": [
+      "Cuello y puños acanalados",
+      "Tapeta de botones",
+      "Corte regular",
+      "Piqué de algodón"
+    ],
+    "material": "Piqué de algodón",
+    "care": "Lavar a máquina en frío.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Marino",
+        "hex": "#1F2B45",
+        "images": [
+          "images/products/polo-pique-hombre-marino-1.webp",
+          "images/products/polo-pique-hombre-marino-2.webp"
+        ],
+        "family": "azul"
+      },
+      {
+        "name": "Oliva",
+        "hex": "#6E6A4E",
+        "images": [
+          "images/products/polo-pique-hombre-oliva-1.webp",
+          "images/products/polo-pique-hombre-oliva-2.webp"
+        ],
+        "family": "verde"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "S",
+        "stock": 2
+      },
+      {
+        "label": "M",
+        "stock": 2
+      },
+      {
+        "label": "L",
+        "stock": 2
+      },
+      {
+        "label": "XL",
+        "stock": 1
+      }
+    ],
+    "isNew": false,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "polo"
+    ],
+    "createdAt": "2026-09-11"
+  },
+  {
+    "id": "DV-0042",
+    "sku": "DV-HOM-003",
+    "slug": "pantalon-chino",
+    "name": "Pantalón chino",
+    "department": "hombre",
+    "category": "pantalones-hombre",
+    "price": 799,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Sarga de algodón con un toque de elasticidad y corte recto. Va con todo.",
+    "details": [
+      "Corte recto",
+      "Bolsillos laterales",
+      "Bolsillos traseros con botón",
+      "Algodón con elastano"
+    ],
+    "material": "Sarga de algodón con elastano",
+    "care": "Lavar a máquina en frío.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Caqui",
+        "hex": "#C8B48E",
+        "images": [
+          "images/products/pantalon-chino-caqui-1.webp",
+          "images/products/pantalon-chino-caqui-2.webp"
+        ],
+        "family": "beige"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "30",
+        "stock": 1
+      },
+      {
+        "label": "32",
+        "stock": 2
+      },
+      {
+        "label": "34",
+        "stock": 2
+      },
+      {
+        "label": "36",
+        "stock": 1
+      }
+    ],
+    "isNew": false,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "chino"
+    ],
+    "createdAt": "2026-08-26"
+  },
+  {
+    "id": "DV-0043",
+    "sku": "DV-HOM-004",
+    "slug": "sueter-punto-hombre",
+    "name": "Suéter de punto",
+    "department": "hombre",
+    "category": "abrigo-hombre",
+    "price": 849,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Punto jaspeado de cuello redondo con puños y bajo acanalados.",
+    "details": [
+      "Cuello redondo",
+      "Punto jaspeado",
+      "Puños y bajo acanalados",
+      "Corte regular"
+    ],
+    "material": "Mezcla de lana y acrílico",
+    "care": "Lavar a mano. Secar en horizontal.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Gris jaspe",
+        "hex": "#9C9A95",
+        "images": [
+          "images/products/sueter-punto-hombre-gris-jaspe-1.webp",
+          "images/products/sueter-punto-hombre-gris-jaspe-2.webp"
+        ],
+        "family": "gris"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "S",
+        "stock": 1
+      },
+      {
+        "label": "M",
+        "stock": 2
+      },
+      {
+        "label": "L",
+        "stock": 2
+      },
+      {
+        "label": "XL",
+        "stock": 1
+      }
+    ],
+    "isNew": true,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "punto"
+    ],
+    "createdAt": "2026-10-05"
+  },
+  {
+    "id": "DV-0044",
+    "sku": "DV-HOM-005",
+    "slug": "chamarra-mezclilla-hombre",
+    "name": "Chamarra de mezclilla",
+    "department": "hombre",
+    "category": "abrigo-hombre",
+    "price": 1090,
+    "compareAtPrice": null,
+    "currency": "MXN",
+    "description": "Mezclilla índigo con costuras contrastantes y botones metálicos. Un clásico que mejora con el uso.",
+    "details": [
+      "Bolsillos con cartera",
+      "Botones metálicos",
+      "Puños con botón",
+      "Mezclilla rígida"
+    ],
+    "material": "Mezclilla 100% algodón",
+    "care": "Lavar al revés en agua fría.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Índigo",
+        "hex": "#33476B",
+        "images": [
+          "images/products/chamarra-mezclilla-hombre-indigo-1.webp",
+          "images/products/chamarra-mezclilla-hombre-indigo-2.webp"
+        ],
+        "family": "azul"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "S",
+        "stock": 1
+      },
+      {
+        "label": "M",
+        "stock": 1
+      },
+      {
+        "label": "L",
+        "stock": 2
+      },
+      {
+        "label": "XL",
+        "stock": 1
+      }
+    ],
+    "isNew": false,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "mezclilla"
+    ],
+    "createdAt": "2026-09-03"
+  },
+  {
+    "id": "DV-0045",
+    "sku": "DV-HOM-006",
+    "slug": "sudadera-capucha-hombre",
+    "name": "Sudadera con capucha",
+    "department": "hombre",
+    "category": "abrigo-hombre",
+    "price": 749,
+    "compareAtPrice": 920,
+    "currency": "MXN",
+    "description": "Felpa gruesa, capucha con cordón y bolsillo canguro. Comodidad de todos los días.",
+    "details": [
+      "Capucha con cordón",
+      "Bolsillo canguro",
+      "Puños y bajo acanalados",
+      "Felpa interior"
+    ],
+    "material": "Algodón y poliéster",
+    "care": "Lavar a máquina en frío.",
+    "origin": "Importado de EE. UU.",
+    "colors": [
+      {
+        "name": "Negro",
+        "hex": "#232221",
+        "images": [
+          "images/products/sudadera-capucha-hombre-negro-1.webp",
+          "images/products/sudadera-capucha-hombre-negro-2.webp"
+        ],
+        "family": "negro"
+      }
+    ],
+    "sizes": [
+      {
+        "label": "S",
+        "stock": 1
+      },
+      {
+        "label": "M",
+        "stock": 2
+      },
+      {
+        "label": "L",
+        "stock": 1
+      },
+      {
+        "label": "XL",
+        "stock": 1
+      }
+    ],
+    "isNew": false,
+    "isBestseller": false,
+    "isFeatured": false,
+    "tags": [
+      "sudadera"
+    ],
+    "createdAt": "2026-08-10"
+  }
+]

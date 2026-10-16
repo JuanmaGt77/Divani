@@ -1,0 +1,67 @@
+/* Cintas cruzadas: una de tinta y una de vidrio que se cruzan y corren en sentidos opuestos */
+.ribbons {
+  position: relative;
+  height: clamp(150px, 15vw, 210px);
+  overflow: clip;
+  margin-block: clamp(4px, 1.5vw, 20px);
+}
+.ribbon {
+  position: absolute;
+  left: -6%;
+  right: -6%;
+  top: 50%;
+  height: clamp(48px, 4.6vw, 64px);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+.ribbon--ink {
+  background: var(--ink);
+  color: var(--on-ink);
+  transform: translateY(-50%) rotate(-3.4deg);
+  box-shadow: 0 20px 40px -22px rgb(23 21 19 / 0.7);
+}
+.ribbon--glass {
+  --glass-tint: rgb(236 226 210 / 0.42);
+  color: var(--ink);
+  transform: translateY(-50%) rotate(2.8deg);
+  border-radius: 0;
+}
+.ribbon__track {
+  display: flex;
+  flex: none;
+  width: max-content;
+  animation: marquee var(--marquee-dur, 46s) linear infinite;
+}
+.ribbon__track--rev { animation-name: marquee-rev; }
+.ribbon__track > span {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(20px, 2.4vw, 34px);
+  padding-left: clamp(20px, 2.4vw, 34px);
+  font-size: clamp(0.75rem, 0.6rem + 0.45vw, 0.9375rem);
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.ribbon__track > span::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  transform: rotate(45deg);
+  background: var(--camel);
+}
+.ribbon__track em {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 1.65em;
+  line-height: 1;
+}
+.ribbon--ink .ribbon__track em { color: var(--latte); }
+@media (prefers-reduced-motion: reduce) {
+  .ribbon__track { animation: none; }
+}

@@ -1,0 +1,50 @@
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+<!-- Cinta superior de avisos (se llena desde settings.announcements) -->
+<div class="announce" role="region" aria-label="Avisos de la tienda">
+  <div class="announce__viewport">
+    <div class="announce__track" data-announce>
+      <span class="announce__item">Ropa americana con etiqueta original</span>
+      <span class="announce__item">Compra fácil por WhatsApp</span>
+      <span class="announce__item">Envíos a todo México</span>
+    </div>
+  </div>
+</div>
+
+<header class="site-header" data-header>
+  <div class="site-header__bar glass glass--live pill" data-glass-live>
+    <button class="icon-btn site-header__menu" type="button" data-open="menu" aria-label="Abrir menú">
+      <svg class="icon" aria-hidden="true"><use href="#i-menu"></use></svg>
+    </button>
+
+    <nav class="site-nav" aria-label="Principal">
+      <a class="site-nav__link" href="tienda.html?depto=mujer" data-mega="mujer">Mujer</a>
+      <a class="site-nav__link" href="tienda.html?depto=ninas" data-mega="ninas">Niñas</a>
+      <a class="site-nav__link" href="tienda.html?depto=ninos" data-mega="ninos">Niños</a>
+      <a class="site-nav__link" href="tienda.html?depto=hombre" data-mega="hombre">Hombre</a>
+      <a class="site-nav__link" href="tienda.html?orden=nuevo">Novedades</a>
+    </nav>
+
+    <a class="site-logo" href="index.html" aria-label="Divani — inicio">
+      <svg viewBox="0 0 805 247" aria-hidden="true"><use href="#logo-wordmark"></use></svg>
+    </a>
+
+    <div class="site-actions">
+      <a class="site-nav__link site-actions__about" href="index.html#nosotros">Nosotros</a>
+      <button class="icon-btn" type="button" data-open="search" aria-label="Buscar">
+        <svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg>
+      </button>
+      <button class="icon-btn site-actions__fav" type="button" data-open="favorites" aria-label="Favoritos">
+        <svg class="icon" aria-hidden="true"><use href="#i-heart"></use></svg>
+        <span class="count-badge" data-fav-count></span>
+      </button>
+      <button class="icon-btn" type="button" data-open="cart" aria-label="Bolsa de compras">
+        <svg class="icon" aria-hidden="true"><use href="#i-bag"></use></svg>
+        <span class="count-badge" data-cart-count></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Menú desplegable por departamento (escritorio) -->
+  <div class="mega glass glass--strong" data-mega-panel hidden></div>
+</header>

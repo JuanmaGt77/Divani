@@ -1,0 +1,35 @@
+[
+  {
+    "id": "look-sastreria-suave",
+    "eyebrow": "Arma tu look",
+    "title": "Sastrería *suave*",
+    "text": "Blazer marfil, top acanalado y pantalón de pinzas arena: la fórmula para verte impecable de la oficina a la cena.",
+    "image": "images/lookbook/look-01.webp",
+    "hotspots": [
+      {
+        "product": "top-acanalado",
+        "color": "Negro",
+        "x": 54.2,
+        "y": 31
+      },
+      {
+        "product": "pantalon-sastre-pinzas",
+        "color": "Arena",
+        "x": 73.3,
+        "y": 60.5
+      },
+      {
+        "product": "blazer-sastre",
+        "color": "Marfil",
+        "x": 26.7,
+        "y": 44
+      },
+      {
+        "product": "bolsa-estructurada",
+        "color": "Negro",
+        "x": 25,
+        "y": 84
+      }
+    ]
+  }
+]

@@ -1,0 +1,226 @@
+{
+  "departments": [
+    {
+      "slug": "mujer",
+      "name": "Mujer",
+      "image": "images/categories/vestidos.webp",
+      "description": "Vestidos, sastrería, mezclilla y básicos americanos."
+    },
+    {
+      "slug": "ninas",
+      "name": "Niñas",
+      "image": "images/categories/ninas.webp",
+      "description": "Vestidos de fiesta, mezclilla y suaves básicos."
+    },
+    {
+      "slug": "ninos",
+      "name": "Niños",
+      "image": "images/categories/ninos.webp",
+      "description": "Playeras, overoles y sudaderas para jugar."
+    },
+    {
+      "slug": "hombre",
+      "name": "Hombre",
+      "image": "images/categories/hombre.webp",
+      "description": "Camisas, polos, chinos y chamarras."
+    }
+  ],
+  "categories": [
+    {
+      "slug": "vestidos",
+      "department": "mujer",
+      "name": "Vestidos",
+      "description": "De día, de noche y para cada ocasión.",
+      "order": 1,
+      "image": "images/categories/vestidos.webp",
+      "productCount": 6
+    },
+    {
+      "slug": "blusas-y-tops",
+      "department": "mujer",
+      "name": "Blusas y tops",
+      "description": "Básicos impecables y piezas protagonistas.",
+      "order": 2,
+      "image": "images/categories/blusas-y-tops.webp",
+      "productCount": 6
+    },
+    {
+      "slug": "jeans-y-pantalones",
+      "department": "mujer",
+      "name": "Jeans y pantalones",
+      "description": "Mezclilla americana y cortes sastre.",
+      "order": 3,
+      "image": "images/categories/jeans-y-pantalones.webp",
+      "productCount": 4
+    },
+    {
+      "slug": "faldas",
+      "department": "mujer",
+      "name": "Faldas",
+      "description": "Plisadas, satinadas y de mezclilla.",
+      "order": 4,
+      "image": "images/categories/faldas.webp",
+      "productCount": 3
+    },
+    {
+      "slug": "abrigos-y-chamarras",
+      "department": "mujer",
+      "name": "Abrigos y chamarras",
+      "description": "Capas que elevan cualquier look.",
+      "order": 5,
+      "image": "images/categories/abrigos-y-chamarras.webp",
+      "productCount": 3
+    },
+    {
+      "slug": "conjuntos",
+      "department": "mujer",
+      "name": "Conjuntos",
+      "description": "Looks completos, listos para usar.",
+      "order": 6,
+      "image": "images/categories/conjuntos.webp",
+      "productCount": 2
+    },
+    {
+      "slug": "bolsas",
+      "department": "mujer",
+      "name": "Bolsas",
+      "description": "El accesorio que lo cambia todo.",
+      "order": 7,
+      "image": "images/categories/bolsas.webp",
+      "productCount": 3
+    },
+    {
+      "slug": "vestidos-ninas",
+      "department": "ninas",
+      "name": "Vestidos",
+      "description": "Para fiestas, paseos y días especiales.",
+      "order": 8,
+      "image": "images/categories/ninas.webp",
+      "productCount": 3
+    },
+    {
+      "slug": "tops-ninas",
+      "department": "ninas",
+      "name": "Blusas y suéteres",
+      "description": "Suaves, cómodos y lindos.",
+      "order": 9,
+      "image": "images/categories/ninas.webp",
+      "productCount": 2
+    },
+    {
+      "slug": "jumpers-ninas",
+      "department": "ninas",
+      "name": "Jumpers",
+      "description": "Mezclilla con olanes.",
+      "order": 10,
+      "image": "images/categories/ninas.webp",
+      "productCount": 1
+    },
+    {
+      "slug": "playeras-ninos",
+      "department": "ninos",
+      "name": "Playeras y polos",
+      "description": "Básicos para todos los días.",
+      "order": 11,
+      "image": "images/categories/ninos.webp",
+      "productCount": 2
+    },
+    {
+      "slug": "sudaderas-ninos",
+      "department": "ninos",
+      "name": "Sudaderas y camisas",
+      "description": "Abrigo y estilo.",
+      "order": 12,
+      "image": "images/categories/ninos.webp",
+      "productCount": 2
+    },
+    {
+      "slug": "pantalones-ninos",
+      "department": "ninos",
+      "name": "Pantalones y overoles",
+      "description": "Resistentes para jugar.",
+      "order": 13,
+      "image": "images/categories/ninos.webp",
+      "productCount": 2
+    },
+    {
+      "slug": "camisas-hombre",
+      "department": "hombre",
+      "name": "Camisas y polos",
+      "description": "Clásicos bien hechos.",
+      "order": 14,
+      "image": "images/categories/hombre.webp",
+      "productCount": 2
+    },
+    {
+      "slug": "pantalones-hombre",
+      "department": "hombre",
+      "name": "Pantalones",
+      "description": "Chinos de corte limpio.",
+      "order": 15,
+      "image": "images/categories/hombre.webp",
+      "productCount": 1
+    },
+    {
+      "slug": "abrigo-hombre",
+      "department": "hombre",
+      "name": "Suéteres y chamarras",
+      "description": "Capas para la temporada.",
+      "order": 16,
+      "image": "images/categories/hombre.webp",
+      "productCount": 3
+    }
+  ],
+  "colorFamilies": [
+    {
+      "id": "negro",
+      "name": "Negro",
+      "hex": "#1B1A19"
+    },
+    {
+      "id": "blanco",
+      "name": "Blanco y marfil",
+      "hex": "#F6F2EA"
+    },
+    {
+      "id": "beige",
+      "name": "Beige y arena",
+      "hex": "#D9C6A6"
+    },
+    {
+      "id": "cafe",
+      "name": "Café y camel",
+      "hex": "#8A6547"
+    },
+    {
+      "id": "azul",
+      "name": "Azul",
+      "hex": "#5F7FA3"
+    },
+    {
+      "id": "rosa",
+      "name": "Rosa",
+      "hex": "#E7C6BD"
+    },
+    {
+      "id": "verde",
+      "name": "Verde",
+      "hex": "#7D8A6A"
+    },
+    {
+      "id": "gris",
+      "name": "Gris",
+      "hex": "#A3A19C"
+    },
+    {
+      "id": "rojo",
+      "name": "Rojo",
+      "hex": "#9E3B32"
+    },
+    {
+      "id": "estampado",
+      "name": "Estampados",
+      "hex": "pattern"
+    }
+  ]
+}

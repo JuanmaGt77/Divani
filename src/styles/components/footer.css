@@ -1,0 +1,101 @@
+.site-footer {
+  position: relative;
+  background: var(--ink);
+  color: var(--on-ink);
+  padding-top: clamp(64px, 8vw, 120px);
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+  overflow: hidden;
+  isolation: isolate;
+}
+.site-footer::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  top: -40%;
+  width: 120%;
+  height: 80%;
+  transform: translateX(-50%);
+  background: radial-gradient(closest-side, rgb(168 133 92 / 0.18), transparent);
+  pointer-events: none;
+}
+.site-footer__top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+  gap: clamp(36px, 6vw, 80px);
+}
+.site-footer__brand { display: grid; gap: 28px; justify-items: start; align-content: start; }
+.site-footer__claim {
+  font-size: var(--fs-2xl);
+  line-height: 1.02;
+  max-width: 13ch;
+}
+.site-footer__claim em { color: var(--latte); }
+.site-footer__cols {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px;
+}
+.site-footer__h {
+  margin-bottom: 18px;
+  font-family: var(--font-sans);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgb(246 241 232 / 0.5);
+}
+.site-footer__col li + li { margin-top: 12px; }
+.site-footer__col a,
+.site-footer__col button {
+  color: rgb(246 241 232 / 0.86);
+  font-size: 0.9375rem;
+  text-align: left;
+  transition: color 0.25s;
+}
+.site-footer__col a:hover,
+.site-footer__col button:hover { color: #fff; }
+.site-footer__contact li { display: flex; align-items: center; gap: 10px; color: rgb(246 241 232 / 0.86); font-size: 0.9375rem; }
+.site-footer__contact .icon { width: 18px; height: 18px; opacity: 0.7; }
+.site-footer__social { display: flex; gap: 8px; margin-top: 22px; }
+.site-footer__social a {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  color: var(--on-ink);
+  transition: background-color 0.3s, border-color 0.3s, transform 0.5s var(--ease-spring);
+}
+.site-footer__social a:hover { background: rgb(255 255 255 / 0.1); transform: translateY(-2px); }
+.site-footer__social .icon { width: 19px; height: 19px; }
+
+.site-footer__word {
+  margin-top: clamp(56px, 8vw, 110px);
+  color: var(--on-ink);
+}
+.site-footer__word svg { width: 100%; height: auto; fill: currentColor; }
+
+.site-footer__bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 20px;
+  margin-top: clamp(20px, 3vw, 36px);
+  padding: 22px 0 calc(22px + var(--safe-bottom));
+  border-top: 1px solid rgb(255 255 255 / 0.12);
+  font-size: 0.8125rem;
+  color: rgb(246 241 232 / 0.56);
+}
+.site-footer__legal { display: flex; flex-wrap: wrap; gap: 8px; }
+.site-footer__legal a:hover { color: #fff; }
+
+@media (max-width: 900px) {
+  .site-footer__top { grid-template-columns: 1fr; }
+}
+@media (max-width: 767px) {
+  .site-footer__cols { grid-template-columns: 1fr 1fr; }
+  .site-footer__cols .site-footer__col:last-child { grid-column: 1 / -1; }
+  .site-footer__bottom { padding-bottom: calc(var(--safe-bottom) + 100px); }
+}
