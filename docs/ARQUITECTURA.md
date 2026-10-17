@@ -1,6 +1,10 @@
-# Arquitectura del frontend
+# Arquitectura
 
-JavaScript moderno sin frameworks (módulos ES), empaquetado con Vite. Cada página HTML tiene un punto de entrada en `src/pages/` que arranca lo común (`src/app.js`) y sus secciones.
+Dos aplicaciones en el mismo proyecto de Vite que comparten el modelo de datos:
+
+- **Tienda** (`index.html`, `tienda.html`…): JavaScript moderno sin frameworks (módulos ES). Cada página tiene un punto de entrada en `src/pages/` que arranca lo común (`src/app.js`) y sus secciones.
+- **Panel** (`admin.html`): Preact + JSX en `src/admin/`, con rutas por hash (`#/pedidos`), secciones que se cargan al abrirlas y componentes estilo iOS.
+- **Compartido** (`src/backend/`): reglas del negocio en JavaScript puro (`model.js`, `ops.js`) que el SQL de Supabase replica exactamente, la base de demostración (`demo/`) y la configuración (`config.js`).
 
 ## Capas
 
@@ -20,10 +24,14 @@ src/store/                Estado del cliente (bolsa y favoritos) en localStorage
 src/services/             Casos de uso: catálogo, contenido, pedidos, mensajes de WhatsApp
         │
         ▼
-src/services/api/         Adaptador según configuración
-        ├── mock.adapter.js  → public/data/*.json  (hoy)
-        └── rest.adapter.js  → VITE_API_URL         (con tu backend)
+src/services/api/         Origen de datos según configuración (index.js)
+        ├── supabase.adapter.js → rpc/storefront y rpc/place_order   (VITE_SUPABASE_URL)
+        ├── demo.adapter.js     → base del panel en este navegador   (demostración)
+        ├── mock.adapter.js     → public/data/*.json                 (catálogo de muestra)
+        └── rest.adapter.js     → VITE_API_URL                        (backend propio)
 ```
+
+Supabase y la demostración entregan un mismo «paquete de la tienda» (`payload.adapter.js`): productos con existencias por color y talla, categorías, banners vigentes, looks, preguntas, contenido de la portada y ajustes públicos, todo en una sola carga.
 
 Regla: los componentes **nunca** hacen `fetch` directo; siempre pasan por un servicio. Así, conectar el backend no toca la interfaz.
 
@@ -33,9 +41,15 @@ Regla: los componentes **nunca** hacen `fetch` directo; siempre pasan por un ser
 2. `cart.store.js` guarda la bolsa en `localStorage` y avisa a sus suscriptores (contadores del encabezado y de la barra inferior, hoja de la bolsa).
 3. En la hoja de la bolsa, el paso «Tus datos» arma el pedido con `OrderService.preview()`; el enlace `https://wa.me/<número>?text=<mensaje>` se actualiza mientras el cliente escribe.
 4. Al presionar «Enviar pedido por WhatsApp»:
-   - **Sin backend**: el enlace abre WhatsApp directamente.
-   - **Con backend**: `OrderService.submit()` hace `POST /orders`, recibe el número de pedido oficial y abre WhatsApp con él.
-5. La hoja muestra «¡Tu pedido está listo!» con opción de vaciar la bolsa.
+   - **Catálogo de muestra**: el enlace abre WhatsApp directamente.
+   - **Con base de datos** (Supabase, demostración o backend propio): se abre una pestaña en el mismo toque, `OrderService.submit()` registra el pedido (valida existencias y precios en el servidor), la bolsa se vacía y la pestaña abre WhatsApp con el número de pedido oficial. Si el navegador bloquea la pestaña, la hoja muestra el botón para abrirlo.
+5. El pedido aparece al instante en el panel (Pedidos) con aviso en tiempo real.
+
+## Contenido editable de la portada
+
+- Cada texto o foto editable lleva `data-slot="seccion.campo"` (`src/sections/site-content.js`); si el panel aún no tiene un valor, se queda el del HTML.
+- Cada sección lleva `data-edit="…"`. Con `?editar=1` dentro del panel (`src/core/edit-bridge.js`), tocar una sección abre su editor y la vista previa se recarga en el mismo punto al guardar.
+- Los ajustes del panel (nombre, WhatsApp, horario, redes, región y moneda) se aplican con `src/core/site-settings.js`.
 
 ## Componentes clave
 

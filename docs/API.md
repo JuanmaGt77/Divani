@@ -178,6 +178,26 @@ En `title`, el texto entre `*asteriscos*` se muestra en cursiva.
 
 `freeShippingFrom` (número o `null`) activa la barra de «Te faltan $X para envío gratis» en la bolsa.
 
+## GET /content
+
+Fotos y textos de la portada que se editan en el panel (Sitio web → Portada). Mismo formato que `public/data/content.json`:
+
+```json
+{
+  "hero": { "eyebrow": "…", "title": "Moda americana, *elegida para ti.*", "subtitle": "…", "video": "…mp4", "videoPortrait": "…mp4", "poster": "…", "posterPortrait": "…" },
+  "ribbons": { "primary": ["…"], "secondary": ["…"] },
+  "editorial": { "image": "…", "eyebrow": "…", "title": "…" },
+  "kids": { "title": "…", "lead": "…", "girlsImage": "…", "boysImage": "…" },
+  "about": { "title": "…", "image": "…", "paragraphs": ["…"] },
+  "men": { "title": "…", "bannerTitle": "…", "image": "…" },
+  "vip": { "title": "…", "text": "…", "image": "…" }
+}
+```
+
+Las partes entre `*asteriscos*` se muestran en cursiva. Si tu backend no tiene esta ruta, la tienda usa los textos del HTML.
+
+> Con Supabase no necesitas un backend propio: la función `storefront()` de `supabase/schema.sql` entrega todo esto en una sola llamada y `place_order()` registra los pedidos.
+
 ## GET /faq
 
 ```json

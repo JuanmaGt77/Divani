@@ -1,52 +1,73 @@
-# Divani · Tienda en línea
+# Divani · Tienda en línea y panel de administración
 
-Tienda de ropa americana premium con compra por WhatsApp. Frontend completo (sin backend todavía), con una capa de datos lista para conectar tu API.
+Tienda de ropa americana premium con compra por WhatsApp y un panel para administrar todo: productos, inventario, pedidos, punto de venta, caja con cortes, reportes, clientes, la portada del sitio y la configuración. Base de datos en **Supabase** y fotos en **Cloudinary**; sin configurarlos, todo funciona en **modo demostración** dentro del navegador.
 
-| Inicio (escritorio) | Celular | Tienda |
+| Tienda (escritorio) | Tienda (celular) | Catálogo |
 | --- | --- | --- |
 | ![Inicio en escritorio](docs/capturas/inicio-escritorio.jpg) | ![Inicio en celular](docs/capturas/inicio-celular.jpg) | ![Tienda](docs/capturas/tienda-escritorio.jpg) |
 
-- **Inicio** (`index.html`): video de marca, cintas, categorías, novedades, banners, «arma tu look», niñas y niños, acerca de nosotros, cómo comprar, hombre, preguntas frecuentes y lista VIP.
-- **Tienda** (`tienda.html`): catálogo con departamentos, categorías, filtros (talla, color, precio, ofertas), orden, búsqueda y «cargar más». Los filtros viven en la URL, así que se pueden compartir.
-- **Bolsa y pedido por WhatsApp**: el cliente arma su bolsa, llena sus datos y se abre WhatsApp con el pedido escrito (prendas, tallas, total, entrega y forma de pago).
-- **Vista rápida de producto**, favoritos, búsqueda instantánea, guía de tallas americanas, notificaciones tipo Dynamic Island, barra inferior estilo iOS 26 en celular y superficies de vidrio líquido.
-- Páginas extra: `404.html` y `aviso-de-privacidad.html` (plantilla).
+| Panel · Resumen | Panel · Punto de venta | Panel · Sitio web | Panel en celular |
+| --- | --- | --- | --- |
+| ![Resumen](docs/capturas/panel-resumen.jpg) | ![Punto de venta](docs/capturas/panel-punto-de-venta.jpg) | ![Sitio web](docs/capturas/panel-sitio-web.jpg) | ![Panel en celular](docs/capturas/panel-celular.jpg) |
 
 ---
 
-## Arranque rápido
+## Qué incluye
+
+### Tienda (`index.html`, `tienda.html`)
+- Portada con video de marca, cintas, categorías, novedades, banners, «arma tu look», niñas y niños, acerca de nosotros, cómo comprar, hombre, preguntas frecuentes y lista VIP. **Todo lo de la portada se cambia desde el panel.**
+- Catálogo con filtros (departamento, categoría, talla, color, precio, ofertas), búsqueda y vista rápida con existencias **por color y talla**.
+- Bolsa y pedido por WhatsApp: con base de datos, el pedido se registra primero (valida existencias y precios) y WhatsApp se abre con el número de pedido oficial.
+- Precios, moneda, lada y textos según la región configurada (México, Guatemala o Estados Unidos).
+- Acceso discreto a la administración (ícono de usuario, menú del celular y pie de página).
+
+### Panel (`admin.html`)
+| Sección | Qué haces ahí |
+| --- | --- |
+| **Resumen** | Ventas de hoy y del mes, ticket promedio, pedidos por atender, gráfica de ventas, lo más vendido, existencias y avisos. |
+| **Pedidos** | Pedidos de la tienda y de WhatsApp: estados (nuevo → confirmado → en preparación → enviado → entregado), pagos, notas, mensajes listos para WhatsApp, impresión de la nota. |
+| **Punto de venta** | Venta en mostrador: buscar o escanear SKU, tallas, descuentos, cobro en efectivo (con cambio), tarjeta, transferencia o mixto, ticket impreso. |
+| **Caja** | Apertura con fondo, ingresos, retiros y gastos, efectivo esperado, corte con conteo por billetes y monedas, diferencias y reporte del corte. |
+| **Productos** | Alta y edición con fotos por color, precios, oferta, costo y margen, tallas, SKU automático por variante y etiquetas con código de barras. |
+| **Inventario** | Existencias por variante, ajustes con motivo, entrada de mercancía, kardex completo y alertas de últimas piezas. |
+| **Clientes** | Se registran solas con cada pedido: historial, frecuentes, por reactivar y contacto por WhatsApp. |
+| **Reportes** | Ventas por periodo con filtros (canal, método de pago, departamento, categoría, búsqueda), comparación con el periodo anterior, productos, cortes de caja y exportación a CSV/impresión. |
+| **Sitio web** | Vista previa en vivo (computadora o iPhone): toca cualquier sección para cambiar sus fotos y textos. Banners con fechas, categorías, «arma tu look» con puntos sobre la foto y preguntas frecuentes. |
+| **Configuración** | Tienda y contacto, región y moneda, pedidos en línea, punto de venta y caja, inventario, conexiones (Supabase y Cloudinary), cuenta y respaldo. |
+
+---
+
+## Probarlo ya (modo demostración)
 
 Requisitos: **Node.js 18 o superior**.
 
 ```bash
 npm install
-cp .env.example .env      # y escribe tu número de WhatsApp
-npm run dev               # servidor local en http://localhost:5173
-npm run build             # genera la versión final en dist/
-npm run preview           # sirve dist/ para revisarla
+npm run dev          # http://localhost:5173  (tienda)  ·  http://localhost:5173/admin.html  (panel)
 ```
 
-### Publicar
+En el panel presiona **«Entrar a la demostración»**: se crea un catálogo con dos meses de ventas de ejemplo en tu navegador. La tienda abierta en ese mismo navegador muestra esos datos y sus pedidos llegan al panel. Puedes reiniciar la demostración en Configuración → Respaldo y datos.
 
-La carpeta `dist/` es un sitio estático: súbela tal cual a Netlify, Vercel, Cloudflare Pages, GitHub Pages, Hostinger o cualquier hosting con cPanel. Funciona en la raíz del dominio o dentro de una subcarpeta (las rutas son relativas).
+## Conectar Supabase y Cloudinary
 
-> Abrir `index.html` con doble clic no funciona: el navegador bloquea los módulos y la lectura de datos desde `file://`. Usa `npm run dev`, `npm run preview` o súbelo a un hosting.
+Guía paso a paso: **[docs/CONEXION.md](docs/CONEXION.md)**. En resumen:
 
----
+1. Ejecuta `supabase/schema.sql` y luego `supabase/seed.sql` en el SQL Editor de Supabase.
+2. Crea el usuario administrador (Authentication → Users → Add user, con «Auto Confirm User»).
+3. Cierra el registro público (Authentication → Sign In / Providers).
+4. Define `VITE_SUPABASE_URL` y `VITE_SUPABASE_PUBLISHABLE_KEY` en tu hosting (o en `.env`) y vuelve a publicar.
+5. En el panel → Configuración → Conexiones, guarda los datos de Cloudinary.
 
-## Antes de publicar (lista de revisión)
+O los pasos 1 a 3 de una vez: `npm run setup:supabase` (ver la guía).
 
-| Qué | Dónde |
-| --- | --- |
-| Tu número de WhatsApp | `.env` → `VITE_WHATSAPP_NUMBER` (52 + 10 dígitos, ej. `525512345678`), **o sin recompilar:** `data/settings.json` → `"whatsapp"` (también dentro de `dist/`) |
-| Redes sociales, horario, dominio | `src/config/site.config.js` (`social`, `hours`, `url`) |
-| Políticas de envío, pagos y cambios | `public/data/faq.json` y `public/data/settings.json` → `checkout` |
-| Aviso de privacidad | `aviso-de-privacidad.html` (completa los datos marcados) |
-| Textos de la cinta superior | `public/data/settings.json` → `announcements` |
-| Productos y fotos reales | `public/data/products.json` + `public/images/products/` (o tu backend) |
-| Imagen para compartir en redes | Cambia `og:image` en `src/partials/head.html` por la URL completa de tu dominio |
+## Publicar
 
-Las prendas, precios, existencias y fotos actuales **son de prueba**: las ilustraciones se generaron para la demostración. Reemplázalas con tus fotos reales antes de vender.
+```bash
+npm run build        # genera dist/
+npm run preview      # revisa dist/ en http://localhost:4173
+```
+
+`dist/` es un sitio estático: Netlify, Vercel, Cloudflare Pages, GitHub Pages o cualquier hosting. Configura el comando `npm run build`, la carpeta `dist` y las variables de entorno de Supabase. Las rutas son relativas: funciona en la raíz del dominio o en una subcarpeta.
 
 ---
 
@@ -54,79 +75,32 @@ Las prendas, precios, existencias y fotos actuales **son de prueba**: las ilustr
 
 ```
 divani/
-├── index.html · tienda.html · 404.html · aviso-de-privacidad.html
-├── vite.config.js            # build multipágina + inserción de fragmentos HTML
-├── .env.example              # WhatsApp y URL del backend
-├── docs/
-│   ├── API.md                # contrato REST que debe cumplir tu backend
-│   └── ARQUITECTURA.md       # capas, flujo de datos y convenciones
-├── public/                   # se copia tal cual a dist/
-│   ├── data/                 # API de prueba (JSON) ← lo reemplaza tu backend
-│   │   ├── products.json · categories.json · banners.json
-│   │   └── settings.json · faq.json · lookbooks.json
-│   ├── images/               # products/ · categories/ · lookbook/
-│   ├── media/                # video/ (hero mp4 + webm + pósters) · banners/ · editorial/
-│   ├── brand/                # logo en SVG (completo, monograma, wordmark) e imagen para compartir
-│   ├── icons/                # favicon, ícono de app (iPhone/Android)
-│   └── manifest.webmanifest · robots.txt
+├── index.html · tienda.html · 404.html · aviso-de-privacidad.html   ← tienda
+├── admin.html                                                        ← panel
+├── supabase/            schema.sql (tablas, seguridad, funciones) · seed.sql (catálogo inicial)
+├── scripts/             build-seed.mjs (genera seed.sql) · setup-supabase.mjs (prepara Supabase)
+├── docs/                CONEXION.md · ARQUITECTURA.md · API.md · capturas/
+├── public/              data/*.json (catálogo de muestra) · images/ · media/ · brand/ · icons/
 └── src/
-    ├── config/site.config.js # nombre, WhatsApp, redes, API, claves de almacenamiento
-    ├── core/                 # utilidades: DOM y plantillas, formato de moneda, URL, almacenamiento, animación
-    ├── services/
-    │   ├── api/              # index.js elige adaptador · mock.adapter.js · rest.adapter.js · query.js · http.js
-    │   ├── catalog.service.js · content.service.js · order.service.js
-    │   └── whatsapp.service.js   # mensajes de pedido, producto, look y favoritos
-    ├── store/                # estado de la bolsa y favoritos (persistido en el navegador)
-    ├── components/           # header, hojas, bolsa/checkout, vista rápida, búsqueda, favoritos, tallas…
-    ├── sections/             # secciones de la portada
-    ├── pages/                # home.js · shop.js · simple.js (punto de entrada de cada página)
-    ├── partials/             # fragmentos HTML compartidos (head, header, footer, hojas, íconos)
-    └── styles/               # base/ (tokens, tipografía) · components/ · sections/ · pages/
+    ├── backend/         Reglas compartidas por tienda, panel y SQL: model.js · ops.js · seed.js · demo/ · config.js
+    ├── admin/           Panel (Preact): api/ · pages/ · components/ · ui/ · lib/ · layout/ · styles/
+    ├── services/api/    Origen de datos de la tienda: supabase · demo · mock (JSON) · rest
+    ├── sections/        Secciones de la portada (incluye site-content.js: lo que se edita en el panel)
+    ├── components/      Encabezado, hojas, bolsa y pedido, vista rápida, búsqueda, favoritos…
+    ├── core/            Utilidades: DOM, formato de moneda, URL, ajustes del sitio, modo edición
+    ├── store/           Bolsa y favoritos (en el navegador)
+    ├── pages/ · partials/ · config/ · styles/
 ```
 
----
+Detalles técnicos en [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md). Si algún día prefieres un backend propio en lugar de Supabase, el contrato está en [docs/API.md](docs/API.md).
 
-## Conectar tu backend
+## Seguridad
 
-1. Implementa los endpoints de [`docs/API.md`](docs/API.md) (productos, categorías, banners, ajustes, preguntas frecuentes, pedidos).
-2. En `.env` pon `VITE_API_URL=https://tu-api.com/v1` y vuelve a compilar.
-
-Eso es todo: `src/services/api/index.js` cambia automáticamente del adaptador de prueba (`mock.adapter.js`) al real (`rest.adapter.js`). Ningún componente llama a `fetch` directamente; todos pasan por los servicios.
-
-- La lógica de filtros y orden está en `src/services/api/query.js` como función pura: si tu backend es Node, puedes reutilizarla tal cual para responder `GET /products`.
-- Con backend activo, el botón «Enviar pedido por WhatsApp» primero registra el pedido con `POST /orders` y luego abre WhatsApp con el número de pedido que devuelve tu API.
-
-## Cambiar productos sin backend
-
-Edita `public/data/products.json`. Cada producto lleva colores (cada color con sus fotos) y tallas con existencias:
-
-```json
-{
-  "slug": "vestido-slip-satinado",
-  "name": "Vestido slip satinado",
-  "department": "mujer",
-  "category": "vestidos",
-  "price": 899,
-  "compareAtPrice": 1190,
-  "colors": [
-    { "name": "Champagne", "hex": "#E3CFAE", "family": "beige",
-      "images": ["images/products/vestido-champagne-1.webp", "images/products/vestido-champagne-2.webp"] }
-  ],
-  "sizes": [{ "label": "S", "stock": 3 }, { "label": "M", "stock": 0 }]
-}
-```
-
-- Fotos en proporción **4:5** (recomendado 1200 × 1500 px, WebP o JPG). La segunda foto aparece al pasar el cursor.
-- `stock: 0` muestra la talla tachada; si todo el producto está en 0 se marca «Agotado».
-- `compareAtPrice` mayor que `price` activa la etiqueta de descuento.
-- `family` agrupa colores para el filtro (negro, blanco, beige, cafe, azul, rosa, verde, gris, rojo, estampado).
+- La página solo lleva la **clave publicable** de Supabase. Las reglas por fila (RLS) dejan que el público lea el catálogo y cree pedidos; costos, clientes, caja y reportes solo los ve el equipo con sesión iniciada.
+- El **API Secret de Cloudinary** se guarda cifrado en la base de datos y solo el servidor lo usa para firmar subidas.
+- Ninguna contraseña ni llave secreta vive en el código: `.env` y `.env.local` están en `.gitignore`.
+- El panel no aparece en buscadores (`noindex` y `robots.txt`).
 
 ## Diseño
 
-Todos los colores, tipografías, radios y curvas de animación están en `src/styles/base/tokens.css`. El vidrio líquido vive en `src/styles/components/glass.css` (clases `.glass`, `.glass--strong`, `.glass--dark`).
-
-Tipografías: Bodoni Moda (títulos) y Jost (texto), servidas por Google Fonts.
-
-## Navegadores
-
-Safari 15+ (iPhone y Mac), Chrome, Edge y Firefox recientes. Las animaciones ligadas al scroll y las esquinas «squircle» se activan solo donde el navegador las soporta; respeta la preferencia de «reducir movimiento».
+Mismo ADN en tienda y panel: marfil, arena y tinta, vidrio líquido estilo iOS 26, tipografías Bodoni Moda y Jost. Tokens de la tienda en `src/styles/base/tokens.css`; del panel en `src/admin/styles/base.css`. Respeta «reducir movimiento» y funciona en Safari 15+, Chrome, Edge y Firefox recientes.
