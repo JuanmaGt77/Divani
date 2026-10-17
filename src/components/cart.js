@@ -6,11 +6,11 @@
 import { html, raw, render, toString } from '../core/dom.js';
 import { money, plural } from '../core/format.js';
 import { load, save } from '../core/storage.js';
-import { STORAGE_KEYS } from '../config/site.config.js';
-import { usingMockData } from '../services/api/index.js';
+import { STORAGE_KEYS, SITE } from '../config/site.config.js';
+import { cdn } from '../backend/model.js';
 import { ContentService } from '../services/content.service.js';
 import { OrderService } from '../services/order.service.js';
-import { openWhatsApp } from '../services/whatsapp.service.js';
+import { prepareWhatsAppWindow } from '../services/whatsapp.service.js';
 import { cart } from '../store/cart.store.js';
 import { sheet } from './sheet.js';
 import { notify } from './island.js';
@@ -20,10 +20,13 @@ let settings = { checkout: { deliveryMethods: [], paymentMethods: [] } };
 let step = 'bag';
 let reference = '';
 let sent = false;
+let registers = false; // ¿los pedidos se guardan en la base de datos?
+let lastOrder = null;  // pedido ya registrado (la bolsa se vacía al registrarlo)
 
 export function openCart() {
   step = 'bag';
   sent = false;
+  lastOrder = null;
   paint();
   sheet('cart')?.open();
 }
@@ -33,6 +36,13 @@ const fallbackPayment = [{ id: 'transferencia', label: 'Transferencia' }];
 
 function paint() {
   if (!root) return;
+  if (lastOrder) {
+    title.textContent = 'Pedido recibido';
+    backBtn.hidden = true;
+    root.classList.remove('is-checkout');
+    render(root, receivedTpl(lastOrder));
+    return;
+  }
   const items = cart.items;
   title.innerHTML = step === 'checkout' ? 'Tus datos' : `Tu bolsa${cart.count ? ` <small>${plural(cart.count, 'pieza', 'piezas')}</small>` : ''}`;
   backBtn.hidden = step !== 'checkout';
@@ -86,7 +96,7 @@ function paint() {
 function lineTpl(i) {
   return html`
   <article class="line" data-line="${i.key}">
-    <img src="${i.image}" alt="" width="78" height="98" loading="lazy" />
+    <img src="${cdn(i.image, { w: 200 })}" alt="" width="78" height="98" loading="lazy" />
     <div class="line__body">
       <div class="line__top">
         <h3 class="line__name">${i.name}</h3>
@@ -125,9 +135,9 @@ function checkoutTpl(subtotal) {
           <input class="input" id="co-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" />
         </div>
         <div class="field field--full">
-          <label class="field__label" for="co-city">Ciudad y estado</label>
-          <input class="input" id="co-city" name="city" autocomplete="address-level2" placeholder="Ej. Guadalajara, Jalisco" required />
-          <p class="field__error">Indica tu ciudad y estado.</p>
+          <label class="field__label" for="co-city">${SITE.cityLabel}</label>
+          <input class="input" id="co-city" name="city" autocomplete="address-level2" placeholder="${SITE.cityPlaceholder}" required />
+          <p class="field__error">${`Indica tu ${SITE.cityLabel.toLowerCase()}.`}</p>
         </div>
         <fieldset class="field field--full" style="border:0;padding:0;margin:0">
           <legend class="field__label" style="margin-bottom:8px">Entrega</legend>
@@ -164,6 +174,27 @@ function checkoutTpl(subtotal) {
       </a>
       <p class="cart__note">Se abrirá WhatsApp con tu pedido escrito. Solo tienes que enviarlo.</p>
     </footer>`;
+}
+
+/** Pedido registrado en la base de datos: ya tiene su número oficial. */
+function receivedTpl(order) {
+  const { url } = OrderService.preview(order);
+  return html`
+    <div class="checkout">
+      <div class="checkout__done">
+        <span class="empty__icon"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg></span>
+        <h3>¡Recibimos tu pedido!</h3>
+        <p class="checkout__number">${order.orderNumber}</p>
+        <p>Termina de enviarlo por WhatsApp: ahí te confirmamos disponibilidad, envío y pago. Si la aplicación no se abrió, toca el botón.</p>
+        <a class="btn btn--ink btn--wa btn--block" href="${url}" target="_blank" rel="noopener">
+          <svg class="icon" aria-hidden="true"><use href="#i-whatsapp"></use></svg>
+          Enviar por WhatsApp
+        </a>
+        <div class="cluster">
+          <button class="btn btn--outline btn--sm" type="button" data-cart-continue>Seguir comprando</button>
+        </div>
+      </div>
+    </div>`;
 }
 
 function doneTpl() {
@@ -298,6 +329,13 @@ function bind() {
       paint();
       return;
     }
+    if (t.closest('[data-cart-continue]')) {
+      lastOrder = null;
+      reference = '';
+      step = 'bag';
+      sheet('cart').close();
+      return;
+    }
     if (t.closest('[data-cart-clear]')) {
       cart.clear();
       reference = '';
@@ -314,22 +352,32 @@ function bind() {
         return;
       }
       persist();
-      if (!usingMockData) {
-        // Con backend: registra el pedido y luego abre WhatsApp con el número oficial
+      if (registers) {
+        // Con base de datos: primero se registra el pedido (valida existencias) y luego se abre
+        // WhatsApp con el número oficial. La ventana se abre en el mismo toque para que no la bloqueen.
         e.preventDefault();
+        if (send.getAttribute('aria-disabled') === 'true') return;
         send.setAttribute('aria-disabled', 'true');
+        send.classList.add('is-loading');
+        const win = prepareWhatsAppWindow();
         try {
-          const res = await OrderService.submit(collect());
+          const order = collect();
+          const res = await OrderService.submit(order);
           reference = res.orderNumber || reference;
-          openWhatsApp(res.url);
+          lastOrder = { ...order, items: order.items.map((i) => ({ ...i })), orderNumber: reference };
+          win.go(res.url);
+          cart.clear();
+          reference = '';
+          paint();
         } catch (err) {
+          win.close();
           notify({ title: 'No pudimos registrar tu pedido', sub: err.message, icon: 'info' });
           send.removeAttribute('aria-disabled');
-          return;
+          send.classList.remove('is-loading');
         }
-      } else {
-        syncLink();
+        return;
       }
+      syncLink();
       setTimeout(() => { sent = true; paint(); }, 400);
     }
   });
@@ -347,13 +395,14 @@ function bind() {
   });
 
   cart.subscribe(() => {
-    if (sheet('cart')?.el.open && !(step === 'checkout' && sent)) paint();
+    if (sheet('cart')?.el.open && !lastOrder && !(step === 'checkout' && sent)) paint();
   }, { immediate: false });
 }
 
 export function initCart() {
   bind();
   ContentService.getSettings().then((s) => { if (s) settings = s; }).catch(() => {});
+  OrderService.registers().then((v) => { registers = v; }).catch(() => {});
 }
 
 export const cartSummaryText = () => toString(html`${plural(cart.count, 'pieza', 'piezas')} · ${money(cart.subtotal)}`);

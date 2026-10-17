@@ -1,8 +1,18 @@
 import { SITE, CATALOG } from '../config/site.config.js';
 
-const currency = new Intl.NumberFormat(SITE.locale, { style: 'currency', currency: SITE.currency, maximumFractionDigits: 0 });
+const makeFormat = (locale, cur) => [0, 2].map((d) => new Intl.NumberFormat(locale, { style: 'currency', currency: cur, minimumFractionDigits: d, maximumFractionDigits: d }));
+let formats = makeFormat(SITE.locale, SITE.currency);
 
-export const money = (n) => currency.format(Number(n) || 0);
+/** Cambia el formato de los precios (lo llama la región configurada en el panel). */
+export function setMoneyFormat(locale, cur) {
+  try { formats = makeFormat(locale, cur); } catch { /* código de moneda inválido: se queda el anterior */ }
+}
+
+/** $1,250 · con centavos solo cuando el precio los tiene ($89.50). */
+export const money = (n) => {
+  const v = Number(n) || 0;
+  return formats[Math.round(v * 100) % 100 ? 1 : 0].format(v);
+};
 
 export const discountPct = (p) =>
   p?.compareAtPrice && p.compareAtPrice > p.price ? Math.round((1 - p.price / p.compareAtPrice) * 100) : 0;

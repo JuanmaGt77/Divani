@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000" role="img" aria-label="Foto en camino">
+  <rect width="800" height="1000" fill="#efe8dc"/>
+  <g fill="none" stroke="#b9a68c" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M400 380a38 38 0 1 0-38-38"/>
+    <path d="M400 380v28L262 492a24 24 0 0 0 13 44h250a24 24 0 0 0 13-44L400 408"/>
+  </g>
+  <text x="400" y="620" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="40" fill="#8a7863">Foto en camino</text>
+</svg>

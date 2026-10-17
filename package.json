@@ -2,17 +2,24 @@
   "name": "divani-tienda",
   "private": true,
   "version": "1.0.0",
-  "description": "Tienda en línea de Divani — ropa americana premium con compra por WhatsApp.",
+  "description": "Tienda en línea y panel de administración de Divani — ropa americana premium con compra por WhatsApp.",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview --port 4173"
+    "preview": "vite preview --port 4173",
+    "seed:build": "node scripts/build-seed.mjs",
+    "setup:supabase": "node scripts/setup-supabase.mjs"
   },
   "devDependencies": {
     "vite": "^6.4.1"
   },
   "engines": {
     "node": ">=18"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.118.0",
+    "lucide-preact": "^1.58.0",
+    "preact": "^10.29.8"
   }
 }

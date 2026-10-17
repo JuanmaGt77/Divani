@@ -76,8 +76,30 @@ export function vipMessage() {
   return `Hola ${SITE.name}, quiero unirme a la lista VIP para enterarme primero de los nuevos ingresos.`;
 }
 
-/** Abre WhatsApp desde código (cuando no se puede usar un <a> directo). */
-export function openWhatsApp(url) {
-  const w = window.open(url, '_blank', 'noopener');
-  if (!w) location.href = url;
+/**
+ * Abre una pestaña en el mismo toque del botón (si se abre después de esperar al servidor,
+ * el navegador la bloquea) y la manda a WhatsApp cuando ya está listo el enlace.
+ */
+export function prepareWhatsAppWindow() {
+  let w = null;
+  try {
+    w = window.open('', '_blank');
+    if (w) {
+      w.opener = null;
+      w.document.title = 'Abriendo WhatsApp…';
+      w.document.body.innerHTML = '<p style="font:16px/1.5 system-ui,sans-serif;color:#5f554b;padding:28px">Abriendo WhatsApp…</p>';
+    }
+  } catch {
+    w = null;
+  }
+  return {
+    /** Devuelve false si no se pudo (ventana bloqueada): entonces se muestra un botón para abrirlo. */
+    go(url) {
+      if (!w || w.closed) return false;
+      try { w.location.href = url; return true; } catch { return false; }
+    },
+    close() {
+      try { w?.close(); } catch { /* ya estaba cerrada */ }
+    },
+  };
 }

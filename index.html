@@ -16,7 +16,7 @@
 
   <main id="contenido">
     <!-- ============ HERO: video de marca ============ -->
-    <section class="hero" aria-label="Divani, ropa americana premium">
+    <section class="hero" aria-label="Divani, ropa americana premium" data-edit="hero">
       <div class="hero__media">
         <video class="hero__video" data-hero-video autoplay muted loop playsinline preload="auto"
           aria-label="Video de presentación de Divani: una tela de seda se desliza y aparece el logotipo.">
@@ -34,9 +34,9 @@
 
       <div class="hero__content container">
         <div class="hero__panel glass glass--live" data-glass-live>
-          <p class="eyebrow rise" style="--i: 0">Otoño · Invierno 2026</p>
-          <h1 class="hero__title rise" style="--i: 1">Moda americana, <em>elegida para ti.</em></h1>
-          <p class="hero__sub rise" style="--i: 2">Prendas con etiqueta original, seleccionadas para mujer, niñas, niños y hombre.</p>
+          <p class="eyebrow rise" style="--i: 0" data-slot="hero.eyebrow">Otoño · Invierno 2026</p>
+          <h1 class="hero__title rise" style="--i: 1" data-slot="hero.title" data-emph>Moda americana, <em>elegida para ti.</em></h1>
+          <p class="hero__sub rise" style="--i: 2" data-slot="hero.subtitle">Prendas con etiqueta original, seleccionadas para mujer, niñas, niños y hombre.</p>
           <div class="hero__actions rise" style="--i: 3">
             <a class="btn btn--ink btn--lg" href="tienda.html">
               Comprar ahora
@@ -62,21 +62,21 @@
     </section>
 
     <!-- ============ CINTAS CRUZADAS ============ -->
-    <section class="ribbons" aria-label="Divani en pocas palabras">
+    <section class="ribbons" aria-label="Divani en pocas palabras" data-edit="ribbons">
       <div class="ribbon ribbon--ink">
-        <div class="ribbon__track" data-ribbon>
+        <div class="ribbon__track" data-ribbon="primary">
           <span>Nueva temporada</span><span><em>Divani</em></span><span>Ropa americana</span><span><em>Fashion in you</em></span><span>Etiqueta original</span><span><em>Divani</em></span><span>Piezas limitadas</span>
         </div>
       </div>
       <div class="ribbon ribbon--glass glass">
-        <div class="ribbon__track ribbon__track--rev" data-ribbon>
+        <div class="ribbon__track ribbon__track--rev" data-ribbon="secondary">
           <span>Compra por WhatsApp</span><span><em>Mujer</em></span><span>Envíos a todo México</span><span><em>Niñas &amp; niños</em></span><span>Atención personal</span><span><em>Hombre</em></span>
         </div>
       </div>
     </section>
 
     <!-- ============ CATEGORÍAS ============ -->
-    <section class="section" id="categorias">
+    <section class="section" id="categorias" data-edit="categories">
       <div class="container">
         <header class="section-head">
           <div class="section-head__text">
@@ -96,7 +96,7 @@
     </section>
 
     <!-- ============ NOVEDADES ============ -->
-    <section class="section section--linen" id="novedades">
+    <section class="section section--linen" id="novedades" data-edit="products">
       <div class="container">
         <header class="section-head">
           <div class="section-head__text">
@@ -120,7 +120,7 @@
     </section>
 
     <!-- ============ BANNERS PROMOCIONALES ============ -->
-    <section class="section section--tight" aria-label="Promociones">
+    <section class="section section--tight" aria-label="Promociones" data-edit="banners">
       <div class="container">
         <div class="promo" data-promo aria-roledescription="carrusel">
           <div class="promo__track" data-promo-track>
@@ -140,7 +140,7 @@
     </section>
 
     <!-- ============ LO MÁS DESEADO ============ -->
-    <section class="section" id="favoritas">
+    <section class="section" id="favoritas" data-edit="products">
       <div class="container">
         <header class="section-head">
           <div class="section-head__text">
@@ -161,18 +161,18 @@
     </section>
 
     <!-- ============ ARMA TU LOOK ============ -->
-    <section class="section section--linen" id="look">
+    <section class="section section--linen" id="look" data-edit="look">
       <div class="container look" data-look></div>
     </section>
 
     <!-- ============ EDITORIAL ============ -->
-    <section class="editorial" aria-label="Divani">
+    <section class="editorial" aria-label="Divani" data-edit="editorial">
       <div class="container">
         <div class="editorial__frame" data-reveal="scale">
-          <img class="editorial__img" src="/media/editorial/silk-02.webp" alt="Tela de seda color marfil en movimiento" loading="lazy" width="1280" height="720" />
+          <img class="editorial__img" src="/media/editorial/silk-02.webp" alt="Tela de seda color marfil en movimiento" loading="lazy" width="1280" height="720" data-slot="editorial.image" data-w="1800" />
           <div class="editorial__copy">
-            <p class="eyebrow">Divani · Fashion in you</p>
-            <h2 class="editorial__title">Ropa americana. <em>Etiqueta original.</em></h2>
+            <p class="eyebrow" data-slot="editorial.eyebrow">Divani · Fashion in you</p>
+            <h2 class="editorial__title" data-slot="editorial.title" data-emph>Ropa americana. <em>Etiqueta original.</em></h2>
             <a class="btn btn--glass glass" href="#nosotros">
               Conoce nuestra historia
               <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
@@ -183,25 +183,25 @@
     </section>
 
     <!-- ============ NIÑAS Y NIÑOS ============ -->
-    <section class="section kids" id="kids">
+    <section class="section kids" id="kids" data-edit="kids">
       <div class="container">
         <header class="section-head">
           <div class="section-head__text">
             <p class="eyebrow">Divani Kids</p>
-            <h2 class="h-2">Para los <em>más pequeños</em></h2>
-            <p class="lead">Vestidos de fiesta, mezclilla y básicos suaves en tallas americanas de 2T a 12.</p>
+            <h2 class="h-2" data-slot="kids.title" data-emph>Para los <em>más pequeños</em></h2>
+            <p class="lead" data-slot="kids.lead">Vestidos de fiesta, mezclilla y básicos suaves en tallas americanas de 2T a 12.</p>
           </div>
         </header>
         <div class="kids__tiles">
           <a class="kids-tile" href="tienda.html?depto=ninas" data-reveal>
-            <img src="/images/categories/ninas.webp" alt="Vestidos y jumper de niña colgados en un riel dorado" loading="lazy" width="800" height="1000" />
+            <img src="/images/categories/ninas.webp" alt="Vestidos y jumper de niña colgados en un riel dorado" loading="lazy" width="800" height="1000" data-slot="kids.girlsImage" data-w="900" />
             <span class="kids-tile__label glass">
               <span class="kids-tile__name">Niñas</span>
               <span class="kids-tile__cta">Ver colección <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span>
             </span>
           </a>
           <a class="kids-tile" href="tienda.html?depto=ninos" data-reveal style="--d: 1">
-            <img src="/images/categories/ninos.webp" alt="Playera, overol y sudadera de niño colgados en un riel dorado" loading="lazy" width="800" height="1000" />
+            <img src="/images/categories/ninos.webp" alt="Playera, overol y sudadera de niño colgados en un riel dorado" loading="lazy" width="800" height="1000" data-slot="kids.boysImage" data-w="900" />
             <span class="kids-tile__label glass">
               <span class="kids-tile__name">Niños</span>
               <span class="kids-tile__cta">Ver colección <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span>
@@ -228,13 +228,13 @@
     </section>
 
     <!-- ============ ACERCA DE NOSOTROS ============ -->
-    <section class="section about" id="nosotros">
+    <section class="section about" id="nosotros" data-edit="about">
       <div class="container about__grid">
         <div class="about__intro">
           <p class="eyebrow">Acerca de nosotros</p>
-          <h2 class="h-2 about__title">Moda americana <em>premium</em>, elegida pieza por pieza.</h2>
+          <h2 class="h-2 about__title" data-slot="about.title" data-emph>Moda americana <em>premium</em>, elegida pieza por pieza.</h2>
           <figure class="about__visual" data-reveal="scale">
-            <img src="/media/editorial/silk-03.webp" alt="Seda color marfil sobre fondo beige" loading="lazy" width="1280" height="720" />
+            <img src="/media/editorial/silk-03.webp" alt="Seda color marfil sobre fondo beige" loading="lazy" width="1280" height="720" data-slot="about.image" data-w="1400" />
             <figcaption class="about__seal glass" data-monogram>
               <svg class="about__mark" viewBox="0 0 418 443" aria-hidden="true"><use href="#logo-mark"></use></svg>
               <span>Fashion in you</span>
@@ -242,7 +242,7 @@
           </figure>
         </div>
         <div class="about__body">
-          <div class="prose about__text">
+          <div class="prose about__text" data-slot="about.paragraphs">
             <p class="lead">Divani nació de una idea sencilla: que vestir bien no dependa de cruzar la frontera. Traemos desde Estados Unidos prendas con su etiqueta original y las seleccionamos con cuidado, pensando en cómo te van a quedar y en cuánto las vas a usar.</p>
             <p>Buscamos cortes que favorecen, telas que se sienten bien y detalles que hacen la diferencia: un satín con buena caída, una mezclilla que dura, un blazer que estructura. Cada modelo llega en pocas piezas, así que lo que encuentras aquí no lo vas a ver en todos lados.</p>
             <p>Y como la ropa se elige mejor platicando, te atendemos por WhatsApp: te damos medidas, te ayudamos con la talla y te acompañamos hasta que tu pedido llegue a tus manos.</p>
@@ -318,9 +318,9 @@
                 <div class="bubble bubble--out" style="--d: 0">
                   <p>Hola Divani, quiero hacer este pedido:</p>
                   <p><strong>Pedido DV-1016-K7Q2</strong></p>
-                  <p>1. Vestido slip satinado<br /><span>Champagne · Talla M · $899</span></p>
-                  <p>2. Jeans wide leg tiro alto<br /><span>Azul claro · Talla 6 · $799</span></p>
-                  <p><strong>Total: $1,698 MXN</strong></p>
+                  <p>1. Vestido slip satinado<br /><span>Champagne · Talla M · <span data-money="899">$899</span></span></p>
+                  <p>2. Jeans wide leg tiro alto<br /><span>Azul claro · Talla 6 · <span data-money="799">$799</span></span></p>
+                  <p><strong>Total: <span data-money="1698">$1,698</span> <span data-currency-code>MXN</span></strong></p>
                   <time>12:41</time>
                 </div>
                 <div class="bubble bubble--in" style="--d: 1">
@@ -328,7 +328,7 @@
                   <time>12:43</time>
                 </div>
                 <div class="bubble bubble--out" style="--d: 2">
-                  <p>¡Perfecto! Envío a Guadalajara, por favor.</p>
+                  <p>¡Perfecto! Envío a <span data-sample-city>Guadalajara</span>, por favor.</p>
                   <time>12:44</time>
                 </div>
               </div>
@@ -340,12 +340,12 @@
     </section>
 
     <!-- ============ HOMBRE ============ -->
-    <section class="section men" id="hombre">
+    <section class="section men" id="hombre" data-edit="men">
       <div class="container">
         <header class="section-head">
           <div class="section-head__text">
             <p class="eyebrow">Hombre</p>
-            <h2 class="h-2">Básicos <em>para él</em></h2>
+            <h2 class="h-2" data-slot="men.title" data-emph>Básicos <em>para él</em></h2>
           </div>
           <a class="link" href="tienda.html?depto=hombre">
             Ver todo hombre
@@ -354,10 +354,10 @@
         </header>
         <div class="men__grid">
           <a class="men__banner" href="tienda.html?depto=hombre" data-reveal>
-            <img src="/images/categories/hombre.webp" alt="Polo, camisa Oxford y chamarra de mezclilla colgados en un riel dorado" loading="lazy" width="800" height="1000" />
+            <img src="/images/categories/hombre.webp" alt="Polo, camisa Oxford y chamarra de mezclilla colgados en un riel dorado" loading="lazy" width="800" height="1000" data-slot="men.image" data-w="1000" />
             <span class="men__label glass">
               <span class="eyebrow eyebrow--plain">Para él</span>
-              <span class="men__title">Camisas, polos, chinos y mezclilla índigo</span>
+              <span class="men__title" data-slot="men.bannerTitle">Camisas, polos, chinos y mezclilla índigo</span>
             </span>
           </a>
           <div class="men__products" data-men-grid></div>
@@ -366,7 +366,7 @@
     </section>
 
     <!-- ============ PREGUNTAS FRECUENTES ============ -->
-    <section class="section section--linen faq" id="preguntas">
+    <section class="section section--linen faq" id="preguntas" data-edit="faq">
       <div class="container faq__grid">
         <div class="faq__intro">
           <p class="eyebrow">Ayuda</p>
@@ -382,14 +382,14 @@
     </section>
 
     <!-- ============ LISTA VIP ============ -->
-    <section class="vip">
+    <section class="vip" data-edit="vip">
       <div class="container">
         <div class="vip__card" data-reveal="scale">
-          <img class="vip__bg" src="/media/editorial/silk-01.webp" alt="" loading="lazy" width="1280" height="720" />
+          <img class="vip__bg" src="/media/editorial/silk-01.webp" alt="" loading="lazy" width="1280" height="720" data-slot="vip.image" data-w="1800" />
           <div class="vip__content glass">
             <p class="eyebrow">Lista VIP</p>
-            <h2 class="h-2">Entérate <em>primero</em></h2>
-            <p>Únete a nuestra lista de difusión y recibe por WhatsApp los nuevos ingresos en cuanto llegan.</p>
+            <h2 class="h-2" data-slot="vip.title" data-emph>Entérate <em>primero</em></h2>
+            <p data-slot="vip.text">Únete a nuestra lista de difusión y recibe por WhatsApp los nuevos ingresos en cuanto llegan.</p>
             <a class="btn btn--ink btn--wa" href="#" data-wa="vip" target="_blank" rel="noopener">
               <svg class="icon" aria-hidden="true"><use href="#i-whatsapp"></use></svg>
               Unirme a la lista VIP

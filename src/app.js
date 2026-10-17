@@ -20,8 +20,9 @@ import { initQuickView, openProduct } from './components/quick-view.js';
 import { productCache, switchCardColor } from './components/product-card.js';
 import { CatalogService } from './services/catalog.service.js';
 import { ContentService } from './services/content.service.js';
-import { setWhatsAppNumber } from './config/site.config.js';
-import { whatsappLinks } from './components/header.js';
+import { siteTexts } from './components/header.js';
+import { initEditBridge } from './core/edit-bridge.js';
+import { cdn } from './backend/model.js';
 
 const openers = {
   menu: () => sheet('menu')?.open(),
@@ -69,11 +70,14 @@ function delegatedActions() {
     if (!p) return;
     const card = el.closest('[data-card]');
     const color = p.colors.find((c) => c.name === card?.dataset.color) || p.colors[0];
-    cart.add(p, { color: color.name, size: el.dataset.size, qty: 1 });
+    if (!cart.add(p, { color: color.name, size: el.dataset.size, qty: 1 })) {
+      notify({ title: 'Esa talla se agotó en este color', sub: 'Toca la prenda para ver otras opciones.', icon: 'info' });
+      return;
+    }
     notify({
       title: 'Agregado a tu bolsa',
       sub: `${p.name} · ${color.name} · ${el.dataset.size}`,
-      image: color.images[0],
+      image: cdn(color.images[0], { w: 160 }),
       action: { label: 'Ver bolsa', onClick: openCart },
     });
   });
@@ -104,7 +108,7 @@ function delegatedActions() {
       notify({
         title: 'Guardado en favoritos',
         sub: p?.name || '',
-        image: p?.colors?.[0]?.images?.[0] || '',
+        image: cdn(p?.colors?.[0]?.images?.[0] || '', { w: 160 }),
         icon: 'heart',
         action: { label: 'Ver', onClick: openFavorites },
       });
@@ -118,16 +122,29 @@ function deepLink() {
   if (slug) setTimeout(() => openProduct(slug), 350);
 }
 
-/** Si settings.json (o el backend) trae un número de WhatsApp, tiene prioridad sobre el de .env. */
-function whatsappFromSettings() {
-  ContentService.getSettings().then((s) => {
-    if (setWhatsAppNumber(s?.whatsapp)) whatsappLinks();
+/** Ajustes del panel: WhatsApp, horario, redes y región (moneda, a dónde se envía…). */
+function settingsFromPanel() {
+  ContentService.getSettings().then(siteTexts).catch(() => {});
+}
+
+/** Oculta los departamentos que se apagaron en el panel (menú, pie de página y menú del celular). */
+function departmentsFromPanel() {
+  CatalogService.getCategories().then(({ departments }) => {
+    if (!departments?.length) return;
+    const on = new Set(departments.map((d) => d.slug));
+    document.querySelectorAll('a[href*="depto="]').forEach((a) => {
+      if (a.closest('main')) return;
+      const dep = new URL(a.href, location.href).searchParams.get('depto');
+      if (dep && !on.has(dep)) (a.closest('li') || a).hidden = true;
+    });
   }).catch(() => {});
 }
 
 export function initApp({ tab } = {}) {
   window.__divaniReady = true;
-  whatsappFromSettings();
+  initEditBridge();
+  settingsFromPanel();
+  departmentsFromPanel();
   initReveal();
   initGlassLight();
   initHeader();

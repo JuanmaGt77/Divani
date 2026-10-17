@@ -3,7 +3,8 @@
  * categorías, novedades, lo más deseado, niñas/niños y hombre.
  */
 import { html, render } from '../core/dom.js';
-import { plural } from '../core/format.js';
+import { plural, discountPct } from '../core/format.js';
+import { cdn } from '../backend/model.js';
 import { observeReveal } from '../core/motion.js';
 import { CatalogService } from '../services/catalog.service.js';
 import { productCard, cardSkeletons, remember } from '../components/product-card.js';
@@ -36,12 +37,17 @@ export async function initCategories() {
   const el = document.querySelector('[data-categories]');
   if (!el) return;
   try {
-    const { categories } = await CatalogService.getCategories();
+    const [{ categories }, sale] = await Promise.all([
+      CatalogService.getCategories(),
+      CatalogService.listProducts({ onSale: 1, pageSize: 100 }).catch(() => null),
+    ]);
     const women = categories.filter((c) => c.department === 'mujer');
+    // El mosaico de rebajas dice el descuento real más alto (o invita a lo más deseado si no hay ofertas)
+    const maxPct = Math.max(0, ...(sale?.data || []).map(discountPct));
     render(el, html`
       ${women.map((c, i) => html`
         <a class="tile${i === 0 ? ' tile--hero' : ''}" href="${`tienda.html?depto=mujer&cat=${c.slug}`}" data-reveal style="${`--d:${i % 4}`}">
-          <img src="${c.image}" alt="${`${c.name} de mujer`}" width="800" height="1000" loading="lazy" decoding="async" />
+          <img src="${cdn(c.image, { w: i === 0 ? 1200 : 800 })}" alt="${`${c.name} de mujer`}" width="800" height="1000" loading="lazy" decoding="async" />
           <span class="tile__label glass">
             <span class="tile__name">${c.name}</span>
             <span class="tile__count">${plural(c.productCount, 'pieza', 'piezas')}</span>
@@ -53,11 +59,17 @@ export async function initCategories() {
         <span class="tile__big">Lo <em>nuevo</em> de la temporada</span>
         <span class="tile__cta">Ver novedades <svg class="icon" aria-hidden="true"><use href="#i-arrow-up-right"></use></svg></span>
       </a>
+      ${sale?.data?.length ? html`
       <a class="tile tile--type tile--sand" href="tienda.html?oferta=1" data-reveal style="--d:3">
         <span class="eyebrow eyebrow--plain">Rebajas</span>
-        <span class="tile__big">Hasta <em>30%</em> menos</span>
+        ${maxPct >= 5 ? html`<span class="tile__big">Hasta <em>${maxPct}%</em> menos</span>` : html`<span class="tile__big">Precios <em>especiales</em></span>`}
         <span class="tile__cta">Ver ofertas <svg class="icon" aria-hidden="true"><use href="#i-arrow-up-right"></use></svg></span>
-      </a>`);
+      </a>` : html`
+      <a class="tile tile--type tile--sand" href="tienda.html?orden=populares" data-reveal style="--d:3">
+        <span class="eyebrow eyebrow--plain">Las favoritas</span>
+        <span class="tile__big">Lo más <em>deseado</em></span>
+        <span class="tile__cta">Ver ahora <svg class="icon" aria-hidden="true"><use href="#i-arrow-up-right"></use></svg></span>
+      </a>`}`);
     el.removeAttribute('aria-busy');
     observeReveal(el);
   } catch {

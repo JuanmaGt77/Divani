@@ -13,6 +13,7 @@
 @import "./components/sheets.css";
 @import "./components/commerce.css";
 @import "./components/footer.css";
+@import "./components/admin-bridge.css";
 
 @import "./sections/hero.css";
 @import "./sections/ribbons.css";

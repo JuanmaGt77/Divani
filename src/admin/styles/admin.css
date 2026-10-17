@@ -1,0 +1,7 @@
+/* Divani · Panel — el orden importa: base → componentes → estructura → secciones */
+@import "./base.css";
+@import "./components.css";
+@import "./media.css";
+@import "./charts.css";
+@import "./layout.css";
+@import "./pages.css";

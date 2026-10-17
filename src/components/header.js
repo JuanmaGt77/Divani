@@ -3,8 +3,11 @@
  * enlaces de WhatsApp y redes sociales.
  */
 import { $, $$, html, render, toString } from '../core/dom.js';
+import { money } from '../core/format.js';
 import { getParams } from '../core/url.js';
 import { SITE } from '../config/site.config.js';
+import { AUTH_STORAGE_KEY } from '../backend/config.js';
+import { cdn } from '../backend/model.js';
 import { CatalogService } from '../services/catalog.service.js';
 import { ContentService } from '../services/content.service.js';
 import { waLink, greetingMessage, vipMessage } from '../services/whatsapp.service.js';
@@ -84,6 +87,41 @@ export function whatsappLinks() {
   $$('[data-year]').forEach((el) => { el.textContent = String(new Date().getFullYear()); });
 }
 
+/** Textos que dependen de la región y de los datos de la tienda (Configuración del panel). */
+export function siteTexts() {
+  whatsappLinks();
+  socialLinks();
+  $$('[data-ship-area]').forEach((el) => { el.textContent = `Envíos a ${SITE.shippingArea}`; });
+  $$('[data-currency-note]').forEach((el) => { el.textContent = `Precios en ${SITE.currencyName} (${SITE.currency})`; });
+  $$('[data-currency-code]').forEach((el) => { el.textContent = SITE.currency; });
+  $$('[data-money]').forEach((el) => { el.textContent = money(el.dataset.money); });
+  const city = /^Ej\.\s*([^,]+)/.exec(SITE.cityPlaceholder || '')?.[1];
+  if (city) $$('[data-sample-city]').forEach((el) => { el.textContent = city; });
+  $$('[data-site-address]').forEach((li) => { li.hidden = !SITE.address; li.querySelector('span').textContent = SITE.address; });
+  $$('[data-site-email]').forEach((li) => {
+    li.hidden = !SITE.email;
+    const a = li.querySelector('a');
+    a.textContent = SITE.email;
+    a.href = `mailto:${SITE.email}`;
+  });
+}
+
+/** Acceso a la administración: si ya hay una sesión abierta en este navegador, lleva directo al panel. */
+export function adminLinks() {
+  let signed = false;
+  try {
+    signed = Boolean(localStorage.getItem(AUTH_STORAGE_KEY) || localStorage.getItem('divani.demo.session'));
+  } catch { /* sin almacenamiento */ }
+  $$('[data-admin-link]').forEach((a) => {
+    a.classList.toggle('is-signed-in', signed);
+    if (a.classList.contains('site-actions__admin')) {
+      a.setAttribute('aria-label', signed ? 'Ir al panel de administración' : 'Iniciar sesión (administración)');
+      a.title = signed ? 'Ir al panel' : 'Iniciar sesión';
+    }
+  });
+  $$('[data-admin-text]').forEach((el) => { el.textContent = signed ? 'Ir al panel de administración' : 'Iniciar sesión'; });
+}
+
 function socialLinks() {
   const labels = { instagram: 'Instagram', facebook: 'Facebook', tiktok: 'TikTok' };
   const links = Object.entries(SITE.social).filter(([, url]) => url);
@@ -115,8 +153,10 @@ async function megaMenu() {
   const paint = (dept) => {
     const d = data.departments.find((x) => x.slug === dept);
     const cats = data.categories.filter((c) => c.department === dept);
-    const cards = dept === 'mujer'
-      ? cats.filter((c) => ['vestidos', 'abrigos-y-chamarras'].includes(c.slug))
+    if (!d) return '';
+    const featured = cats.filter((c) => ['vestidos', 'abrigos-y-chamarras'].includes(c.slug) && c.image);
+    const cards = dept === 'mujer' && featured.length
+      ? featured
       : [{ name: `Ver ${d.name.toLowerCase()}`, image: d.image, slug: '' }];
     return toString(html`
       <div class="mega__grid">
@@ -131,7 +171,7 @@ async function megaMenu() {
           <a href="${`tienda.html?depto=${dept}&oferta=1`}"><span>Ofertas</span><small>%</small></a>
         </nav>
         <div class="mega__cards">
-          ${cards.slice(0, 2).map((c) => html`<a class="mega-card" href="${`tienda.html?depto=${dept}${c.slug ? `&cat=${c.slug}` : ''}`}"><img src="${c.image}" alt="" loading="lazy" /><span class="glass">${c.name}</span></a>`)}
+          ${cards.slice(0, 2).map((c) => html`<a class="mega-card" href="${`tienda.html?depto=${dept}${c.slug ? `&cat=${c.slug}` : ''}`}"><img src="${cdn(c.image, { w: 500 })}" alt="" loading="lazy" /><span class="glass">${c.name}</span></a>`)}
         </div>
       </div>`);
   };
@@ -170,8 +210,8 @@ export function initHeader() {
   scrollState();
   counters();
   announcements();
-  whatsappLinks();
-  socialLinks();
+  siteTexts();
+  adminLinks();
   activeNav();
   megaMenu();
 }

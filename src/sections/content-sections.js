@@ -4,6 +4,7 @@
 import { html, render, emphasis } from '../core/dom.js';
 import { money } from '../core/format.js';
 import { reduceMotion, observeReveal } from '../core/motion.js';
+import { cdn } from '../backend/model.js';
 import { ContentService } from '../services/content.service.js';
 import { CatalogService } from '../services/catalog.service.js';
 import { lookMessage, waLink } from '../services/whatsapp.service.js';
@@ -27,7 +28,10 @@ export async function initPromos() {
 
   render(track, html`${banners.map((b, i) => html`
     <article class="promo__slide${i === 0 ? ' is-current' : ''}" aria-roledescription="diapositiva" aria-label="${`${i + 1} de ${banners.length}`}">
-      <img class="promo__img" src="${b.image}" alt="" width="1600" height="900" ${i === 0 ? '' : html`loading="lazy"`} decoding="async" />
+      <picture>
+        ${b.imageMobile ? html`<source media="(max-width: 767px)" srcset="${cdn(b.imageMobile, { w: 900 })}" />` : ''}
+        <img class="promo__img" src="${cdn(b.image, { w: 2000 })}" alt="" width="1600" height="900" ${i === 0 ? '' : html`loading="lazy"`} decoding="async" />
+      </picture>
       <div class="promo__card glass glass--live">
         <p class="eyebrow">${b.eyebrow}</p>
         <h2 class="promo__title">${emphasis(b.title)}</h2>
@@ -103,7 +107,7 @@ export async function initLookbook() {
 
   render(root, html`
     <figure class="look__media" data-reveal="scale">
-      <img src="${look.image}" alt="${`Look: ${pieces.map((x) => x.p.name).join(', ')}`}" width="1200" height="1000" loading="lazy" decoding="async" />
+      <img src="${cdn(look.image, { w: 1400 })}" alt="${`Look: ${pieces.map((x) => x.p.name).join(', ')}`}" width="1200" height="1000" loading="lazy" decoding="async" />
       ${pieces.map((x, i) => html`
         <button class="hotspot" type="button" style="${`--x:${x.x}%;--y:${x.y}%`}" data-hotspot="${i}" aria-expanded="false" aria-label="${`Ver ${x.p.name}`}">
           <span class="hotspot__dot glass"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg></span>
@@ -116,7 +120,7 @@ export async function initLookbook() {
       <div class="look__list">
         ${pieces.map((x, i) => html`
           <button class="look-item" type="button" data-look-item="${i}" data-product-link="${x.p.slug}">
-            <img src="${x.color.images[0]}" alt="" width="60" height="75" loading="lazy" />
+            <img src="${cdn(x.color.images[0], { w: 160 })}" alt="" width="60" height="75" loading="lazy" />
             <span><span class="look-item__name">${x.p.name}</span><br /><span class="look-item__meta">${x.color.name}</span></span>
             <span class="look-item__price">${money(x.p.price)}</span>
           </button>`)}
@@ -155,7 +159,7 @@ export async function initFaq() {
     render(el, html`${faq.map((f, i) => html`
       <details ${i === 0 ? html`open` : ''}>
         <summary>${f.q}<svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg></summary>
-        <div class="accordion__body"><p>${f.a}</p></div>
+        <div class="accordion__body"><p style="white-space:pre-line">${f.a}</p></div>
       </details>`)}`);
   } catch {
     el.closest('section').hidden = true;

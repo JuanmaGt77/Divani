@@ -7,7 +7,11 @@ import { http } from './http.js';
 export const restAdapter = {
   name: 'rest',
 
+  registersOrders: true,
+
   getSettings: () => http('/settings'),
+
+  getContent: () => http('/content').catch(() => ({})),
 
   getBanners: ({ placement } = {}) => http('/banners', { params: { placement } }),
 

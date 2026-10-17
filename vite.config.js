@@ -30,6 +30,8 @@ export default defineConfig({
   // Rutas relativas: el sitio funciona en la raíz de un dominio o dentro de una subcarpeta.
   base: './',
   plugins: [htmlPartials()],
+  // El panel (src/admin) usa Preact con JSX
+  esbuild: { jsx: 'automatic', jsxImportSource: 'preact' },
   server: { port: 5173, open: true },
   build: {
     outDir: 'dist',
@@ -40,6 +42,7 @@ export default defineConfig({
         tienda: resolve(root, 'tienda.html'),
         noEncontrado: resolve(root, '404.html'),
         privacidad: resolve(root, 'aviso-de-privacidad.html'),
+        admin: resolve(root, 'admin.html'),
       },
     },
   },

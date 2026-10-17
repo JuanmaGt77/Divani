@@ -4,6 +4,9 @@
  */
 import { html, raw, render, esc } from '../core/dom.js';
 import { money, discountPct, totalStock } from '../core/format.js';
+import { sizesOf, colorStock, firstAvailableColor } from '../core/product.js';
+import { cdn } from '../backend/model.js';
+import { SITE } from '../config/site.config.js';
 import { setParams, productUrl } from '../core/url.js';
 import { listen } from '../core/emitter.js';
 import { CatalogService } from '../services/catalog.service.js';
@@ -39,14 +42,20 @@ export async function openProduct(slug, { color } = {}) {
     return;
   }
   productCache.set(p.slug, p);
-  const colorIdx = Math.max(0, p.colors.findIndex((c) => c.name === color));
-  const available = p.sizes.filter((s) => s.stock > 0);
-  state = { p, colorIdx, size: available.length === 1 ? available[0].label : null, qty: 1 };
+  const asked = p.colors.findIndex((c) => c.name === color);
+  const colorIdx = asked >= 0 ? asked : Math.max(0, p.colors.indexOf(firstAvailableColor(p)));
+  state = { p, colorIdx, size: onlySize(p, p.colors[colorIdx]?.name), qty: 1 };
   paint({ fresh: true });
   sheet('product').open();
   setParams({ p: p.slug });
   root.querySelector('.pdp__info')?.scrollTo(0, 0);
   root.scrollTo?.(0, 0);
+}
+
+/** Si el color tiene una sola talla disponible, se elige sola. */
+function onlySize(p, colorName) {
+  const available = sizesOf(p, colorName).filter((s) => s.stock > 0);
+  return available.length === 1 ? available[0].label : null;
 }
 
 function paint({ fresh = false } = {}) {
@@ -70,17 +79,19 @@ function draw() {
   const color = p.colors[colorIdx];
   const pct = discountPct(p);
   const stock = totalStock(p);
-  const sel = p.sizes.find((s) => s.label === size);
+  const sizes = sizesOf(p, color.name);
+  const inColor = colorStock(p, color.name);
+  const sel = sizes.find((s) => s.label === size);
   const fav = favorites.has(p.slug);
   const wa = waLink(productMessage(p, { color: color.name, size, qty }));
 
   render(root, html`
     <div class="pdp__gallery">
       <div class="pdp__slides" data-pdp-slides>
-        ${color.images.map((src, i) => html`<div class="pdp__slide"><img src="${src}" alt="${i === 0 ? `${p.name}, color ${color.name}` : `Detalle de ${p.name} con su etiqueta`}" width="800" height="1000" /></div>`)}
+        ${color.images.map((src, i) => html`<div class="pdp__slide"><img src="${cdn(src, { w: 1100 })}" alt="${i === 0 ? `${p.name}, color ${color.name}` : `Detalle de ${p.name} con su etiqueta`}" width="800" height="1000" /></div>`)}
       </div>
       <div class="pdp__thumbs glass">
-        ${color.images.map((src, i) => html`<button class="pdp__thumb" type="button" data-pdp-thumb="${i}" aria-current="${String(i === 0)}" aria-label="${`Ver foto ${i + 1}`}"><img src="${src}" alt="" /></button>`)}
+        ${color.images.map((src, i) => html`<button class="pdp__thumb" type="button" data-pdp-thumb="${i}" aria-current="${String(i === 0)}" aria-label="${`Ver foto ${i + 1}`}"><img src="${cdn(src, { w: 160 })}" alt="" /></button>`)}
       </div>
       <div class="pdp__dots glass" aria-hidden="true">${color.images.map((_, i) => html`<span aria-current="${String(i === 0)}"></span>`)}</div>
     </div>
@@ -99,19 +110,22 @@ function draw() {
       <div class="pdp__group">
         <p class="pdp__label"><span>Color: <strong>${color.name}</strong></span></p>
         <div class="pdp__colors" role="group" aria-label="Colores">
-          ${p.colors.map((c, i) => html`<button class="pdp__color" type="button" data-pdp-color="${i}" aria-pressed="${String(i === colorIdx)}" aria-label="${c.name}"><span class="swatch" style="${`--c:${c.hex}`}"></span></button>`)}
+          ${p.colors.map((c, i) => {
+            const out = colorStock(p, c.name) === 0;
+            return html`<button class="pdp__color${out ? ' is-out' : ''}" type="button" data-pdp-color="${i}" aria-pressed="${String(i === colorIdx)}" aria-label="${out ? `${c.name} (agotado)` : c.name}"><span class="swatch" style="${`--c:${c.hex}`}"></span></button>`;
+          })}
         </div>
       </div>
 
       <div class="pdp__group">
         <p class="pdp__label">
           <span>Talla${size ? html`: <strong>${size}</strong>` : ''}</span>
-          ${p.sizes.length > 1 ? html`<button type="button" data-size-guide><svg class="icon" aria-hidden="true"><use href="#i-ruler"></use></svg>Guía de tallas</button>` : ''}
+          ${sizes.length > 1 ? html`<button type="button" data-size-guide><svg class="icon" aria-hidden="true"><use href="#i-ruler"></use></svg>Guía de tallas</button>` : ''}
         </p>
         <div class="pdp__sizes" role="group" aria-label="Tallas" data-pdp-sizes>
-          ${p.sizes.map((s) => html`<button class="pdp__size" type="button" data-pdp-size="${s.label}" aria-pressed="${String(s.label === size)}" ${s.stock ? '' : raw('disabled')} aria-label="${s.stock ? `Talla ${s.label}` : `Talla ${s.label}, agotada`}">${s.label}</button>`)}
+          ${sizes.map((s) => html`<button class="pdp__size" type="button" data-pdp-size="${s.label}" aria-pressed="${String(s.label === size)}" ${s.stock ? '' : raw('disabled')} aria-label="${s.stock ? `Talla ${s.label}` : `Talla ${s.label}, agotada`}">${s.label}</button>`)}
         </div>
-        <p class="pdp__hint" data-pdp-hint aria-live="polite">${sel && sel.stock <= CATALOG.lowStock ? `Solo ${sel.stock === 1 ? 'queda 1 pieza' : `quedan ${sel.stock} piezas`} en esta talla.` : ''}</p>
+        <p class="pdp__hint" data-pdp-hint aria-live="polite">${stock > 0 && !inColor ? 'Este color se agotó: elige otro.' : sel && sel.stock <= CATALOG.lowStock ? `Solo ${sel.stock === 1 ? 'queda 1 pieza' : `quedan ${sel.stock} piezas`} en esta talla.` : ''}</p>
       </div>
 
       ${stock > 0 ? html`
@@ -121,7 +135,7 @@ function draw() {
           <output aria-live="polite">${qty}</output>
           <button type="button" data-pdp-qty="1" aria-label="Agregar uno" ${sel && qty >= sel.stock ? raw('disabled') : ''}><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg></button>
         </div>
-        <button class="btn btn--ink" type="button" data-pdp-add>
+        <button class="btn btn--ink" type="button" data-pdp-add ${inColor ? '' : raw('disabled')}>
           <svg class="icon" aria-hidden="true"><use href="#i-bag"></use></svg>
           Agregar a la bolsa
         </button>
@@ -139,7 +153,7 @@ function draw() {
 
       <ul class="pdp__perks list-reset">
         <li><svg class="icon" aria-hidden="true"><use href="#i-tag"></use></svg>Prenda importada con etiqueta original</li>
-        <li><svg class="icon" aria-hidden="true"><use href="#i-truck"></use></svg>Envíos a todo México</li>
+        <li><svg class="icon" aria-hidden="true"><use href="#i-truck"></use></svg>Envíos a ${SITE.shippingArea}</li>
         <li><svg class="icon" aria-hidden="true"><use href="#i-chat"></use></svg>Te asesoramos con la talla por WhatsApp</li>
       </ul>
 
@@ -168,6 +182,8 @@ function draw() {
   `);
 }
 
+const currentSizes = () => sizesOf(state.p, state.p.colors[state.colorIdx]?.name);
+
 function bind() {
   root = document.querySelector('[data-product]');
   if (!root) return;
@@ -177,20 +193,25 @@ function bind() {
     const color = t.closest('[data-pdp-color]');
     if (color) {
       state.colorIdx = +color.dataset.pdpColor;
+      // Cada color tiene sus propias tallas: si la elegida no hay en este color, se libera
+      const name = state.p.colors[state.colorIdx].name;
+      if (!sizesOf(state.p, name).some((s) => s.label === state.size && s.stock > 0)) state.size = onlySize(state.p, name);
+      const max = sizesOf(state.p, name).find((s) => s.label === state.size)?.stock || 1;
+      state.qty = Math.max(1, Math.min(state.qty, max));
       paint();
       return;
     }
     const size = t.closest('[data-pdp-size]');
     if (size && !size.disabled) {
       state.size = size.dataset.pdpSize;
-      const max = state.p.sizes.find((s) => s.label === state.size)?.stock || 1;
+      const max = currentSizes().find((s) => s.label === state.size)?.stock || 1;
       state.qty = Math.min(state.qty, max);
       paint();
       return;
     }
     const qty = t.closest('[data-pdp-qty]');
     if (qty) {
-      const max = state.p.sizes.find((s) => s.label === state.size)?.stock ?? 10;
+      const max = currentSizes().find((s) => s.label === state.size)?.stock ?? 10;
       state.qty = Math.max(1, Math.min(max, state.qty + Number(qty.dataset.pdpQty)));
       paint();
       return;
@@ -232,12 +253,15 @@ function add() {
     return;
   }
   const color = p.colors[colorIdx];
-  cart.add(p, { color: color.name, size, qty });
+  if (!cart.add(p, { color: color.name, size, qty })) {
+    notify({ title: 'Esa talla se agotó', sub: `${p.name} · ${color.name} · ${size}`, icon: 'info' });
+    return;
+  }
   sheet('product').close();
   notify({
     title: 'Agregado a tu bolsa',
     sub: `${p.name} · ${color.name} · ${size}`,
-    image: color.images[0],
+    image: cdn(color.images[0], { w: 160 }),
     action: { label: 'Ver bolsa', onClick: openCart },
   });
 }

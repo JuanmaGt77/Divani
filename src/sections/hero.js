@@ -3,6 +3,31 @@
  * dibuja el progreso y se pausa cuando no está en pantalla (ahorra batería).
  */
 import { reduceMotion } from '../core/motion.js';
+import { cdn } from '../backend/model.js';
+
+const DEFAULT_VIDEO = /media\/video\/divani-hero(-portrait)?\.mp4$/;
+// Video elegido en el panel (si es el de fábrica se usan sus versiones webm/mp4 locales)
+let custom = null;
+let applyCustom = null;
+
+/** Cambia el video y las fotos de respaldo de la portada (Sitio web → Portada con video). */
+export function setHeroMedia(hero = {}) {
+  const poster = document.querySelector('[data-hero-poster]');
+  if (poster && hero.poster) {
+    const img = poster.querySelector('img');
+    const src = cdn(hero.poster, { w: 1920 });
+    if (img && img.getAttribute('src') !== src) img.setAttribute('src', src);
+    const source = poster.querySelector('source');
+    const port = cdn(hero.posterPortrait || hero.poster, { w: 900 });
+    if (source && source.getAttribute('srcset') !== port) source.setAttribute('srcset', port);
+  }
+  const next = hero.video && !DEFAULT_VIDEO.test(hero.video)
+    ? { landscape: cdn(hero.video), portrait: cdn(hero.videoPortrait || hero.video) }
+    : null;
+  if (JSON.stringify(next) === JSON.stringify(custom)) return;
+  custom = next;
+  applyCustom?.();
+}
 
 export function initHero() {
   const video = document.querySelector('[data-hero-video]');
@@ -13,7 +38,9 @@ export function initHero() {
   const progress = document.querySelector('[data-hero-progress]');
   const portrait = matchMedia('(max-width: 767px)');
   // Mismo formato (webm/mp4) que eligió el navegador, en la orientación correcta
-  const urlFor = (kind, ext) => new URL(`media/video/divani-hero${kind === 'portrait' ? '-portrait' : ''}.${ext}`, document.baseURI).href;
+  const urlFor = (kind, ext) => (custom
+    ? new URL(custom[kind], document.baseURI).href
+    : new URL(`media/video/divani-hero${kind === 'portrait' ? '-portrait' : ''}.${ext}`, document.baseURI).href);
   let userPaused = reduceMotion();
 
   const setIcon = (btn, name, label) => {
@@ -35,6 +62,17 @@ export function initHero() {
   };
   portrait.addEventListener?.('change', pick);
   video.addEventListener('loadedmetadata', pick, { once: true });
+
+  // Video subido desde el panel
+  applyCustom = () => {
+    if (!custom) return;
+    video.querySelectorAll('source').forEach((x) => x.remove());
+    video.src = urlFor(portrait.matches ? 'portrait' : 'landscape');
+    poster?.classList.remove('is-hidden');
+    video.load();
+    if (!userPaused) video.play().catch(() => {});
+  };
+  if (custom) applyCustom();
 
   video.addEventListener('playing', () => poster?.classList.add('is-hidden'));
 

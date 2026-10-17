@@ -3,6 +3,8 @@
  */
 import { html, raw, esc } from '../core/dom.js';
 import { money, badgesOf, totalStock } from '../core/format.js';
+import { sizesOf, firstAvailableColor } from '../core/product.js';
+import { cdn } from '../backend/model.js';
 import { favorites } from '../store/favorites.store.js';
 import { productUrl } from '../core/url.js';
 
@@ -13,9 +15,11 @@ const familyHex = (c) => c.hex || '#ccc';
 
 export function productCard(p, { index = 0, reveal = true, category = '' } = {}) {
   productCache.set(p.slug, p);
-  const color = p.colors?.[0] || { images: [] };
-  const [img1, img2] = color.images;
+  const color = firstAvailableColor(p) || { images: [] };
+  const colorIdx = Math.max(0, p.colors?.indexOf(color) ?? 0);
+  const [img1, img2] = (color.images || []).map((src) => cdn(src, { w: 640 }));
   const stock = totalStock(p);
+  const inColor = new Map(sizesOf(p, color.name).map((s) => [s.label, s.stock]));
   const badges = badgesOf(p);
   const fav = favorites.has(p.slug);
   const sale = p.compareAtPrice && p.compareAtPrice > p.price;
@@ -24,7 +28,7 @@ export function productCard(p, { index = 0, reveal = true, category = '' } = {})
   const oneSize = sizes.length === 1;
 
   return html`
-  <article class="card${stock === 0 ? ' is-soldout' : ''}" data-card="${p.slug}" ${reveal ? raw(`data-reveal style="--d:${index % 4}"`) : ''}>
+  <article class="card${stock === 0 ? ' is-soldout' : ''}" data-card="${p.slug}" data-color="${color.name || ''}" ${reveal ? raw(`data-reveal style="--d:${index % 4}"`) : ''}>
     <div class="card__media">
       <a class="card__link" href="${href}" data-product-link="${p.slug}" aria-label="${`Ver ${p.name}`}">
         <img class="card__img--main" src="${img1}" alt="${`${p.name} color ${color.name}`}" width="800" height="1000" loading="lazy" decoding="async" />
@@ -40,7 +44,7 @@ export function productCard(p, { index = 0, reveal = true, category = '' } = {})
       <div class="card__quick glass">
         <p class="card__quick-title">${oneSize ? 'Agregar a la bolsa' : 'Agregar talla'}</p>
         <div class="card__sizes">
-          ${sizes.map((s) => html`<button class="size-btn" type="button" data-quick-add="${p.slug}" data-size="${s.label}" ${s.stock ? '' : raw('disabled')} aria-label="${`Agregar talla ${s.label}`}">${s.label}</button>`)}
+          ${sizes.map((s) => html`<button class="size-btn" type="button" data-quick-add="${p.slug}" data-size="${s.label}" ${inColor.get(s.label) ? '' : raw('disabled')} aria-label="${`Agregar talla ${s.label}`}">${s.label}</button>`)}
         </div>
       </div>
       <button class="icon-btn glass round card__add" type="button" data-quick="${p.slug}" aria-label="${`Agregar ${p.name}`}">
@@ -56,7 +60,7 @@ export function productCard(p, { index = 0, reveal = true, category = '' } = {})
       </p>
       ${p.colors?.length > 1 ? html`
       <div class="card__swatches">
-        ${p.colors.map((c, i) => html`<button class="card__swatch" type="button" data-card-color="${i}" aria-pressed="${String(i === 0)}" aria-label="${`Color ${c.name}`}"><span class="swatch" style="${`--c:${familyHex(c)}`}"></span></button>`)}
+        ${p.colors.map((c, i) => html`<button class="card__swatch" type="button" data-card-color="${i}" aria-pressed="${String(i === colorIdx)}" aria-label="${`Color ${c.name}`}"><span class="swatch" style="${`--c:${familyHex(c)}`}"></span></button>`)}
         <small>${p.colors.length} colores</small>
       </div>` : html`<div class="card__swatches"><span class="swatch" style="${`--c:${familyHex(color)}`}"></span><small>${color.name}</small></div>`}
     </div>
@@ -77,10 +81,13 @@ export function switchCardColor(cardEl, index) {
   const c = p?.colors?.[index];
   if (!c) return;
   const [main, alt] = cardEl.querySelectorAll('.card__media img');
-  if (main) { main.src = c.images[0]; main.alt = `${p.name} color ${c.name}`; }
-  if (alt && c.images[1]) alt.src = c.images[1];
+  if (main) { main.src = cdn(c.images[0], { w: 640 }); main.alt = `${p.name} color ${c.name}`; }
+  if (alt && c.images[1]) alt.src = cdn(c.images[1], { w: 640 });
   cardEl.querySelectorAll('[data-card-color]').forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.cardColor === index)));
   cardEl.dataset.color = c.name;
+  // Las tallas disponibles cambian con el color
+  const inColor = new Map(sizesOf(p, c.name).map((x) => [x.label, x.stock]));
+  cardEl.querySelectorAll('[data-quick-add]').forEach((b) => { b.disabled = !inColor.get(b.dataset.size); });
 }
 
 export function miniCard(p) {
@@ -88,7 +95,7 @@ export function miniCard(p) {
   const c = p.colors?.[0];
   return html`
   <a class="mini" href="${productUrl(p.slug)}" data-product-link="${p.slug}">
-    <span class="mini__media"><img src="${c?.images?.[0]}" alt="" width="800" height="1000" loading="lazy" /></span>
+    <span class="mini__media"><img src="${cdn(c?.images?.[0], { w: 400 })}" alt="" width="800" height="1000" loading="lazy" /></span>
     <span class="mini__name">${p.name}</span>
     <span class="mini__price">${money(p.price)}</span>
   </a>`;

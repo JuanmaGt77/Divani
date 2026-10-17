@@ -15,6 +15,12 @@ export const SITE = {
   url: '',
   locale: 'es-MX',
   currency: 'MXN',
+  currencyName: 'pesos mexicanos',
+  shippingArea: 'todo México',
+  cityLabel: 'Ciudad y estado',
+  cityPlaceholder: 'Ej. Guadalajara, Jalisco',
+  address: '',
+  email: '',
   whatsapp: {
     number: whatsappNumber,
     // Cómo se muestra el número en la página
@@ -63,7 +69,12 @@ export const STORAGE_KEYS = {
 };
 
 export function formatPhone(n) {
-  // 52 + 10 dígitos  →  +52 55 1234 5678
-  const m = n.match(/^(52)1?(\d{2})(\d{4})(\d{4})$/);
-  return m ? `+${m[1]} ${m[2]} ${m[3]} ${m[4]}` : `+${n}`;
+  // México: +52 55 1234 5678 · Guatemala: +502 5555 1234 · EE. UU.: +1 713 555 1234
+  let m = n.match(/^(52)1?(\d{2})(\d{4})(\d{4})$/);
+  if (m) return `+${m[1]} ${m[2]} ${m[3]} ${m[4]}`;
+  m = n.match(/^(502)(\d{4})(\d{4})$/);
+  if (m) return `+${m[1]} ${m[2]} ${m[3]}`;
+  m = n.match(/^(1)(\d{3})(\d{3})(\d{4})$/);
+  if (m) return `+${m[1]} ${m[2]} ${m[3]} ${m[4]}`;
+  return `+${n}`;
 }

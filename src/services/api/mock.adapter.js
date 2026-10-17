@@ -4,6 +4,8 @@
  * rest.adapter.js automáticamente (definiendo VITE_API_URL).
  */
 import { API } from '../../config/site.config.js';
+import { mergeSettings } from '../../backend/model.js';
+import { applySiteSettings } from '../../core/site-settings.js';
 import { ApiError } from './http.js';
 import { queryProducts } from './query.js';
 
@@ -34,8 +36,14 @@ function orderNumber() {
 
 export const mockAdapter = {
   name: 'mock',
+  registersOrders: false,
 
-  getSettings: () => load('settings'),
+  async getSettings() {
+    const s = mergeSettings({ public: await load('settings') }).public;
+    return applySiteSettings(s);
+  },
+
+  getContent: () => load('content'),
 
   async getBanners({ placement } = {}) {
     const all = await load('banners');

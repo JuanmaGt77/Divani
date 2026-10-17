@@ -1,4 +1,4 @@
-<footer class="site-footer" id="contacto">
+<footer class="site-footer" id="contacto" data-edit="store">
   <div class="container">
     <div class="site-footer__top">
       <div class="site-footer__brand">
@@ -44,7 +44,15 @@
             </li>
             <li>
               <svg class="icon" aria-hidden="true"><use href="#i-truck"></use></svg>
-              <span>Envíos a todo México</span>
+              <span data-ship-area>Envíos a todo México</span>
+            </li>
+            <li data-site-address hidden>
+              <svg class="icon" aria-hidden="true"><use href="#i-map-pin"></use></svg>
+              <span></span>
+            </li>
+            <li data-site-email hidden>
+              <svg class="icon" aria-hidden="true"><use href="#i-chat"></use></svg>
+              <a href="#"></a>
             </li>
           </ul>
           <div class="site-footer__social" data-social></div>
@@ -61,7 +69,9 @@
       <p class="site-footer__legal">
         <a href="aviso-de-privacidad.html">Aviso de privacidad</a>
         <span aria-hidden="true">·</span>
-        <span>Precios en pesos mexicanos (MXN)</span>
+        <span data-currency-note>Precios en pesos mexicanos (MXN)</span>
+        <span aria-hidden="true">·</span>
+        <a href="admin.html" data-admin-link>Administración</a>
       </p>
     </div>
   </div>

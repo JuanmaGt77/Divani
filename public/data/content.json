@@ -1,0 +1,45 @@
+{
+  "hero": {
+    "eyebrow": "Otoño · Invierno 2026",
+    "title": "Moda americana, *elegida para ti.*",
+    "subtitle": "Prendas con etiqueta original, seleccionadas para mujer, niñas, niños y hombre.",
+    "video": "media/video/divani-hero.mp4",
+    "videoPortrait": "media/video/divani-hero-portrait.mp4",
+    "poster": "media/video/divani-hero-poster.webp",
+    "posterPortrait": "media/video/divani-hero-portrait-poster.webp"
+  },
+  "ribbons": {
+    "primary": ["Nueva temporada", "*Divani*", "Ropa americana", "*Fashion in you*", "Etiqueta original", "*Divani*", "Piezas limitadas"],
+    "secondary": ["Compra por WhatsApp", "*Mujer*", "Envíos a todo México", "*Niñas & niños*", "Atención personal", "*Hombre*"]
+  },
+  "editorial": {
+    "image": "media/editorial/silk-02.webp",
+    "eyebrow": "Divani · Fashion in you",
+    "title": "Ropa americana. *Etiqueta original.*"
+  },
+  "kids": {
+    "title": "Para los *más pequeños*",
+    "lead": "Vestidos de fiesta, mezclilla y básicos suaves en tallas americanas de 2T a 12.",
+    "girlsImage": "images/categories/ninas.webp",
+    "boysImage": "images/categories/ninos.webp"
+  },
+  "about": {
+    "title": "Moda americana *premium*, elegida pieza por pieza.",
+    "image": "media/editorial/silk-03.webp",
+    "paragraphs": [
+      "Divani nació de una idea sencilla: que vestir bien no dependa de cruzar la frontera. Traemos desde Estados Unidos prendas con su etiqueta original y las seleccionamos con cuidado, pensando en cómo te van a quedar y en cuánto las vas a usar.",
+      "Buscamos cortes que favorecen, telas que se sienten bien y detalles que hacen la diferencia: un satín con buena caída, una mezclilla que dura, un blazer que estructura. Cada modelo llega en pocas piezas, así que lo que encuentras aquí no lo vas a ver en todos lados.",
+      "Y como la ropa se elige mejor platicando, te atendemos por WhatsApp: te damos medidas, te ayudamos con la talla y te acompañamos hasta que tu pedido llegue a tus manos."
+    ]
+  },
+  "men": {
+    "title": "Básicos *para él*",
+    "bannerTitle": "Camisas, polos, chinos y mezclilla índigo",
+    "image": "images/categories/hombre.webp"
+  },
+  "vip": {
+    "title": "Entérate *primero*",
+    "text": "Únete a nuestra lista de difusión y recibe por WhatsApp los nuevos ingresos en cuanto llegan.",
+    "image": "media/editorial/silk-01.webp"
+  }
+}

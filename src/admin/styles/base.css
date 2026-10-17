@@ -1,0 +1,166 @@
+/* ==========================================================================
+   Divani · Panel de administración — tokens y base
+   Mismo ADN de la tienda (marfil, arena, tinta y vidrio líquido de iOS 26),
+   ajustado para trabajar muchas horas: contraste alto, textos de 15 px,
+   áreas táctiles de 44 px y superficies opacas donde hay datos.
+   ========================================================================== */
+:root {
+  color-scheme: light;
+
+  --ink: #171513;
+  --ink-2: #2c2824;
+  --text: #171513;
+  --text-2: #5f554b;
+  --text-3: #8a7e72;
+  --on-ink: #fbf8f2;
+
+  --bg: #f3eee6;
+  --bg-2: #ebe3d6;
+  --surface: rgb(255 253 249 / 0.9);
+  --surface-solid: #fffdf9;
+  --surface-2: #faf6ef;
+  --fill: rgb(120 98 72 / 0.075);
+  --fill-2: rgb(120 98 72 / 0.13);
+  --fill-3: rgb(120 98 72 / 0.2);
+  --line: rgb(23 21 19 / 0.08);
+  --line-2: rgb(23 21 19 / 0.14);
+
+  --accent: #a8855c;
+  --accent-ink: #7b5b36;
+  --accent-soft: rgb(168 133 92 / 0.15);
+  --focus-ring: 0 0 0 3px rgb(168 133 92 / 0.38);
+
+  --blue: #2a5d8f;   --blue-soft: #e2ecf6;
+  --amber: #8c5c0e;  --amber-soft: #f6e9cf;
+  --plum: #7a476c;   --plum-soft: #f2e4ee;
+  --teal: #1b6464;   --teal-soft: #dbeeeb;
+  --green: #2c6a4d;  --green-soft: #def0e5;
+  --red: #a23f2b;    --red-soft: #f7e2dc;
+  --gray: #625c55;   --gray-soft: #ece7e0;
+  --switch-on: #2f9b62;
+
+  --glass: rgb(255 252 246 / 0.6);
+  --glass-strong: rgb(255 252 246 / 0.82);
+  --glass-blur: saturate(180%) blur(22px);
+  --glass-edge: inset 0 1px 0.5px rgb(255 255 255 / 0.9), inset 0 0 0 1px rgb(255 255 255 / 0.3);
+
+  --font-sans: "Jost", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Bodoni Moda", "Bodoni 72", Didot, "Times New Roman", serif;
+
+  --r-xs: 8px;
+  --r-sm: 11px;
+  --r: 14px;
+  --r-lg: 20px;
+  --r-xl: 26px;
+  --r-pill: 999px;
+
+  --shadow-1: 0 1px 2px rgb(64 44 22 / 0.06), 0 0 0 1px rgb(23 21 19 / 0.05);
+  --shadow-2: 0 12px 32px -14px rgb(64 44 22 / 0.3), 0 0 0 1px rgb(23 21 19 / 0.05);
+  --shadow-3: 0 30px 70px -24px rgb(40 28 14 / 0.45), 0 0 0 1px rgb(23 21 19 / 0.06);
+
+  --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+
+  --sidebar-w: 252px;
+  --tabbar-h: 62px;
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  min-height: 100dvh;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-variant-numeric: tabular-nums;
+  overflow-x: hidden;
+}
+img, svg, video, canvas { display: block; max-width: 100%; }
+input, button, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; background: none; border: 0; padding: 0; }
+a { color: inherit; text-decoration: none; }
+h1, h2, h3, h4 { font-weight: 500; line-height: 1.2; text-wrap: balance; }
+p { text-wrap: pretty; }
+ul, ol { padding: 0; list-style: none; }
+table { border-collapse: collapse; }
+:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: 6px; }
+::selection { background: rgb(168 133 92 / 0.28); }
+[hidden] { display: none !important; }
+
+/* Fondo cálido con manchas suaves: le da profundidad al vidrio */
+.app-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(55vw 45vh at 4% -6%, rgb(233 219 199 / 0.95), transparent 62%),
+    radial-gradient(45vw 40vh at 102% 4%, rgb(216 197 168 / 0.6), transparent 62%),
+    radial-gradient(60vw 55vh at 70% 108%, rgb(240 222 210 / 0.75), transparent 64%),
+    var(--bg);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Tipografía */
+.display { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.01em; }
+.eyebrow {
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+}
+.muted { color: var(--text-2); }
+.faint { color: var(--text-3); }
+.small { font-size: 13px; }
+.xsmall { font-size: 12px; }
+.strong { font-weight: 500; }
+.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em; letter-spacing: -0.01em; }
+.ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.tone-up { color: var(--green); }
+.tone-down { color: var(--red); }
+
+/* Utilidades de layout */
+.stack { display: flex; flex-direction: column; gap: var(--gap, 16px); }
+.row { display: flex; align-items: center; gap: var(--gap, 10px); min-width: 0; }
+.row--wrap { flex-wrap: wrap; }
+.row--between { justify-content: space-between; }
+.row--end { justify-content: flex-end; }
+.row--top { align-items: flex-start; }
+.grow { flex: 1 1 auto; min-width: 0; }
+.grid { display: grid; gap: var(--gap, 16px); grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr)); }
+.grid--auto { grid-template-columns: repeat(auto-fill, minmax(var(--min, 240px), 1fr)); }
+.span-2 { grid-column: span 2; }
+.span-all { grid-column: 1 / -1; }
+.divider { height: 1px; background: var(--line); border: 0; margin: 4px 0; }
+
+@media (max-width: 899px) {
+  .grid:not(.grid--auto) { grid-template-columns: repeat(var(--cols-m, 1), minmax(0, 1fr)); }
+  .span-2 { grid-column: auto; }
+  .hide-mobile { display: none !important; }
+}
+@media (min-width: 900px) {
+  .show-mobile { display: none !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

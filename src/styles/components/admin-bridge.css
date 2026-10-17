@@ -1,0 +1,93 @@
+/* ==========================================================================
+   Conexión con el panel: acceso a la administración y modo edición de la
+   vista previa (index.html?editar=1 dentro del panel)
+   ========================================================================== */
+
+/* Acceso a la administración */
+.site-actions__admin { position: relative; }
+.site-actions__admin-label { display: none; }
+.site-actions__admin.is-signed-in {
+  width: auto;
+  gap: 6px;
+  padding: 0 12px 0 10px;
+  border-radius: var(--r-pill);
+  background: rgb(23 21 19 / 0.06);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+}
+.site-actions__admin.is-signed-in .site-actions__admin-label { display: inline; }
+@media (max-width: 767px) {
+  .site-actions__admin { display: none; }
+}
+.menu__sub .menu__admin { display: inline-flex; align-items: center; gap: 8px; }
+.menu__sub .menu__admin .icon { width: 17px; height: 17px; }
+
+/* Banner con foto distinta en celular */
+.promo__slide > picture { display: contents; }
+
+/* Color agotado en la ficha */
+.pdp__color.is-out { position: relative; opacity: 0.55; }
+.pdp__color.is-out::after {
+  content: "";
+  position: absolute;
+  left: 7px;
+  right: 7px;
+  top: 50%;
+  height: 1.5px;
+  background: var(--ink);
+  transform: rotate(-45deg);
+}
+
+/* Pedido registrado */
+.checkout__number {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 1.15rem !important;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--ink) !important;
+  padding: 6px 14px;
+  border-radius: var(--r-pill);
+  background: rgb(23 21 19 / 0.06);
+}
+.btn.is-loading { cursor: progress; }
+
+/* Modo edición */
+.is-editing [data-edit] { cursor: pointer; }
+.is-editing .skip-link { display: none; }
+.edit-outline {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 3px #a8855c, 0 0 0 6px rgb(168 133 92 / 0.18);
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), width 0.18s cubic-bezier(0.22, 1, 0.36, 1), height 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* La vista previa se muestra reducida dentro del panel: la etiqueta va grande para que se lea */
+.edit-outline__label {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 52px;
+  padding: 0 24px 0 18px;
+  border-radius: 999px;
+  background: #171513;
+  color: #fbf8f2;
+  font: 500 21px/1 var(--font-sans, system-ui, sans-serif);
+  box-shadow: 0 12px 28px -10px rgb(0 0 0 / 0.55);
+  white-space: nowrap;
+}
+.edit-outline__label .icon { width: 22px; height: 22px; color: #e3c79c; }
+@media (max-width: 767px) {
+  .edit-outline__label { top: 10px; left: 10px; height: 40px; padding: 0 16px 0 13px; font-size: 16px; gap: 8px; }
+  .edit-outline__label .icon { width: 17px; height: 17px; }
+}
+@keyframes edit-flash {
+  0%, 100% { box-shadow: none; }
+  30% { box-shadow: inset 0 0 0 3px #a8855c, 0 0 0 8px rgb(168 133 92 / 0.2); }
+}
+.is-edit-flash { animation: edit-flash 1.4s ease; }
