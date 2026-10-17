@@ -1358,7 +1358,7 @@ begin
   select coalesce(private->'cloudinary', '{}'::jsonb) into cfg from public.settings where id = 1;
   select value into v_secret from private.secrets where name = 'cloudinary_api_secret';
   if coalesce(cfg->>'cloudName', '') = '' or coalesce(cfg->>'apiKey', '') = '' or v_secret is null then
-    raise exception 'Cloudinary no está configurado. Ve a Configuración → Integraciones.';
+    raise exception 'Cloudinary no está configurado. Ve a Configuración → Conexiones.';
   end if;
   v_root := coalesce(nullif(cfg->>'folder', ''), 'divani');
   v_folder := coalesce(nullif(p_params->>'folder', ''), v_root);

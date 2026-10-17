@@ -78,22 +78,30 @@ El API Secret se guarda cifrado en la base de datos y solo lo usa el servidor pa
 
 ## Alternativa: todo en un comando
 
-Si prefieres no copiar y pegar, `npm run setup:supabase` hace los pasos 1 a 3 desde tu computadora:
+`npm run setup:supabase` hace los pasos 1 a 5 desde tu computadora (en la terminal de Visual Studio Code, por ejemplo):
 
-1. Crea un archivo `.env.local` (no se sube a GitHub) con:
+1. En Supabase → tu foto (arriba a la derecha) → **Account preferences → Access Tokens** → **Generate new token**. Ponle una caducidad corta: solo se usa para esta preparación.
+2. Crea en la carpeta del proyecto un archivo `.env.local` (no se sube a GitHub) con:
 
    ```
    VITE_SUPABASE_URL=https://xxxx.supabase.co
-   VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_…
-   SUPABASE_SECRET_KEY=sb_secret_…
-   SUPABASE_ACCESS_TOKEN=sbp_…        # Account → Access Tokens (para ejecutar el SQL)
+   SUPABASE_ACCESS_TOKEN=sbp_…
    ADMIN_EMAIL=somosdivani@gmail.com
    ADMIN_PASSWORD=tu-contraseña
-   SITE_URL=https://tu-dominio.com
+   CLOUDINARY_CLOUD_NAME=…
+   CLOUDINARY_API_KEY=…
+   CLOUDINARY_API_SECRET=…
+   SITE_URL=https://tu-dominio.com      # opcional
    ```
 
-2. Ejecuta `npm install` y luego `npm run setup:supabase`. Al final te dice si la tienda lee el catálogo y si tu usuario entra al panel.
-3. Borra `SUPABASE_SECRET_KEY`, `SUPABASE_ACCESS_TOKEN` y `ADMIN_PASSWORD` del archivo cuando termines.
+3. Ejecuta `npm install` y luego `npm run setup:supabase`. El script:
+   - obtiene solo las llaves del proyecto (la secreta nunca se guarda),
+   - crea las tablas y el catálogo inicial, y cierra el registro público,
+   - crea tu usuario administrador ya confirmado,
+   - comprueba que la tienda lee el catálogo y que tu usuario entra al panel,
+   - conecta Cloudinary y hace una subida de prueba,
+   - agrega a `.env.local` la URL y la clave publicable, así `npm run dev` ya usa tu base de datos.
+4. Cuando termine, borra del archivo `SUPABASE_ACCESS_TOKEN`, `ADMIN_PASSWORD` y `CLOUDINARY_API_SECRET`, y elimina el token en Supabase.
 
 Para cambiar la contraseña de un administrador que ya existe: `npm run setup:supabase -- --reset-password`.
 
