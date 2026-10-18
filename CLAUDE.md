@@ -68,14 +68,14 @@ Para verificar a mano: `npm run verify`, abrir tienda y panel sin errores en la 
 ## Estado actual (18 de octubre de 2026)
 
 Hecho:
-- Migración completa a Astro + React + TypeScript en la rama `migracion-astro` (tienda, página por prenda, panel, SQL nuevo, documentación). Verificado: tipos, lint, pruebas, compilación y recorrido en Chrome (tienda y panel, 390 px y escritorio) sin errores de consola.
+- Migración completa a Astro + React + TypeScript (tienda, página por prenda, panel, SQL nuevo, documentación), unida a `main` y en GitHub. Verificado: tipos, lint, pruebas, compilación y recorrido en Chrome (tienda y panel, 390 px y escritorio) sin errores de consola.
 - Supabase conectado: tablas y catálogo de ejemplo cargados, registro público cerrado, `somosdivani@gmail.com` con acceso de administrador. `.env.local` tiene `PUBLIC_SUPABASE_URL` y `PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
 
 Pendiente:
-1. **Aplicar el SQL nuevo** en Supabase: `schema.sql` y `actualizaciones/2026-10-18-guatemala-ropa-americana.sql` (hasta entonces `/producto/…` responde 503 y la base sigue con región México y textos de «etiqueta»).
-2. Revisar y unir la rama `migracion-astro` a `main`.
-3. **Publicar** en Cloudflare Workers (ver `docs/CONEXION.md`): build `npm run build`, deploy `npx wrangler deploy`, variables de compilación `PUBLIC_SUPABASE_URL`, `PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `PUBLIC_SITE_URL`. Después poner la dirección en Supabase → Authentication → URL Configuration.
-4. **Cloudinary**: el dueño genera una API Key nueva y pega API Key + API Secret en el panel (Configuración → Conexiones → Guardar → Probar subida).
-5. **Seguridad**: quitar de `.env.local` `SUPABASE_ACCESS_TOKEN`, `ADMIN_PASSWORD` y `CLOUDINARY_API_SECRET`; borrar el token personal «divani» en Supabase; cambiar la contraseña del administrador.
-6. **Datos reales**: cambiar las 45 prendas de ejemplo por las reales; configurar WhatsApp, horario y redes en Configuración → Tienda y contacto.
-7. Completar `src/pages/aviso-de-privacidad.astro` (datos marcados con `<mark>`).
+1. **Publicar** en Cloudflare Workers (ver `docs/CONEXION.md`). Esta computadora no tiene sesión de Cloudflare: el dueño debe autorizar `npx wrangler login` (o conectar el repositorio en el panel de Cloudflare). Luego `npm run deploy`. Variables de compilación: `PUBLIC_SUPABASE_URL`, `PUBLIC_SUPABASE_PUBLISHABLE_KEY` y `PUBLIC_SITE_URL` (la dirección final). Después poner esa dirección en Supabase → Authentication → URL Configuration (Site URL y `…/admin` en Redirect URLs).
+2. **Cloudinary**: el dueño genera una API Key nueva y pega API Key + API Secret en el panel (Configuración → Conexiones → Guardar → Probar subida).
+3. **Seguridad** (lo hace el dueño): quitar de `.env.local` `SUPABASE_ACCESS_TOKEN`, `ADMIN_PASSWORD` y `CLOUDINARY_API_SECRET`; borrar el token personal «divani» en Supabase; cambiar la contraseña del administrador.
+4. **Datos reales**: cambiar las 45 prendas de ejemplo por las reales; configurar WhatsApp, horario y redes en Configuración → Tienda y contacto.
+5. Completar `src/pages/aviso-de-privacidad.astro` (datos marcados con `<mark>`).
+
+Ya aplicado en Supabase (18 de octubre de 2026): `schema.sql` nuevo y `actualizaciones/2026-10-18-guatemala-ropa-americana.sql` (región GTQ, textos sin «etiqueta», enlaces `/tienda`). La migración ya está en `main` (GitHub).
