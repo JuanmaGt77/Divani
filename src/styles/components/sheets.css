@@ -122,6 +122,8 @@ html.is-locked { overflow: hidden; }
   .sheet.is-dragging .sheet__panel { transition: none; }
   .sheet__grabber { display: block; }
   .sheet__head { padding: 10px 14px 10px 20px; }
+  /* El tirador y el encabezado se arrastran para cerrar: el navegador no debe desplazar la página */
+  .sheet__grabber, .sheet__head { touch-action: none; }
   .sheet__title { font-size: 1.5rem; }
   .sheet__body { padding: 0 18px 20px; }
 }

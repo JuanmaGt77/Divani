@@ -137,7 +137,7 @@
   stroke-dasharray: 2400;
   stroke-dashoffset: 2400;
 }
-.js-motion .about__seal[data-monogram].is-in .about__mark {
+.js-motion .about__seal[data-monogram][data-in] .about__mark {
   fill: currentColor;
   stroke-width: 0;
   stroke-dashoffset: 0;
@@ -295,7 +295,7 @@
   transition-delay: calc(var(--d, 0) * 0.9s + 0.3s);
 }
 .js-motion .phone .bubble--in { transform-origin: bottom left; }
-.js-motion .phone.is-in .bubble { opacity: 1; transform: none; }
+.js-motion .phone[data-in] .bubble { opacity: 1; transform: none; }
 @media (max-width: 900px) {
   .howto__grid { grid-template-columns: 1fr; }
 }

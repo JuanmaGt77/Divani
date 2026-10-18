@@ -1,0 +1,124 @@
+---
+/**
+ * Diseño común de la tienda: <head> (buscadores, redes, íconos y fuentes), íconos SVG,
+ * encabezado, pie, hojas (bolsa, búsqueda, favoritos, vista rápida) y barra inferior del celular.
+ */
+import '@/styles/main.css';
+import Sprite from '@/components/Sprite.astro';
+import SiteHeader from '@/store/islands/SiteHeader';
+import SiteFooter from '@/store/islands/SiteFooter';
+import StoreOverlays from '@/store/islands/StoreOverlays';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Título y descripción para redes (si no, los mismos de la página). */
+  ogTitle?: string;
+  ogDescription?: string;
+  /** Imagen para compartir: ruta local o dirección completa. */
+  image?: string;
+  imageAlt?: string;
+  type?: 'website' | 'product';
+  bodyClass?: string;
+  /** Pestaña activa de la barra inferior (celular). */
+  tab?: 'inicio' | 'tienda';
+  noindex?: boolean;
+  /** Datos estructurados para buscadores (JSON-LD). */
+  jsonLd?: Record<string, unknown>;
+}
+
+const DEFAULT_IMAGE = '/brand/og-image.jpg';
+const {
+  title,
+  description,
+  ogTitle = title,
+  ogDescription = description,
+  image = DEFAULT_IMAGE,
+  imageAlt = 'Divani · Ropa americana premium',
+  type = 'website',
+  bodyClass,
+  tab,
+  noindex = false,
+  jsonLd,
+} = Astro.props;
+
+// Direcciones completas para redes y buscadores: el dominio configurado (PUBLIC_SITE_URL) o,
+// en las páginas que se generan al momento, el de la petición
+const origin = Astro.site?.origin ?? (Astro.isPrerendered ? null : Astro.url.origin);
+const absolute = (u: string) => (origin ? new URL(u, origin).href : u);
+const canonical = origin ? new URL(Astro.url.pathname, origin).href : null;
+const year = new Date().getFullYear();
+---
+
+<!doctype html>
+<html lang="es-GT">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex ? <meta name="robots" content="noindex" /> : canonical && <link rel="canonical" href={canonical} />}
+    <script is:inline>
+      // Activa las animaciones de aparición antes de pintar; si el JS no arranca, se desactivan solas.
+      (function () {
+        const d = document.documentElement;
+        if (!window.matchMedia || !matchMedia('(prefers-reduced-motion: reduce)').matches) d.classList.add('js-motion');
+        setTimeout(function () {
+          if (!window.__divaniReady) d.classList.remove('js-motion');
+        }, 4000);
+      })();
+    </script>
+    <meta name="theme-color" content="#171513" />
+    <meta name="color-scheme" content="light" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/icons/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Divani" />
+    <meta property="og:site_name" content="Divani" />
+    <meta property="og:type" content={type} />
+    <meta property="og:locale" content="es_GT" />
+    <meta property="og:title" content={ogTitle} />
+    <meta property="og:description" content={ogDescription} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    <meta property="og:image" content={absolute(image)} />
+    <meta property="og:image:alt" content={imageAlt} />
+    {image === DEFAULT_IMAGE && (
+      <>
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+      </>
+    )}
+    <meta name="twitter:card" content="summary_large_image" />
+    <slot name="head" />
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd).replace(/</g, '\\u003c')} />}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..600;1,6..96,400..600&family=Jost:wght@300..600&display=swap"
+    />
+  </head>
+  <body class={bodyClass}>
+    <Sprite />
+    <a class="skip-link" href="#contenido">
+      Saltar al contenido
+    </a>
+    <SiteHeader client:load />
+    <slot />
+    <SiteFooter client:visible year={year} />
+    <StoreOverlays client:load tab={tab} />
+    <script>
+      import { initEditBridge } from '@/store/lib/edit-bridge';
+      import { initGlassLight, initReveal } from '@/store/lib/motion';
+
+      initEditBridge();
+      initReveal();
+      initGlassLight();
+    </script>
+  </body>
+</html>

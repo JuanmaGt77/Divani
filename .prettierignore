@@ -1,0 +1,10 @@
+dist
+.astro
+.wrangler
+node_modules
+public
+supabase
+docs
+package-lock.json
+*.css
+*.md

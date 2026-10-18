@@ -1,0 +1,51 @@
+---
+/** Portada. Cada sección es una «isla» de React que se activa al acercarse a la pantalla. */
+import StoreLayout from '@/layouts/StoreLayout.astro';
+import Hero from '@/store/islands/home/Hero';
+import Ribbons from '@/store/islands/home/Ribbons';
+import Categories from '@/store/islands/home/Categories';
+import NewArrivals from '@/store/islands/home/NewArrivals';
+import Promos from '@/store/islands/home/Promos';
+import Bestsellers from '@/store/islands/home/Bestsellers';
+import Lookbook from '@/store/islands/home/Lookbook';
+import Editorial from '@/store/islands/home/Editorial';
+import Kids from '@/store/islands/home/Kids';
+import About from '@/store/islands/home/About';
+import HowTo from '@/store/islands/home/HowTo';
+import Men from '@/store/islands/home/Men';
+import Faq from '@/store/islands/home/Faq';
+import Vip from '@/store/islands/home/Vip';
+---
+
+<StoreLayout
+  title="Divani · Ropa americana premium"
+  description="Divani: ropa americana premium para mujer, niñas, niños y hombre. Compra fácil y segura por WhatsApp con envíos a toda Guatemala."
+  ogTitle="Divani · Fashion in you"
+  ogDescription="Ropa americana premium. Compra fácil por WhatsApp."
+  bodyClass="page-home"
+  tab="inicio"
+  jsonLd={{
+    '@context': 'https://schema.org',
+    '@type': 'ClothingStore',
+    name: 'Divani',
+    description: 'Ropa americana premium para mujer, niñas, niños y hombre.',
+    ...(Astro.site ? { url: Astro.site.href, logo: new URL('/brand/logo-full.svg', Astro.site).href } : {}),
+  }}
+>
+  <main id="contenido">
+    <Hero client:load />
+    <Ribbons client:visible />
+    <Categories client:visible />
+    <NewArrivals client:visible />
+    <Promos client:visible />
+    <Bestsellers client:visible />
+    <Lookbook client:visible />
+    <Editorial client:visible />
+    <Kids client:visible />
+    <About client:visible />
+    <HowTo client:visible />
+    <Men client:visible />
+    <Faq client:visible />
+    <Vip client:visible />
+  </main>
+</StoreLayout>

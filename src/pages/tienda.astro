@@ -1,0 +1,17 @@
+---
+/** Tienda: catálogo con filtros (el estado vive en la URL: /tienda?depto=mujer&cat=vestidos). */
+import StoreLayout from '@/layouts/StoreLayout.astro';
+import ShopPage from '@/store/islands/ShopPage';
+---
+
+<StoreLayout
+  title="Tienda · Divani"
+  description="Compra ropa americana premium: vestidos, blusas, jeans, abrigos, bolsas y ropa para niñas, niños y hombre. Pedidos por WhatsApp."
+  ogDescription="Ropa americana premium. Compra fácil por WhatsApp."
+  bodyClass="page-shop"
+  tab="tienda"
+>
+  <main id="contenido" class="shop">
+    <ShopPage client:load />
+  </main>
+</StoreLayout>

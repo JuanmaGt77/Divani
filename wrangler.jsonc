@@ -1,0 +1,9 @@
+// Cloudflare Workers: la tienda se publica aquí (Workers & Pages en el panel de Cloudflare).
+// Las páginas estáticas las sirve Cloudflare directo; el Worker solo atiende /producto/… y /admin.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "divani",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+}

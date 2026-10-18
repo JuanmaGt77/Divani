@@ -42,7 +42,7 @@
   transition-delay: calc(var(--d, 0) * 80ms);
 }
 .js-motion [data-reveal="scale"] { transform: scale(0.96); }
-.js-motion [data-reveal].is-in {
+.js-motion [data-reveal][data-in] {
   opacity: 1;
   transform: none;
 }

@@ -1,0 +1,36 @@
+/* ==========================================================================
+   Página de producto (/producto/…): la misma ficha de la vista rápida, a página completa
+   ========================================================================== */
+.product-page {
+  display: grid;
+  gap: 18px;
+  padding-top: clamp(20px, 3vw, 36px);
+}
+.pdp--page {
+  flex: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: clamp(28px, 4vw, 64px);
+  align-items: start;
+}
+.pdp--page .pdp__gallery {
+  position: sticky;
+  top: calc(var(--header-h) + 20px);
+  aspect-ratio: 4 / 5;
+  border-radius: var(--r-xl);
+  overflow: hidden;
+}
+.pdp--page .pdp__info { overflow: visible; padding: 8px 0 0; }
+.related .section-cta { margin-top: 28px; }
+
+@media (max-width: 767px) {
+  .pdp--page { display: block; overflow: visible; }
+  .pdp--page .pdp__gallery {
+    position: relative;
+    top: auto;
+    max-height: none;
+    margin-inline: calc(var(--gutter) * -1);
+    border-radius: 0;
+  }
+  .pdp--page .pdp__info { padding: 22px 0 0; }
+}

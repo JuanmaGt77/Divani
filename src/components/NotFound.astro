@@ -1,0 +1,34 @@
+---
+/** Contenido de «página no encontrada» (404 y prendas que ya no existen). */
+interface Props {
+  eyebrow?: string;
+  title?: string;
+  text?: string;
+}
+const {
+  eyebrow = 'Error 404',
+  title = 'Esta página <em>se nos escapó</em>',
+  text = 'Puede que la prenda ya no esté disponible o que el enlace haya cambiado. Te ayudamos a encontrar algo igual de bonito.',
+} = Astro.props;
+---
+
+<main id="contenido" class="container page-simple">
+  <div class="page-simple__inner">
+    <span class="page-simple__mark">
+      <svg viewBox="0 0 418 443" aria-hidden="true">
+        <use href="#logo-mark"></use>
+      </svg>
+    </span>
+    <p class="eyebrow eyebrow--plain">{eyebrow}</p>
+    <h1 class="h-1" set:html={title} />
+    <p class="lead">{text}</p>
+    <div class="cluster" style="justify-content:center">
+      <a class="btn btn--ink" href="/tienda">
+        Ir a la tienda
+      </a>
+      <a class="btn btn--outline" href="/">
+        Volver al inicio
+      </a>
+    </div>
+  </div>
+</main>

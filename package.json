@@ -1,25 +1,57 @@
 {
   "name": "divani-tienda",
   "private": true,
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Tienda en línea y panel de administración de Divani — ropa americana premium con compra por WhatsApp.",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview --port 4173",
-    "seed:build": "node scripts/build-seed.mjs",
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "verify": "npm run check && npm run lint && npm run test && npm run build",
+    "deploy": "astro build && wrangler deploy",
+    "seed:build": "tsx scripts/build-seed.ts",
     "setup:supabase": "node scripts/setup-supabase.mjs"
   },
-  "devDependencies": {
-    "vite": "^6.4.1"
-  },
   "engines": {
-    "node": ">=18"
+    "node": ">=22.22.0"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^14.4.0",
+    "@astrojs/react": "^7.1.0",
+    "@nanostores/react": "^2.0.1",
     "@supabase/supabase-js": "^2.118.0",
-    "lucide-preact": "^1.58.0",
-    "preact": "^10.29.8"
+    "@tanstack/react-query": "^5.104.4",
+    "astro": "^7.4.0",
+    "lucide-react": "^1.59.0",
+    "nanostores": "^1.5.5",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router": "^8.4.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "eslint": "^10.13.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-astro": "^3.2.1",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.13.0",
+    "prettier": "^3.9.10",
+    "prettier-plugin-astro": "^1.1.1",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.71.2",
+    "vitest": "^5.0.5",
+    "wrangler": "^4.151.1"
   }
 }

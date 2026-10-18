@@ -1,7 +1,0 @@
-User-agent: *
-Allow: /
-# El panel de administración no debe aparecer en buscadores
-Disallow: /admin.html
-
-# Cuando publiques el sitio, agrega aquí la URL de tu mapa del sitio:
-# Sitemap: https://tu-dominio.com/sitemap.xml

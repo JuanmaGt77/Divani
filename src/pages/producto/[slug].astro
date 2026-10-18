@@ -1,0 +1,108 @@
+---
+/**
+ * Página de una prenda (/producto/vestido-slip-satinado). Se genera al momento en el servidor
+ * con una consulta ligera (product_page) para que buscadores, WhatsApp y redes muestren el
+ * nombre, la foto y el precio al compartir el enlace.
+ */
+import StoreLayout from '@/layouts/StoreLayout.astro';
+import NotFound from '@/components/NotFound.astro';
+import ProductPage from '@/store/islands/ProductPage';
+import { cdn, mergeSettings } from '@/lib/model';
+import { rpc } from '@/lib/rpc';
+import type { ProductPagePayload } from '@/lib/types';
+import { applySettings } from '@/store/data/storefront';
+import { totalStock } from '@/store/lib/product';
+
+export const prerender = false;
+
+const slug = Astro.params.slug ?? '';
+let page: ProductPagePayload | null = null;
+let failed = false;
+try {
+  page = await rpc<ProductPagePayload | null>('product_page', { p_slug: slug }, { timeout: 8000 });
+} catch {
+  failed = true;
+}
+
+if (page) {
+  page = { ...page, settings: mergeSettings({ public: page.settings }).public, related: page.related || [] };
+  applySettings(page.settings);
+  Astro.response.headers.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=600');
+} else {
+  Astro.response.status = failed ? 503 : 404;
+  Astro.response.headers.set('Cache-Control', 'no-store');
+}
+
+const product = page?.product;
+const settings = page?.settings;
+const store = settings?.store?.name || 'Divani';
+const base = Astro.site ?? Astro.url;
+const images = (product?.colors.flatMap((c) => c.images) || [])
+  .slice(0, 6)
+  .map((src) => new URL(cdn(src, { w: 1200 }), base).href);
+const summary = (product?.description || 'Ropa americana premium. Compra fácil por WhatsApp.')
+  .replace(/\s+/g, ' ')
+  .trim();
+const description = summary.length > 155 ? `${summary.slice(0, 152).trimEnd()}…` : summary;
+const canonical = product ? new URL(`/producto/${product.slug}`, base).href : '';
+const initialColor = Astro.url.searchParams.get('color') || undefined;
+
+const jsonLd =
+  product && settings
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        name: product.name,
+        description: summary,
+        sku: product.sku,
+        image: images,
+        ...(page?.category ? { category: page.category.name } : {}),
+        offers: {
+          '@type': 'Offer',
+          url: canonical,
+          priceCurrency: settings.region.currency,
+          price: product.price,
+          availability: totalStock(product) > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+          seller: { '@type': 'Organization', name: store },
+        },
+      }
+    : undefined;
+---
+
+{page && product && settings ? (
+  <StoreLayout
+    title={`${product.name} · ${store}`}
+    description={description}
+    image={images[0]}
+    imageAlt={product.name}
+    type="product"
+    bodyClass="page-product"
+    tab="tienda"
+    jsonLd={jsonLd}
+  >
+    <Fragment slot="head">
+      <meta property="product:price:amount" content={String(product.price)} />
+      <meta property="product:price:currency" content={settings.region.currency} />
+    </Fragment>
+    <main id="contenido">
+      <ProductPage client:load initial={page} initialColor={initialColor} />
+    </main>
+  </StoreLayout>
+) : (
+  <StoreLayout
+    title={failed ? `No pudimos cargar esta prenda · ${store}` : `Prenda no encontrada · ${store}`}
+    description="Esta prenda no está disponible."
+    bodyClass="page-simple-body"
+    noindex
+  >
+    {failed ? (
+      <NotFound
+        eyebrow="Sin conexión"
+        title="No pudimos <em>cargar esta prenda</em>"
+        text="Revisa tu conexión e inténtalo de nuevo en un momento. Mientras tanto, puedes seguir viendo la tienda."
+      />
+    ) : (
+      <NotFound eyebrow="Prenda no encontrada" />
+    )}
+  </StoreLayout>
+)}
