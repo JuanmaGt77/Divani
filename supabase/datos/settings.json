@@ -1,10 +1,9 @@
 {
   "whatsapp": "",
-  "whatsappNote": "Opcional: tu número con lada (52 + 10 dígitos). Si lo dejas vacío se usa VITE_WHATSAPP_NUMBER del archivo .env.",
   "announcements": [
-    "Ropa americana con etiqueta original",
+    "Ropa americana premium",
     "Compra fácil por WhatsApp",
-    "Envíos a todo México",
+    "Envíos a toda Guatemala",
     "Piezas limitadas por modelo",
     "Atención personalizada"
   ],
@@ -45,5 +44,15 @@
     "Blazer",
     "Niñas",
     "Bolsas"
-  ]
+  ],
+  "region": {
+    "preset": "gt",
+    "locale": "es-GT",
+    "currency": "GTQ",
+    "currencyName": "quetzales",
+    "phonePrefix": "502",
+    "shippingArea": "toda Guatemala",
+    "cityLabel": "Municipio y departamento",
+    "cityPlaceholder": "Ej. Mixco, Guatemala"
+  }
 }

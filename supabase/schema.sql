@@ -5,7 +5,8 @@
 --  Después ejecuta supabase/seed.sql para cargar el catálogo inicial.
 --
 --  Se puede volver a ejecutar sin perder datos: crea lo que falte y actualiza
---  funciones y políticas. Las reglas del negocio replican src/backend/ops.js.
+--  funciones y políticas. Las reglas del negocio viven aquí: la tienda y el panel
+--  solo llaman a estas funciones.
 -- =============================================================================
 
 begin;
@@ -521,33 +522,44 @@ end $$;
 -- =============================================================================
 --  Tienda en línea (acceso público)
 -- =============================================================================
+-- Prendas a la venta (activas y con al menos una variante activa), ya en el formato que recibe
+-- la tienda: una fila por prenda. La usan storefront() y product_page().
+create or replace view private.store_products as
+select p.id, p.slug, p.department, p.category, p.sort, p.created_at,
+  jsonb_build_object(
+    'id', p.id, 'sku', p.code, 'slug', p.slug, 'name', p.name, 'department', p.department, 'category', p.category,
+    'price', p.price, 'compareAtPrice', p.compare_at_price, 'description', p.description, 'details', to_jsonb(p.details),
+    'material', p.material, 'care', p.care, 'origin', p.origin, 'colors', c.colors, 'sizes', coalesce(s.sizes, '[]'::jsonb),
+    'isNew', p.is_new, 'isBestseller', p.is_bestseller, 'isFeatured', p.is_featured, 'tags', to_jsonb(p.tags),
+    'createdAt', p.created_at
+  ) as data
+from public.products p
+cross join lateral (
+  select jsonb_agg(jsonb_build_object(
+           'name', pc.name, 'hex', pc.hex, 'family', pc.family,
+           'images', case when cardinality(pc.images) > 0 then to_jsonb(pc.images) else '["images/placeholder-product.svg"]'::jsonb end,
+           'sizes', vs.sizes) order by pc.sort) as colors
+  from public.product_colors pc
+  cross join lateral (
+    select jsonb_agg(jsonb_build_object('label', v.size, 'stock', greatest(v.stock, 0), 'sku', v.sku)
+                     order by public.size_rank(v.size), v.sort) as sizes
+    from public.product_variants v
+    where v.color_id = pc.id and v.active
+  ) vs
+  where pc.product_id = p.id and vs.sizes is not null
+) c
+cross join lateral (
+  select jsonb_agg(jsonb_build_object('label', x.size, 'stock', x.stock) order by public.size_rank(x.size)) as sizes
+  from (select v.size, sum(greatest(v.stock, 0))::int as stock
+          from public.product_variants v
+         where v.product_id = p.id and v.active
+         group by v.size) x
+) s
+where p.status = 'activo' and c.colors is not null;
+
 create or replace function public.storefront() returns jsonb
 language sql stable security definer set search_path = public, pg_temp as $$
-  with variants as (
-    select v.* from public.product_variants v where v.active
-  ),
-  colors as (
-    select c.product_id, c.sort,
-      jsonb_build_object(
-        'name', c.name, 'hex', c.hex, 'family', c.family,
-        'images', case when cardinality(c.images) > 0 then to_jsonb(c.images) else '["images/placeholder-product.svg"]'::jsonb end,
-        'sizes', (select jsonb_agg(jsonb_build_object('label', v.size, 'stock', greatest(v.stock, 0), 'sku', v.sku)
-                                   order by public.size_rank(v.size), v.sort)
-                  from variants v where v.color_id = c.id)
-      ) as color
-    from public.product_colors c
-    where exists (select 1 from variants v where v.color_id = c.id)
-  ),
-  prods as (
-    select p.*,
-      (select jsonb_agg(cl.color order by cl.sort) from colors cl where cl.product_id = p.id) as colors_json,
-      (select jsonb_agg(jsonb_build_object('label', s.size, 'stock', s.stock) order by public.size_rank(s.size))
-         from (select v.size, sum(greatest(v.stock, 0))::int as stock from variants v where v.product_id = p.id group by v.size) s
-      ) as sizes_json
-    from public.products p
-    where p.status = 'activo'
-  ),
-  visible as (select * from prods where colors_json is not null)
+  with visible as materialized (select * from private.store_products)
   select jsonb_build_object(
     'settings', (select public from public.settings where id = 1),
     'departments', coalesce((select jsonb_agg(jsonb_build_object('slug', d.slug, 'name', d.name, 'description', d.description, 'image', d.image) order by d.sort)
@@ -559,7 +571,7 @@ language sql stable security definer set search_path = public, pg_temp as $$
                     from public.categories c where c.active), '[]'::jsonb),
     'banners', coalesce((select jsonb_agg(jsonb_build_object(
                       'id', b.id, 'placement', b.placement, 'eyebrow', b.eyebrow, 'title', b.title, 'text', b.text,
-                      'cta', jsonb_build_object('label', coalesce(nullif(b.cta_label, ''), 'Ver más'), 'href', coalesce(nullif(b.cta_href, ''), 'tienda.html')),
+                      'cta', jsonb_build_object('label', coalesce(nullif(b.cta_label, ''), 'Ver más'), 'href', coalesce(nullif(b.cta_href, ''), '/tienda')),
                       'image', b.image, 'imageMobile', b.image_mobile, 'theme', b.theme) order by b.sort)
                     from public.banners b
                     where b.active and (b.starts_at is null or b.starts_at <= now()) and (b.ends_at is null or b.ends_at >= now())), '[]'::jsonb),
@@ -567,14 +579,41 @@ language sql stable security definer set search_path = public, pg_temp as $$
                     from public.lookbooks l where l.active), '[]'::jsonb),
     'faq', coalesce((select jsonb_agg(jsonb_build_object('q', f.question, 'a', f.answer) order by f.sort) from public.faq f where f.active), '[]'::jsonb),
     'content', coalesce((select jsonb_object_agg(key, value) from public.site_content), '{}'::jsonb),
-    'products', coalesce((select jsonb_agg(jsonb_build_object(
-                      'id', v.id, 'sku', v.code, 'slug', v.slug, 'name', v.name, 'department', v.department, 'category', v.category,
-                      'price', v.price, 'compareAtPrice', v.compare_at_price, 'description', v.description, 'details', to_jsonb(v.details),
-                      'material', v.material, 'care', v.care, 'origin', v.origin, 'colors', v.colors_json, 'sizes', coalesce(v.sizes_json, '[]'::jsonb),
-                      'isNew', v.is_new, 'isBestseller', v.is_bestseller, 'isFeatured', v.is_featured, 'tags', to_jsonb(v.tags),
-                      'createdAt', v.created_at) order by v.sort, v.created_at desc)
-                    from visible v), '[]'::jsonb)
+    'products', coalesce((select jsonb_agg(v.data order by v.sort, v.created_at desc) from visible v), '[]'::jsonb)
   );
+$$;
+
+-- Página de una prenda (/producto/…): la prenda, su categoría y departamento, prendas parecidas
+-- y los ajustes públicos. Devuelve null si la prenda no existe o no está a la venta.
+create or replace function public.product_page(p_slug text) returns jsonb
+language sql stable security definer set search_path = public, pg_temp as $$
+  with item as (select * from private.store_products where slug = p_slug limit 1)
+  select jsonb_build_object(
+    'settings', (select public from public.settings where id = 1),
+    'product', i.data,
+    'category', (select jsonb_build_object('slug', c.slug, 'department', c.department, 'name', c.name, 'description', c.description,
+                                           'order', c.sort, 'image', c.image, 'productCount', 0)
+                   from public.categories c where c.slug = i.category and c.active),
+    'department', (select jsonb_build_object('slug', d.slug, 'name', d.name, 'description', d.description, 'image', d.image)
+                     from public.departments d where d.slug = i.department and d.active),
+    -- Primero las de la misma categoría, después el resto del departamento
+    'related', coalesce((select jsonb_agg(r.data order by r.rank) from (
+                 select sp.data, row_number() over (order by (sp.category is not distinct from i.category) desc, sp.sort, sp.created_at desc) as rank
+                   from private.store_products sp
+                  where sp.department = i.department and sp.id <> i.id
+                  order by rank
+                  limit 8) r), '[]'::jsonb)
+  )
+  from item i;
+$$;
+
+-- Direcciones de las prendas a la venta (mapa del sitio para los buscadores)
+create or replace function public.storefront_sitemap() returns jsonb
+language sql stable security definer set search_path = public, pg_temp as $$
+  select coalesce(jsonb_agg(jsonb_build_object('slug', p.slug, 'updatedAt', p.updated_at) order by p.sort, p.created_at desc), '[]'::jsonb)
+  from public.products p
+  where p.status = 'activo'
+    and exists (select 1 from public.product_variants v where v.product_id = p.id and v.active);
 $$;
 
 -- Pedido desde la tienda en línea: valida existencias y usa los precios de la base
@@ -1311,6 +1350,84 @@ begin
   end loop;
 end $$;
 
+-- Departamentos: solo se editan (nombre, descripción, foto y si se muestran)
+create or replace function public.save_department(payload jsonb) returns jsonb
+language plpgsql security definer set search_path = public, pg_temp as $$
+declare
+  d public.departments;
+begin
+  perform private.require_staff(true);
+  update public.departments set
+    name        = coalesce(nullif(private.clean(payload->>'name', 60), ''), name),
+    description = private.clean(payload->>'description', 200),
+    image       = coalesce(payload->>'image', image),
+    active      = coalesce((payload->>'active')::boolean, true)
+  where slug = payload->>'slug'
+  returning * into d;
+  if d.slug is null then raise exception 'Departamento no encontrado.'; end if;
+  return to_jsonb(d);
+end $$;
+
+-- Categorías: crear o editar. Una categoría con productos no cambia de departamento.
+create or replace function public.save_category(payload jsonb) returns jsonb
+language plpgsql security definer set search_path = public, pg_temp as $$
+declare
+  v_name text := private.clean(payload->>'name', 60);
+  v_dept text := payload->>'department';
+  v_slug text := nullif(payload->>'slug', '');
+  c public.categories;
+  n int := 2;
+begin
+  perform private.require_staff(true);
+  if v_name = '' then raise exception 'Escribe el nombre de la categoría.'; end if;
+  if not exists (select 1 from public.departments where slug = v_dept) then raise exception 'Elige un departamento.'; end if;
+  if v_slug is not null then
+    select * into c from public.categories where slug = v_slug for update;
+  end if;
+
+  if c.slug is null then
+    -- Nueva: el identificador sale del nombre (y del departamento si no es Mujer)
+    v_slug := private.slugify(case when v_dept = 'mujer' then v_name else v_name || '-' || v_dept end);
+    while exists (select 1 from public.categories where slug = v_slug) loop
+      v_slug := private.slugify(v_name) || '-' || v_dept || '-' || n;
+      n := n + 1;
+    end loop;
+    insert into public.categories (slug, department, name, description, image, sort, active)
+    values (v_slug, v_dept, v_name, private.clean(payload->>'description', 200), coalesce(payload->>'image', ''),
+            coalesce((select max(sort) + 1 from public.categories), 0), coalesce((payload->>'active')::boolean, true))
+    returning * into c;
+  else
+    if c.department <> v_dept and exists (select 1 from public.products where category = c.slug) then
+      raise exception 'Esta categoría tiene productos: muévelos antes de cambiarla de departamento.';
+    end if;
+    update public.categories set
+      department  = v_dept,
+      name        = v_name,
+      description = private.clean(payload->>'description', 200),
+      image       = coalesce(nullif(payload->>'image', ''), image),
+      active      = coalesce((payload->>'active')::boolean, true)
+    where slug = c.slug
+    returning * into c;
+  end if;
+  return to_jsonb(c);
+end $$;
+
+-- Eliminar una categoría (solo si ya no tiene productos)
+create or replace function public.delete_category(p_slug text) returns jsonb
+language plpgsql security definer set search_path = public, pg_temp as $$
+declare
+  used int;
+begin
+  perform private.require_staff(true);
+  select count(*) into used from public.products where category = p_slug;
+  if used > 0 then
+    raise exception 'Esta categoría tiene % producto%. Muévelos a otra categoría antes de eliminarla.',
+      used, case when used = 1 then '' else 's' end;
+  end if;
+  delete from public.categories where slug = p_slug;
+  return jsonb_build_object('slug', p_slug);
+end $$;
+
 -- =============================================================================
 --  Integraciones (Cloudinary)
 -- =============================================================================
@@ -1454,6 +1571,8 @@ revoke all on all functions in schema private from public, anon, authenticated;
 revoke execute on all functions in schema public from public, anon;
 grant execute on all functions in schema public to authenticated;
 grant execute on function public.storefront() to anon, authenticated;
+grant execute on function public.product_page(text) to anon, authenticated;
+grant execute on function public.storefront_sitemap() to anon, authenticated;
 grant execute on function public.place_order(jsonb) to anon, authenticated;
 grant execute on function public.size_rank(text) to anon, authenticated;
 

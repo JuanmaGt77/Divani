@@ -8,7 +8,6 @@
     "category": "vestidos",
     "price": 899,
     "compareAtPrice": 1190,
-    "currency": "MXN",
     "description": "Corte al bies con caída líquida y escote en V. El vestido que va de la cena al evento sin esfuerzo.",
     "details": [
       "Tirantes ajustables",
@@ -80,7 +79,6 @@
     "category": "vestidos",
     "price": 949,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Silueta cruzada que marca la cintura, mangas 3/4 y lazo lateral. Estampado floral en tonos terracota.",
     "details": [
       "Escote en V cruzado",
@@ -143,7 +141,6 @@
     "category": "vestidos",
     "price": 829,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Clásico camisero con cinturón de hebilla dorada y botones al frente. Fresco, pulido y fácil de llevar.",
     "details": [
       "Cuello camisero",
@@ -205,7 +202,6 @@
     "category": "vestidos",
     "price": 879,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Punto acanalado que estiliza la figura. Cuello redondo, manga larga y largo a media pierna.",
     "details": [
       "Punto acanalado con elasticidad",
@@ -276,7 +272,6 @@
     "category": "vestidos",
     "price": 749,
     "compareAtPrice": 990,
-    "currency": "MXN",
     "description": "Mangas abullonadas, escote cuadrado y falda con vuelo. Un clásico con actitud.",
     "details": [
       "Escote cuadrado",
@@ -338,7 +333,6 @@
     "category": "vestidos",
     "price": 799,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "El little black dress definitivo: cuello barco, corte entallado y largo a la rodilla.",
     "details": [
       "Cuello barco",
@@ -400,7 +394,6 @@
     "category": "blusas-y-tops",
     "price": 649,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Satín con caída fluida, cuello camisero y puños con botón. Fajada o suelta, siempre impecable.",
     "details": [
       "Cuello camisero",
@@ -462,7 +455,6 @@
     "category": "blusas-y-tops",
     "price": 549,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Bordado de ojal, escote cuadrado y mangas abullonadas. Romántico y fresco.",
     "details": [
       "Bordado de ojal",
@@ -524,7 +516,6 @@
     "category": "blusas-y-tops",
     "price": 699,
     "compareAtPrice": 890,
-    "currency": "MXN",
     "description": "Tejido de ochos, hombro caído y puños acanalados. Abrigador sin perder ligereza.",
     "details": [
       "Tejido de ochos",
@@ -595,7 +586,6 @@
     "category": "blusas-y-tops",
     "price": 349,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "El básico que lo combina todo: tela acanalada que se ajusta al cuerpo y escote redondo profundo.",
     "details": [
       "Tela acanalada elástica",
@@ -665,7 +655,6 @@
     "category": "blusas-y-tops",
     "price": 449,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Rayas clásicas, cuello barco y manga larga. Un ícono atemporal.",
     "details": [
       "Cuello barco",
@@ -727,7 +716,6 @@
     "category": "blusas-y-tops",
     "price": 599,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Punto fino de canalé con cuello alto. Perfecto para capas en temporada fría.",
     "details": [
       "Cuello alto doblado",
@@ -789,7 +777,6 @@
     "category": "jeans-y-pantalones",
     "price": 799,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Tiro alto, pierna amplia y mezclilla rígida. Alarga la silueta al instante.",
     "details": [
       "Tiro alto",
@@ -863,7 +850,6 @@
     "category": "jeans-y-pantalones",
     "price": 749,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Corte recto de tiro medio con cinco bolsillos. El jean que usarás todos los días.",
     "details": [
       "Tiro medio",
@@ -929,7 +915,6 @@
     "category": "jeans-y-pantalones",
     "price": 829,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Pinzas al frente, raya marcada y pierna amplia. Elegancia relajada para la oficina o el fin de semana.",
     "details": [
       "Pinzas al frente",
@@ -1000,7 +985,6 @@
     "category": "jeans-y-pantalones",
     "price": 779,
     "compareAtPrice": 960,
-    "currency": "MXN",
     "description": "Satín fluido con pierna extra amplia y pretina elástica. Comodidad con brillo.",
     "details": [
       "Pierna extra amplia",
@@ -1062,7 +1046,6 @@
     "category": "faldas",
     "price": 699,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Plisado fino que se mueve contigo, con brillo satinado y pretina elástica.",
     "details": [
       "Plisado fino",
@@ -1133,7 +1116,6 @@
     "category": "faldas",
     "price": 499,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Mezclilla con dobladillo deshilachado, cinco bolsillos y tiro alto.",
     "details": [
       "Tiro alto",
@@ -1199,7 +1181,6 @@
     "category": "faldas",
     "price": 629,
     "compareAtPrice": 790,
-    "currency": "MXN",
     "description": "Corte al bies con caída impecable. Combínala con suéter o con playera básica.",
     "details": [
       "Corte al bies",
@@ -1261,7 +1242,6 @@
     "category": "abrigos-y-chamarras",
     "price": 1490,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Doble botonadura, cinturón y charreteras. La pieza clave de toda temporada.",
     "details": [
       "Doble botonadura",
@@ -1323,7 +1303,6 @@
     "category": "abrigos-y-chamarras",
     "price": 1190,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Hombros estructurados, solapa de muesca y botones dorados. Eleva cualquier look.",
     "details": [
       "Solapa de muesca",
@@ -1394,7 +1373,6 @@
     "category": "abrigos-y-chamarras",
     "price": 899,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Corte clásico con bolsillos de parche, costuras contrastantes y botones metálicos.",
     "details": [
       "Bolsillos con cartera",
@@ -1455,7 +1433,6 @@
     "category": "conjuntos",
     "price": 1190,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Cárdigan corto con botones y falda midi a juego. Un look completo, suave y elegante.",
     "details": [
       "Cárdigan con botones",
@@ -1517,7 +1494,6 @@
     "category": "conjuntos",
     "price": 1890,
     "compareAtPrice": 2290,
-    "currency": "MXN",
     "description": "Blazer de solapa y pantalón de pinzas en el mismo tono arena. Poder absoluto.",
     "details": [
       "Blazer con botones dorados",
@@ -1579,7 +1555,6 @@
     "category": "bolsas",
     "price": 899,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Silueta estructurada con asa superior y cierre de giro dorado.",
     "details": [
       "Asa superior",
@@ -1633,7 +1608,6 @@
     "category": "bolsas",
     "price": 749,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Formato baguette para llevar al hombro, con solapa y broche dorado.",
     "details": [
       "Asa corta de hombro",
@@ -1678,7 +1652,6 @@
     "category": "bolsas",
     "price": 849,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Amplia, ligera y con asas largas. Para el trabajo, la universidad o el viaje.",
     "details": [
       "Asas largas",
@@ -1723,7 +1696,6 @@
     "category": "vestidos-ninas",
     "price": 649,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Capas de tul, destellos sutiles y moño de satín en la cintura. Para su día especial.",
     "details": [
       "Falda de tul en capas",
@@ -1796,7 +1768,6 @@
     "category": "vestidos-ninas",
     "price": 499,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Estampado floral, tirantes con moño y falda de dos niveles. Fresco y alegre.",
     "details": [
       "Tirantes con moño",
@@ -1870,7 +1841,6 @@
     "category": "jumpers-ninas",
     "price": 549,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Mezclilla suave con olanes en los tirantes y falda con vuelo.",
     "details": [
       "Tirantes con olán",
@@ -1943,7 +1913,6 @@
     "category": "tops-ninas",
     "price": 459,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Punto suave con botones tipo perla. Perfecto sobre vestidos o con jeans.",
     "details": [
       "Botones tipo perla",
@@ -2025,7 +1994,6 @@
     "category": "tops-ninas",
     "price": 399,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Cuello redondo tipo bebé, mangas abullonadas y botones al frente.",
     "details": [
       "Cuello bebé",
@@ -2098,7 +2066,6 @@
     "category": "vestidos-ninas",
     "price": 529,
     "compareAtPrice": 650,
-    "currency": "MXN",
     "description": "Lunares clásicos, mangas abullonadas y una falda que gira y gira.",
     "details": [
       "Escote cuadrado",
@@ -2171,7 +2138,6 @@
     "category": "playeras-ninos",
     "price": 299,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Algodón suave con rayas clásicas y bolsillo al pecho.",
     "details": [
       "Cuello redondo",
@@ -2245,7 +2211,6 @@
     "category": "pantalones-ninos",
     "price": 599,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Overol clásico con tirantes ajustables, botones metálicos y bolsillo al pecho.",
     "details": [
       "Tirantes ajustables",
@@ -2318,7 +2283,6 @@
     "category": "playeras-ninos",
     "price": 349,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Piqué de algodón con cuello y botones. Arreglado sin dejar de ser cómodo.",
     "details": [
       "Cuello polo",
@@ -2400,7 +2364,6 @@
     "category": "sudaderas-ninos",
     "price": 549,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Felpa suave por dentro, capucha con cordón y bolsillo canguro.",
     "details": [
       "Capucha con cordón",
@@ -2473,7 +2436,6 @@
     "category": "sudaderas-ninos",
     "price": 449,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Franela cálida a cuadros con botones al frente y bolsillo al pecho.",
     "details": [
       "Franela suave",
@@ -2547,7 +2509,6 @@
     "category": "pantalones-ninos",
     "price": 399,
     "compareAtPrice": 490,
-    "currency": "MXN",
     "description": "Cintura elástica con cordón y puños acanalados. Listo para correr y jugar.",
     "details": [
       "Cintura elástica con cordón",
@@ -2620,7 +2581,6 @@
     "category": "camisas-hombre",
     "price": 749,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Tejido Oxford con cuello abotonado y bolsillo al pecho. El básico de todo guardarropa.",
     "details": [
       "Cuello abotonado",
@@ -2686,7 +2646,6 @@
     "category": "camisas-hombre",
     "price": 599,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Piqué de algodón con cuello acanalado y tres botones. Casual con un toque pulido.",
     "details": [
       "Cuello y puños acanalados",
@@ -2752,7 +2711,6 @@
     "category": "pantalones-hombre",
     "price": 799,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Sarga de algodón con un toque de elasticidad y corte recto. Va con todo.",
     "details": [
       "Corte recto",
@@ -2809,7 +2767,6 @@
     "category": "abrigo-hombre",
     "price": 849,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Punto jaspeado de cuello redondo con puños y bajo acanalados.",
     "details": [
       "Cuello redondo",
@@ -2866,7 +2823,6 @@
     "category": "abrigo-hombre",
     "price": 1090,
     "compareAtPrice": null,
-    "currency": "MXN",
     "description": "Mezclilla índigo con costuras contrastantes y botones metálicos. Un clásico que mejora con el uso.",
     "details": [
       "Bolsillos con cartera",
@@ -2923,7 +2879,6 @@
     "category": "abrigo-hombre",
     "price": 749,
     "compareAtPrice": 920,
-    "currency": "MXN",
     "description": "Felpa gruesa, capucha con cordón y bolsillo canguro. Comodidad de todos los días.",
     "details": [
       "Capucha con cordón",

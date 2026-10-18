@@ -5,7 +5,10 @@
     "eyebrow": "Temporada Otoño · Invierno",
     "title": "Capas que se sienten *tan bien* como se ven",
     "text": "Gabardinas, satines y tejidos americanos recién llegados. Pocas piezas por modelo.",
-    "cta": { "label": "Ver novedades", "href": "tienda.html?orden=nuevo" },
+    "cta": {
+      "label": "Ver novedades",
+      "href": "/tienda?orden=nuevo"
+    },
     "image": "media/banners/nueva-coleccion.webp",
     "theme": "light"
   },
@@ -15,7 +18,10 @@
     "eyebrow": "Rebajas de temporada",
     "title": "Hasta *30%* en piezas seleccionadas",
     "text": "Vestidos, suéteres y satines con precio especial mientras haya existencias.",
-    "cta": { "label": "Ver ofertas", "href": "tienda.html?oferta=1" },
+    "cta": {
+      "label": "Ver ofertas",
+      "href": "/tienda?oferta=1"
+    },
     "image": "media/banners/rebajas.webp",
     "theme": "light"
   },
@@ -23,9 +29,12 @@
     "id": "bn-denim",
     "placement": "home-carousel",
     "eyebrow": "Denim americano",
-    "title": "Mezclilla con *etiqueta original*",
+    "title": "Mezclilla *americana*",
     "text": "Wide leg, rectos, faldas y chamarras. Cortes clásicos que mejoran con cada uso.",
-    "cta": { "label": "Ver mezclilla", "href": "tienda.html?q=mezclilla" },
+    "cta": {
+      "label": "Ver mezclilla",
+      "href": "/tienda?q=mezclilla"
+    },
     "image": "media/banners/denim.webp",
     "theme": "light"
   },
@@ -35,7 +44,10 @@
     "eyebrow": "Divani Kids",
     "title": "Para los *más pequeños*",
     "text": "Vestidos de fiesta, mezclilla y básicos suaves para niñas y niños.",
-    "cta": { "label": "Ver niñas y niños", "href": "tienda.html?depto=ninas" },
+    "cta": {
+      "label": "Ver niñas y niños",
+      "href": "/tienda?depto=ninas"
+    },
     "image": "media/banners/kids.webp",
     "theme": "light"
   },
@@ -45,7 +57,10 @@
     "eyebrow": "Para él",
     "title": "Básicos *americanos*",
     "text": "Camisas Oxford, polos, chinos y mezclilla índigo.",
-    "cta": { "label": "Ver hombre", "href": "tienda.html?depto=hombre" },
+    "cta": {
+      "label": "Ver hombre",
+      "href": "/tienda?depto=hombre"
+    },
     "image": "media/banners/hombre.webp",
     "theme": "light"
   }
