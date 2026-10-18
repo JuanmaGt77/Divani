@@ -6,73 +6,76 @@ Tienda en línea de ropa (mujer, niñas, niños y un poco de hombre) con compra 
 
 ## Reglas del negocio (no romperlas)
 
-- La ropa se presenta como **«ropa americana premium con etiqueta original»** traída de Estados Unidos. **Los clientes nunca deben enterarse del proveedor**: no mencionar proveedores, mayoristas ni terceros en ningún texto de la tienda (el editor de «Acerca de nosotros» lo recuerda).
+- La tienda es de **Guatemala** (GTQ, +502). La ropa se presenta como **«ropa americana premium»**, nada más: **no** decir «etiqueta original» ni «etiquetada».
+- **Los clientes nunca deben enterarse del proveedor**: no mencionar proveedores, mayoristas ni terceros en ningún texto de la tienda (el editor de «Acerca de nosotros» lo recuerda).
 - Solo existe la sección «Acerca de nosotros» (sin misión ni visión).
-- Se compra por WhatsApp: con base de datos, el pedido se registra primero (valida existencias y precios en el servidor) y luego se abre WhatsApp con el número de pedido oficial.
+- Se compra por WhatsApp: el pedido se registra primero (`place_order` valida existencias y precios en el servidor) y luego se abre WhatsApp con el número de pedido oficial.
 - Diseño: beige, marfil y tinta, elegante, vidrio líquido estilo iOS 26, tipografías Bodoni Moda (títulos) y Jost (texto). El panel es estilo iPhone: cómodo, claro, táctil (44 px mínimo).
-- Región configurable desde el panel: México (MXN, +52), Guatemala (GTQ, +502) o Estados Unidos (USD, +1). La organización de Supabase se llama «SomosDivani-GT»: confirmar con el dueño si la tienda es de Guatemala.
+- Región configurable desde el panel: Guatemala (por defecto), México o Estados Unidos.
 
 ## Comandos
 
 ```bash
 npm install
-npm run dev              # tienda http://localhost:5173 · panel http://localhost:5173/admin.html
-npm run build            # genera dist/ (sitio estático)
-npm run seed:build       # regenera supabase/seed.sql desde public/data/*.json
-npm run setup:supabase   # prepara Supabase (SQL, usuario admin, Cloudinary); lee .env.local
+npm run dev              # tienda http://localhost:5173 · panel http://localhost:5173/admin
+npm run verify           # astro check + eslint + vitest + build (usar antes de cada commit)
+npm run build            # genera dist/ (falla si faltan PUBLIC_SUPABASE_URL / PUBLIC_SUPABASE_PUBLISHABLE_KEY)
+npm run preview          # prueba dist/ con el motor de Cloudflare (workerd)
+npm run deploy           # build + wrangler deploy
+npm run seed:build       # regenera supabase/seed.sql desde supabase/datos/*.json
+npm run setup:supabase   # prepara Supabase (schema, seed si está vacía, actualizaciones, admin, Cloudinary); lee .env.local
 ```
 
-No hay framework de pruebas en el repo. Para verificar: `npm run build` sin errores, abrir tienda y panel sin errores en la consola, y revisar en celular (390 px) que no haya scroll horizontal.
+Para verificar a mano: `npm run verify`, abrir tienda y panel sin errores en la consola y revisar en celular (390 px) que no haya scroll horizontal.
 
-## Arquitectura
+## Arquitectura (Astro 7 + React 19 + TypeScript estricto, Cloudflare Workers)
 
-Un proyecto de Vite multipágina (`vite.config.js`, `base: './'`; los fragmentos `<!-- @include partials/… -->` se insertan desde `src/partials/`).
+- `astro.config.mjs`: adaptador `@astrojs/cloudflare` (Workers; Pages ya no lo soporta), React, `build.format: 'file'`, `trailingSlash: 'never'`, esquema `astro:env` (`PUBLIC_SUPABASE_URL`, `PUBLIC_SUPABASE_PUBLISHABLE_KEY`) y `PUBLIC_SITE_URL` opcional como `site`. Desactiva que Cloudflare copie `.env.local` a `dist/server/.dev.vars`.
+- Alias `@/` → `src/`.
 
-**Tienda** (`index.html`, `tienda.html`, `404.html`, `aviso-de-privacidad.html`) — JavaScript sin frameworks:
-- `src/pages/*.js` punto de entrada de cada página → `src/app.js` (lo común).
-- `src/services/api/index.js` elige el origen de datos: `supabase.adapter.js` (rpc `storefront` y `place_order`), `demo.adapter.js` (base del panel en IndexedDB), `mock.adapter.js` (`public/data/*.json`) o `rest.adapter.js`. Supabase y demo comparten `payload.adapter.js` (un solo «paquete de la tienda»).
-- `src/sections/site-content.js`: textos y fotos editables de la portada (`data-slot="seccion.campo"` en `index.html`).
-- `src/core/edit-bridge.js`: con `?editar=1` dentro del panel, tocar una sección (`data-edit="…"`) abre su editor.
-- `src/core/site-settings.js`: aplica los ajustes del panel (nombre, WhatsApp, horario, redes, región y moneda).
-- `src/core/product.js`: existencias por color y talla (`colors[].sizes`).
+**Tienda** (`src/pages/index.astro`, `tienda.astro`, `404.astro`, `aviso-de-privacidad.astro` estáticas; `producto/[slug].astro`, `sitemap.xml.ts`, `robots.txt.ts` en el servidor):
+- `src/layouts/StoreLayout.astro`: `<head>` (SEO, og, JSON-LD), `Sprite.astro` (íconos `#i-…`), `SiteHeader` (`client:load`), `SiteFooter` (`client:visible`), `StoreOverlays` (`client:load`) y `initEditBridge/initReveal/initGlassLight`.
+- `src/store/islands/`: islas de React (`home/*` con `client:visible`, `ShopPage`, `ProductPage`, encabezado, pie y hojas).
+- `src/store/data/storefront.ts`: el «paquete» de la rpc `storefront` (una vez por página, caché en localStorage), `useStorefront()` (sin datos hasta hidratar), `useSettings()`, `applySettings()` (región/moneda).
+- `src/store/data/content.ts`: textos y fotos editables de la portada (`useContent().get(seccion, campo)`); los de fábrica salen de `supabase/datos/content.json`.
+- `src/store/state/`: `cart`, `favorites`, `ui` (nanostores compartidos entre islas). `src/store/lib/hydration.ts`: `useHydrated()` evita diferencias al hidratar.
+- `src/store/lib/edit-bridge.ts`: con `?editar=1` dentro del panel, tocar una sección (`data-edit="…"`) abre su editor.
+- `src/lib/`: tipos (`types.ts`), reglas puras de presentación y validación (`model.ts`: SKU, regiones, `DEFAULT_SETTINGS`, `cdn()`…), formato (`format.ts`), filtros del catálogo (`catalog-query.ts`), `rpc.ts` y `env.ts`. Pruebas en `*.test.ts` (vitest).
 
-**Panel** (`admin.html`) — Preact + JSX en `src/admin/`:
-- `api/demo.js` y `api/supabase.js` tienen **la misma interfaz**; `api/index.js` elige según haya Supabase o no.
-- Rutas por hash (`lib/router.js`): `/` resumen, `/pedidos`, `/vender` (punto de venta), `/caja`, `/productos`, `/inventario`, `/clientes`, `/reportes`, `/sitio` (editor del sitio con vista previa), `/ajustes` (`?seccion=tienda|region|pedidos|caja|inventario|integraciones|cuenta|datos`).
-- Datos con `lib/query.js` (`useQuery(clave, fn, temas)` + `invalidate(tema)`); avisos con `toast()`; hojas con `<Sheet>` (`ui/overlays.jsx`).
-- Componentes de interfaz en `ui/` (controles, superficies, gráficas, fotos), estilos en `styles/`.
-
-**Compartido** (`src/backend/`):
-- `model.js`: reglas puras (SKU por variante tipo `DV-MUJ-001-NEG-M`, totales, resumen de caja, regiones, `storefrontPayload`, `cdn()` para Cloudinary).
-- `ops.js`: operaciones del negocio para el modo demostración.
-- `demo/`: base de demostración en IndexedDB con historial de ventas de ejemplo.
-- `config.js`: modo Supabase si existen `VITE_SUPABASE_URL` y `VITE_SUPABASE_PUBLISHABLE_KEY`.
+**Panel** (`src/pages/admin/[...ruta].astro` → `src/admin/App.tsx`, `client:only`):
+- React Router con `basename '/admin'` (`routes.tsx`): `/` resumen, `/pedidos`, `/vender`, `/caja`, `/productos`, `/inventario`, `/clientes`, `/reportes`, `/sitio`, `/ajustes` (`?seccion=tienda|region|pedidos|caja|inventario|integraciones|cuenta|datos`).
+- Datos con TanStack Query: `useData(clave, fn, temas)` + `invalidate(tema)` (`lib/query.ts`); avisos con `toast()`; hojas con `<Sheet>` (`ui/overlays.tsx`).
+- `api/index.ts` es la única puerta a Supabase (supabase-js); `api/mappers.ts` convierte filas.
+- Ya **no existe modo demostración**.
 
 **Supabase** (`supabase/`):
-- `schema.sql`: tablas (`staff, settings, departments, categories, products, product_colors, product_variants, orders, order_items, order_events, inventory_movements, cash_sessions, cash_movements, banners, lookbooks, faq, site_content`), seguridad por fila (RLS) y funciones: `storefront, place_order, pos_checkout, order_set_status, order_set_payment, order_update, cash_open, cash_movement, cash_close, cash_session_summary, inventory_adjust, inventory_receive, save_product, delete_product, reorder_rows, set_integration_secret, integrations_status, cloudinary_signature, whoami`. Es idempotente: se puede volver a ejecutar.
-- `seed.sql`: **generado** por `scripts/build-seed.mjs`; no editarlo a mano.
+- `schema.sql`: tablas, RLS y **todas las reglas del negocio** (la tienda y el panel solo llaman funciones): `storefront, product_page, storefront_sitemap, place_order, pos_checkout, order_set_status, order_set_payment, order_update, cash_open, cash_movement, cash_close, cash_session_summary, inventory_adjust, inventory_receive, save_product, delete_product, save_category, delete_category, save_department, reorder_rows, set_integration_secret, integrations_status, cloudinary_signature, whoami`. Vista `private.store_products`. Es idempotente.
+- `seed.sql`: **generado** por `scripts/build-seed.ts`; no editarlo a mano.
+- `actualizaciones/*.sql`: correcciones de datos para la base que ya existe (idempotentes, en orden por fecha).
 - Administradores: los correos de `private.bootstrap_admins` (incluye `somosdivani@gmail.com`) reciben acceso al crear su usuario.
 
-**Cloudinary**: subidas firmadas. El API Secret vive cifrado en `private.secrets` (se guarda con `set_integration_secret` desde Configuración → Conexiones); `cloudinary_signature` firma en el servidor con SHA-1. Fotos en la carpeta `divani/…`.
+**Cloudinary**: subidas firmadas. El API Secret vive cifrado en `private.secrets` (se guarda con `set_integration_secret` desde Configuración → Conexiones); `cloudinary_signature` firma en el servidor. Fotos en la carpeta `divani/…`. Cloud name: `ompbjpp9`.
 
 ## Reglas al cambiar código
 
-- Las reglas del negocio existen **dos veces**: en `src/backend/ops.js` (demostración) y en `supabase/schema.sql` (producción). Si cambias una, cambia la otra igual.
-- Si cambias `schema.sql`, hay que volver a ejecutarlo en Supabase (SQL Editor o `npm run setup:supabase`).
-- Si cambias `public/data/*.json`, corre `npm run seed:build`.
-- **Nunca** subas secretos: `.env` y `.env.local` están en `.gitignore`. Solo las variables `VITE_*` llegan al navegador. Nada de secret key, tokens `sbp_`, API Secret de Cloudinary ni contraseñas en el código, en commits ni en la documentación.
+- Las reglas del negocio viven **solo** en `supabase/schema.sql`. Si cambias `schema.sql`, hay que volver a ejecutarlo en Supabase (SQL Editor o `npm run setup:supabase`). Para corregir datos ya cargados, agrega un archivo en `supabase/actualizaciones/`.
+- Si cambias `supabase/datos/*.json`, corre `npm run seed:build`.
+- **Nunca** subas secretos: `.env`, `.env.local` y `.dev.vars` están en `.gitignore`. Solo las variables `PUBLIC_*` llegan al navegador. Nada de secret key, tokens `sbp_`, API Secret de Cloudinary ni contraseñas en el código, en commits ni en la documentación.
 - Mantén la interfaz en español, el estilo visual existente y las áreas táctiles de 44 px. Usa los tokens de `src/styles/base/tokens.css` (tienda) y `src/admin/styles/base.css` (panel).
-- Commits en español y descriptivos.
+- Islas: nada que dependa del navegador (localStorage, datos, fecha) en el primer render; usa `useHydrated()`/`useStorefront()`.
+- Commits en español y descriptivos. Antes de cada commit: `npm run verify`.
 
 ## Estado actual (18 de octubre de 2026)
 
 Hecho:
-- Tienda + panel completos y en GitHub. Guía en `docs/CONEXION.md`.
-- Supabase **conectado** con `npm run setup:supabase`: tablas y catálogo cargados, registro público cerrado, usuario `somosdivani@gmail.com` creado con acceso de administrador y comprobado. `.env.local` ya tiene `VITE_SUPABASE_URL` y `VITE_SUPABASE_PUBLISHABLE_KEY`.
+- Migración completa a Astro + React + TypeScript en la rama `migracion-astro` (tienda, página por prenda, panel, SQL nuevo, documentación). Verificado: tipos, lint, pruebas, compilación y recorrido en Chrome (tienda y panel, 390 px y escritorio) sin errores de consola.
+- Supabase conectado: tablas y catálogo de ejemplo cargados, registro público cerrado, `somosdivani@gmail.com` con acceso de administrador. `.env.local` tiene `PUBLIC_SUPABASE_URL` y `PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
 
 Pendiente:
-1. **Cloudinary**: la prueba de subida dio «Invalid Signature» porque el API Secret estaba mal copiado. El dueño va a generar una API Key nueva en Cloudinary y pegar API Key + API Secret en el panel (Configuración → Conexiones → Guardar → Probar subida). Cloud name: `ompbjpp9`.
-2. **Seguridad**: quitar de `.env.local` `SUPABASE_ACCESS_TOKEN`, `ADMIN_PASSWORD` y `CLOUDINARY_API_SECRET`; borrar el token personal «divani» en Supabase; cambiar la contraseña del administrador (se compartieron en un chat).
-3. **Publicar la tienda** (Netlify, Vercel o Cloudflare Pages): comando `npm run build`, carpeta `dist`, variables `VITE_SUPABASE_URL` y `VITE_SUPABASE_PUBLISHABLE_KEY`. Después poner esa dirección en Supabase → Authentication → URL Configuration → Site URL.
-4. **Datos reales**: el catálogo cargado es de ejemplo (45 prendas inventadas con fotos ilustradas). Cambiarlo por los productos y fotos reales desde el panel (o archivar los de ejemplo). Configurar el número de WhatsApp, horario y redes en Configuración → Tienda y contacto, y la región en Configuración → Región y moneda.
-5. Revisar `aviso-de-privacidad.html` (plantilla) y poner la URL completa del dominio en `og:image` (`src/partials/head.html`).
+1. **Aplicar el SQL nuevo** en Supabase: `schema.sql` y `actualizaciones/2026-10-18-guatemala-ropa-americana.sql` (hasta entonces `/producto/…` responde 503 y la base sigue con región México y textos de «etiqueta»).
+2. Revisar y unir la rama `migracion-astro` a `main`.
+3. **Publicar** en Cloudflare Workers (ver `docs/CONEXION.md`): build `npm run build`, deploy `npx wrangler deploy`, variables de compilación `PUBLIC_SUPABASE_URL`, `PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `PUBLIC_SITE_URL`. Después poner la dirección en Supabase → Authentication → URL Configuration.
+4. **Cloudinary**: el dueño genera una API Key nueva y pega API Key + API Secret en el panel (Configuración → Conexiones → Guardar → Probar subida).
+5. **Seguridad**: quitar de `.env.local` `SUPABASE_ACCESS_TOKEN`, `ADMIN_PASSWORD` y `CLOUDINARY_API_SECRET`; borrar el token personal «divani» en Supabase; cambiar la contraseña del administrador.
+6. **Datos reales**: cambiar las 45 prendas de ejemplo por las reales; configurar WhatsApp, horario y redes en Configuración → Tienda y contacto.
+7. Completar `src/pages/aviso-de-privacidad.astro` (datos marcados con `<mark>`).

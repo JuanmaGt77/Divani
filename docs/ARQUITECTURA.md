@@ -1,87 +1,84 @@
 # Arquitectura
 
-Dos aplicaciones en el mismo proyecto de Vite que comparten el modelo de datos:
+Un solo proyecto de **Astro 7** con **React 19** y **TypeScript** estricto, publicado en **Cloudflare Workers**. Los datos y las reglas del negocio viven en **Supabase** (PostgreSQL); las fotos en **Cloudinary**.
 
-- **Tienda** (`index.html`, `tienda.html`…): JavaScript moderno sin frameworks (módulos ES). Cada página tiene un punto de entrada en `src/pages/` que arranca lo común (`src/app.js`) y sus secciones.
-- **Panel** (`admin.html`): Preact + JSX en `src/admin/`, con rutas por hash (`#/pedidos`), secciones que se cargan al abrirlas y componentes estilo iOS.
-- **Compartido** (`src/backend/`): reglas del negocio en JavaScript puro (`model.js`, `ops.js`) que el SQL de Supabase replica exactamente, la base de demostración (`demo/`) y la configuración (`config.js`).
+| Parte | Cómo se genera | Código |
+| --- | --- | --- |
+| Tienda: `/`, `/tienda`, `/aviso-de-privacidad`, `/404` | HTML estático al compilar + «islas» de React | `src/pages/*.astro`, `src/store/` |
+| Página de cada prenda: `/producto/[slug]` | En el Worker, en cada visita (consulta `product_page`) | `src/pages/producto/[slug].astro`, `src/store/islands/ProductPage.tsx` |
+| Panel: `/admin/…` | En el Worker (cualquier dirección abre la aplicación) + React en el navegador | `src/pages/admin/[...ruta].astro`, `src/admin/` |
+| `sitemap.xml`, `robots.txt` | En el Worker | `src/pages/*.ts` |
 
-## Capas
+## Configuración y variables
+
+- `astro.config.mjs`: adaptador de Cloudflare, React, direcciones limpias (`build.format: 'file'`, sin `/` final) y el esquema de variables `astro:env`. Si falta `PUBLIC_SUPABASE_URL` o `PUBLIC_SUPABASE_PUBLISHABLE_KEY`, la compilación falla.
+- `PUBLIC_SITE_URL` (opcional) es la dirección pública: se usa en las vistas previas al compartir, la dirección canónica y el mapa del sitio.
+- `src/lib/env.ts` lee las variables; `src/lib/rpc.ts` llama a las funciones públicas de Supabase con `fetch` (sirve en el navegador y en el Worker).
+- `wrangler.jsonc`: nombre del Worker, fecha de compatibilidad y `nodejs_compat`. El adaptador agrega el resto al compilar.
+
+## Tienda
 
 ```
-HTML (index.html, tienda.html…)  +  fragmentos en src/partials/
-        │
-        ▼
-src/pages/*.js            Punto de entrada de cada página
-        │
-        ├── src/sections/       Secciones de la portada (pintan datos en el HTML)
-        ├── src/components/     Piezas reutilizables: hojas, bolsa, vista rápida, búsqueda…
-        │
-        ▼
-src/store/                Estado del cliente (bolsa y favoritos) en localStorage, con suscripción
-        │
-        ▼
-src/services/             Casos de uso: catálogo, contenido, pedidos, mensajes de WhatsApp
-        │
-        ▼
-src/services/api/         Origen de datos según configuración (index.js)
-        ├── supabase.adapter.js → rpc/storefront y rpc/place_order   (VITE_SUPABASE_URL)
-        ├── demo.adapter.js     → base del panel en este navegador   (demostración)
-        ├── mock.adapter.js     → public/data/*.json                 (catálogo de muestra)
-        └── rest.adapter.js     → VITE_API_URL                        (backend propio)
+src/pages/index.astro ─┐
+src/pages/tienda.astro ─┼─► src/layouts/StoreLayout.astro  (<head>, íconos, SiteHeader, SiteFooter, StoreOverlays)
+producto/[slug].astro ─┘          │
+                                  ▼
+                 src/store/islands/   islas de React (cada sección es una)
+                       ├── home/       Hero, Ribbons, Categories, NewArrivals, Promos, Bestsellers, Lookbook,
+                       │               Editorial, Kids, About, HowTo, Men, Faq, Vip
+                       ├── ShopPage.tsx, ProductPage.tsx
+                       ├── SiteHeader.tsx, SiteFooter.tsx
+                       └── StoreOverlays.tsx + overlays/  (menú, búsqueda, bolsa, favoritos, vista rápida, isla de avisos, barra inferior)
+                                  │
+                 src/store/data/      storefront.ts (paquete de la tienda), content.ts (textos de la portada), orders.ts (place_order)
+                 src/store/state/     cart.ts, favorites.ts, ui.ts  (átomos de nanostores compartidos entre islas)
+                 src/store/components/ ProductCard, ProductDetail, Sheet, Segmented, Marquee, Rail, SizeGuide…
+                 src/store/lib/       whatsapp, url, product, storage, hydration, motion, edit-bridge
 ```
 
-Supabase y la demostración entregan un mismo «paquete de la tienda» (`payload.adapter.js`): productos con existencias por color y talla, categorías, banners vigentes, looks, preguntas, contenido de la portada y ajustes públicos, todo en una sola carga.
+- **Islas**: el encabezado, las hojas y la página de la tienda se activan al cargar (`client:load`); las secciones de la portada al acercarse a la pantalla (`client:visible`). Comparten estado con **nanostores** (bolsa, favoritos, hoja abierta, vista rápida).
+- **Paquete de la tienda**: `storefront()` devuelve en una sola consulta productos con existencias por color y talla, categorías, banners vigentes, looks, preguntas, contenido de la portada y ajustes públicos. Se pide una vez por página y se guarda en `localStorage` (`divani.storefront.v2`) para pintar al instante la siguiente visita; luego se actualiza.
+- **Hidratación sin saltos**: el HTML generado no trae datos del navegador. `useHydrated()` hace que el primer render en el navegador sea igual al HTML; después se muestran datos, bolsa y favoritos. Los textos de la portada usan los de fábrica (`supabase/datos/content.json`) hasta que llegan los guardados.
+- **Región**: `applySettings()` aplica moneda e idioma (`src/lib/format.ts`). La página de producto la aplica en el servidor antes de mostrar precios.
+- **Filtros**: `src/lib/catalog-query.ts` filtra, ordena, pagina y calcula facetas (función pura con pruebas). El estado de `/tienda` vive en la URL.
 
-Regla: los componentes **nunca** hacen `fetch` directo; siempre pasan por un servicio. Así, conectar el backend no toca la interfaz.
+### Flujo de compra
 
-## Flujo de compra
+1. La tarjeta o la ficha llaman a `cart.add(producto, { color, size, qty })`; la bolsa se guarda en `localStorage` y se sincroniza entre pestañas.
+2. En la bolsa, «Continuar con mi pedido» pide nombre, teléfono, ciudad, entrega y pago (se recuerdan en el navegador).
+3. Al enviar: se abre una pestaña en el mismo toque, `place_order` registra el pedido (valida existencias y precios en el servidor), la bolsa se vacía y la pestaña abre WhatsApp con el número de pedido oficial. Si el navegador bloquea la pestaña, aparece un botón para abrirlo.
+4. El pedido aparece al instante en el panel (aviso en tiempo real).
 
-1. La tarjeta o la vista rápida llama a `cart.add(producto, { color, talla, cantidad })`.
-2. `cart.store.js` guarda la bolsa en `localStorage` y avisa a sus suscriptores (contadores del encabezado y de la barra inferior, hoja de la bolsa).
-3. En la hoja de la bolsa, el paso «Tus datos» arma el pedido con `OrderService.preview()`; el enlace `https://wa.me/<número>?text=<mensaje>` se actualiza mientras el cliente escribe.
-4. Al presionar «Enviar pedido por WhatsApp»:
-   - **Catálogo de muestra**: el enlace abre WhatsApp directamente.
-   - **Con base de datos** (Supabase, demostración o backend propio): se abre una pestaña en el mismo toque, `OrderService.submit()` registra el pedido (valida existencias y precios en el servidor), la bolsa se vacía y la pestaña abre WhatsApp con el número de pedido oficial. Si el navegador bloquea la pestaña, la hoja muestra el botón para abrirlo.
-5. El pedido aparece al instante en el panel (Pedidos) con aviso en tiempo real.
+### Contenido editable y vista previa
 
-## Contenido editable de la portada
+- Cada sección lleva `data-edit="…"`. Con `?editar=1` dentro del panel (`src/store/lib/edit-bridge.ts`), tocar una sección abre su editor; la comunicación con el panel es por `postMessage`.
+- Animaciones de aparición: `data-reveal` en cualquier elemento (`style="--d: 1"` para escalonar). `initReveal()` marca `data-in` al entrar en pantalla y vigila los elementos que agregan las islas.
 
-- Cada texto o foto editable lleva `data-slot="seccion.campo"` (`src/sections/site-content.js`); si el panel aún no tiene un valor, se queda el del HTML.
-- Cada sección lleva `data-edit="…"`. Con `?editar=1` dentro del panel (`src/core/edit-bridge.js`), tocar una sección abre su editor y la vista previa se recarga en el mismo punto al guardar.
-- Los ajustes del panel (nombre, WhatsApp, horario, redes, región y moneda) se aplican con `src/core/site-settings.js`.
+## Panel
 
-## Componentes clave
+- `src/admin/App.tsx`: TanStack Query (`QueryClientProvider`), sesión y aviso de pedidos nuevos.
+- `src/admin/routes.tsx`: React Router con `basename: '/admin'`; cada sección se carga al abrirla. Las direcciones viejas con `#/` se redirigen.
+- `src/admin/api/`: cliente de Supabase (`client.ts`), conversión de filas a objetos (`mappers.ts`) y la interfaz `api` (`index.ts`) que usan las páginas.
+- Datos: `useData(clave, fn, temas)` + `invalidate(tema)` (`lib/query.ts`); avisos con `toast()`; hojas con `<Sheet>` (`ui/overlays.tsx`); cambios sin guardar con `useUnsavedChanges` (`lib/navigation.ts`).
 
-| Archivo | Qué hace |
-| --- | --- |
-| `components/sheet.js` | Controla los `<dialog>`: abrir/cerrar con animación, bloqueo de scroll, foco, Esc, tocar fuera y arrastrar hacia abajo en celular |
-| `components/island.js` | Notificación tipo Dynamic Island (`notify({ title, sub, image, action })`) |
-| `components/product-card.js` | Plantilla de tarjeta, caché de productos mostrados y tarjeta compacta |
-| `components/quick-view.js` | Detalle de producto en hoja: galería, colores, tallas, cantidad, WhatsApp, compartir |
-| `components/cart.js` | Bolsa y pedido en dos pasos, validación y enlace de WhatsApp |
-| `components/header.js` | Estado al hacer scroll, contadores, mega menú, cinta de avisos, enlaces de WhatsApp y redes |
-| `components/segmented.js` | Control segmentado con «lente» deslizante |
-| `components/tabbar.js` | Barra inferior estilo iOS 26 que se compacta al bajar |
-| `services/api/query.js` | Filtros, orden, paginación y facetas (función pura, reutilizable en Node) |
+## Base de datos (Supabase)
 
-## Acciones declarativas en el HTML
-
-`src/app.js` escucha clics en todo el documento:
-
-- `data-open="cart|favorites|search|menu|sizes"` abre la hoja correspondiente.
-- `data-product-link="<slug>"` abre la vista rápida (Ctrl/⌘ + clic abre la tienda en otra pestaña).
-- `data-quick-add="<slug>" data-size="M"` agrega directo a la bolsa.
-- `data-fav="<slug>"` marca o desmarca favorito.
-- `data-wa="greeting|vip"` recibe el enlace de WhatsApp con el mensaje correspondiente.
+- `supabase/schema.sql`: tablas, seguridad por fila (RLS) y **todas** las reglas del negocio como funciones: `storefront`, `product_page`, `storefront_sitemap`, `place_order` (públicas) y `pos_checkout`, `order_set_status`, `order_set_payment`, `order_update`, `cash_*`, `inventory_*`, `save_product`, `delete_product`, `save_category`, `delete_category`, `save_department`, `reorder_rows`, `set_integration_secret`, `integrations_status`, `cloudinary_signature`, `whoami` (equipo). Se puede volver a ejecutar.
+- `private.store_products` (vista): cada prenda a la venta ya en el formato de la tienda; la usan `storefront()` y `product_page()`.
+- `supabase/datos/*.json` → `npm run seed:build` → `supabase/seed.sql` (no se edita a mano).
+- `supabase/actualizaciones/*.sql`: correcciones de datos para bases que ya existían.
 
 ## Estilos
 
-- `styles/base/tokens.css`: paleta, tipografía, espaciado, radios, curvas de animación y capas (`z-index`).
-- `styles/components/glass.css`: material de vidrio líquido. Úsalo con `class="glass"` (+ `glass--strong`, `glass--dark`, `glass--live` para el reflejo que sigue al cursor).
-- Animaciones de aparición: agrega `data-reveal` a cualquier elemento (y `style="--d: 1"` para escalonar). Se desactivan solas con «reducir movimiento».
+- Tienda: `src/styles/main.css` importa en orden base → componentes → secciones → páginas. Tokens en `src/styles/base/tokens.css`; vidrio líquido con `class="glass"` (+ `glass--strong`, `glass--dark`, `glass--live`).
+- Panel: `src/admin/styles/` (tokens en `base.css`).
+
+## Calidad
+
+`npm run verify` ejecuta `astro check` (tipos), `eslint`, `vitest` y la compilación. Las pruebas viven junto al código (`src/lib/*.test.ts`).
 
 ## Estado en la URL
 
-- Tienda: `?depto=mujer&cat=vestidos&talla=M&color=negro&min=500&max=1200&oferta=1&nuevo=1&disponible=1&q=satín&orden=precio-asc`
-- Cualquier página: `?p=<slug>` abre la vista rápida de ese producto (enlaces para compartir por WhatsApp o redes).
+- Tienda: `/tienda?depto=mujer&cat=vestidos&talla=M&color=negro&min=200&max=500&oferta=1&nuevo=1&disponible=1&q=satín&orden=precio-asc`
+- Cualquier página: `?p=<slug>` abre la vista rápida de ese producto.
+- Prenda: `/producto/<slug>` (opcional `?color=<nombre>`).
