@@ -46,7 +46,9 @@ const {
 // en las páginas que se generan al momento, el de la petición
 const origin = Astro.site?.origin ?? (Astro.isPrerendered ? null : Astro.url.origin);
 const absolute = (u: string) => (origin ? new URL(u, origin).href : u);
-const canonical = origin ? new URL(Astro.url.pathname, origin).href : null;
+// Al compilar, las páginas se llaman /index.html o /tienda.html; la dirección pública es / y /tienda
+const path = Astro.url.pathname.replace(/(?:^|\/)index\.html$/, '/').replace(/\.html$/, '');
+const canonical = origin ? new URL(path || '/', origin).href : null;
 const year = new Date().getFullYear();
 ---
 

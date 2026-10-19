@@ -72,10 +72,12 @@ Hecho:
 - Supabase conectado: tablas y catálogo de ejemplo cargados, registro público cerrado, `somosdivani@gmail.com` con acceso de administrador. `.env.local` tiene `PUBLIC_SUPABASE_URL` y `PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
 
 Pendiente:
-1. **Publicar** en Cloudflare Workers (ver `docs/CONEXION.md`). Esta computadora no tiene sesión de Cloudflare: el dueño debe autorizar `npx wrangler login` (o conectar el repositorio en el panel de Cloudflare). Luego `npm run deploy`. Variables de compilación: `PUBLIC_SUPABASE_URL`, `PUBLIC_SUPABASE_PUBLISHABLE_KEY` y `PUBLIC_SITE_URL` (la dirección final). Después poner esa dirección en Supabase → Authentication → URL Configuration (Site URL y `…/admin` en Redirect URLs).
+1. **Dominio propio** (opcional, cuando el dueño lo compre): conectarlo en Cloudflare (Worker `divani` → Settings → Domains & Routes), cambiar `PUBLIC_SITE_URL` en `.env.local`, volver a publicar y actualizar Site URL y Redirect URLs en Supabase.
 2. **Cloudinary**: el dueño genera una API Key nueva y pega API Key + API Secret en el panel (Configuración → Conexiones → Guardar → Probar subida).
 3. **Seguridad** (lo hace el dueño): quitar de `.env.local` `SUPABASE_ACCESS_TOKEN`, `ADMIN_PASSWORD` y `CLOUDINARY_API_SECRET`; borrar el token personal «divani» en Supabase; cambiar la contraseña del administrador.
 4. **Datos reales**: cambiar las 45 prendas de ejemplo por las reales; configurar WhatsApp, horario y redes en Configuración → Tienda y contacto.
 5. Completar `src/pages/aviso-de-privacidad.astro` (datos marcados con `<mark>`).
+
+**Publicada** en Cloudflare Workers: https://divani.divani.workers.dev (cuenta con sesión de wrangler en esta computadora; para actualizar: `npm run deploy`, que usa `.env.local` con `PUBLIC_SITE_URL=https://divani.divani.workers.dev`). Supabase Auth: Site URL esa dirección; Redirect URLs `…/**` y `http://localhost:5173/**`.
 
 Ya aplicado en Supabase (18 de octubre de 2026): `schema.sql` nuevo y `actualizaciones/2026-10-18-guatemala-ropa-americana.sql` (región GTQ, textos sin «etiqueta», enlaces `/tienda`). La migración ya está en `main` (GitHub).
