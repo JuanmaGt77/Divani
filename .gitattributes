@@ -1,0 +1,13 @@
+# Finales de línea LF en todos los sistemas (Prettier, Astro y las herramientas de Node los esperan así).
+# Sin esto, Git en Windows convierte los archivos a CRLF y `prettier --check` falla.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.gif binary
+*.ico binary
+*.mp4 binary
+*.webm binary
+*.woff2 binary
