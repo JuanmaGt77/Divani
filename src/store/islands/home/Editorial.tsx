@@ -14,7 +14,7 @@ export default function Editorial() {
   return (
     <section className="editorial" aria-label="Divani" data-edit="editorial">
       <div className="container">
-        <div className="editorial__frame" data-reveal="scale">
+        <div className="editorial__frame" data-reveal="scale" suppressHydrationWarning>
           {image ? (
             <img
               className="editorial__img"

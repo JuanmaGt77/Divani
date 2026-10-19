@@ -30,7 +30,7 @@ export default function About() {
               <Emph text={title} />
             </h2>
           ) : null}
-          <figure className="about__visual" data-reveal="scale">
+          <figure className="about__visual" data-reveal="scale" suppressHydrationWarning>
             {image ? (
               <img
                 src={cdn(image, { w: 1400 })}
@@ -40,7 +40,7 @@ export default function About() {
                 height={720}
               />
             ) : null}
-            <figcaption className="about__seal glass" data-monogram="">
+            <figcaption className="about__seal glass" data-monogram="" suppressHydrationWarning>
               <svg className="about__mark" viewBox="0 0 418 443" aria-hidden="true">
                 <use href="#logo-mark" />
               </svg>
@@ -58,7 +58,13 @@ export default function About() {
           </div>
           <ul className="pillars list-reset">
             {PILLARS.map((p, i) => (
-              <li key={p.title} className="pillar glass" data-reveal="" style={i ? { '--d': i } : undefined}>
+              <li
+                key={p.title}
+                className="pillar glass"
+                data-reveal=""
+                suppressHydrationWarning
+                style={i ? { '--d': i } : undefined}
+              >
                 <Icon name={p.icon} />
                 <h3 className="pillar__title">{p.title}</h3>
                 <p>{p.text}</p>

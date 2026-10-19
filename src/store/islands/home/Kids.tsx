@@ -62,6 +62,7 @@ export default function Kids() {
                 className="kids-tile"
                 href={`/tienda?depto=${t.dept}`}
                 data-reveal=""
+                suppressHydrationWarning
                 style={{ '--d': i }}
               >
                 {image ? (

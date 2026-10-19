@@ -6,6 +6,7 @@ import { useRef, useState, type UIEvent } from 'react';
 import { money } from '@/lib/format';
 import { cdn } from '@/lib/model';
 import type { PublicSettings, StoreProduct } from '@/lib/types';
+import { useHydrated } from '../lib/hydration';
 import { CATALOG, colorStock, discountPct, firstAvailableColor, sizesOf, totalStock } from '../lib/product';
 import { productUrl } from '../lib/url';
 import { productMessage, waLink } from '../lib/whatsapp';
@@ -52,6 +53,8 @@ export function ProductDetail({
   const sizesBox = useRef<HTMLDivElement>(null);
   const favRef = useRef<HTMLButtonElement>(null);
   const fav = useFavorites().includes(p.slug);
+  // El mensaje lleva la dirección completa de la prenda, que solo se conoce en el navegador
+  const hydrated = useHydrated();
 
   if (!color) return null;
   const pct = discountPct(p);
@@ -59,7 +62,9 @@ export function ProductDetail({
   const sizes = sizesOf(p, color.name);
   const inColor = colorStock(p, color.name);
   const sel = sizes.find((s) => s.label === size);
-  const wa = waLink(settings, productMessage(settings, p, { color: color.name, size, qty }));
+  const wa = hydrated
+    ? waLink(settings, productMessage(settings, p, { color: color.name, size, qty }))
+    : waLink(settings);
   const Title = headingLevel;
 
   const pickColor = (i: number) => {

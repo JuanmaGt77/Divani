@@ -15,7 +15,7 @@ export default function Vip() {
   return (
     <section className="vip" data-edit="vip">
       <div className="container">
-        <div className="vip__card" data-reveal="scale">
+        <div className="vip__card" data-reveal="scale" suppressHydrationWarning>
           {image ? (
             <img className="vip__bg" src={cdn(image, { w: 1800 })} alt="" loading="lazy" width={1280} height={720} />
           ) : null}

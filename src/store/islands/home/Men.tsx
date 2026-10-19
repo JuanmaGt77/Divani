@@ -39,7 +39,7 @@ export default function Men() {
           </a>
         </header>
         <div className="men__grid">
-          <a className="men__banner" href="/tienda?depto=hombre" data-reveal="">
+          <a className="men__banner" href="/tienda?depto=hombre" data-reveal="" suppressHydrationWarning>
             {image ? (
               <img
                 src={cdn(image, { w: 1000 })}

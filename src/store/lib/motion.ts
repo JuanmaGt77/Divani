@@ -4,6 +4,10 @@
  *    también los que las islas pintan después de cargar datos.
  *  - Reflejo del vidrio que sigue al puntero (.glass--live, solo con mouse).
  * La clase js-motion se agrega desde un script en <head> para evitar parpadeos.
+ *
+ * data-in se pone por fuera de React y puede llegar antes de que la isla se active: los elementos
+ * con data-reveal, data-monogram o data-phone que vienen en el HTML generado llevan
+ * suppressHydrationWarning (React deja el atributo y no avisa de la diferencia).
  */
 import { reduceMotion } from './hydration';
 

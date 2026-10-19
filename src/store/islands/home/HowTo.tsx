@@ -36,7 +36,13 @@ export default function HowTo() {
           </header>
           <ol className="steps list-reset">
             {STEPS.map((s, i) => (
-              <li key={s.title} className="step" data-reveal="" style={i ? { '--d': i } : undefined}>
+              <li
+                key={s.title}
+                className="step"
+                data-reveal=""
+                suppressHydrationWarning
+                style={i ? { '--d': i } : undefined}
+              >
                 <span className="step__n">{i + 1}</span>
                 <div>
                   <h3 className="step__title">{s.title}</h3>
@@ -56,7 +62,12 @@ export default function HowTo() {
           </a>
         </div>
 
-        <figure className="phone" aria-label="Ejemplo de un pedido enviado por WhatsApp" data-phone="">
+        <figure
+          className="phone"
+          aria-label="Ejemplo de un pedido enviado por WhatsApp"
+          data-phone=""
+          suppressHydrationWarning
+        >
           <div className="phone__frame">
             <div className="phone__island" aria-hidden="true" />
             <div className="phone__screen">
