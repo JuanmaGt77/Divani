@@ -73,7 +73,7 @@ Hecho:
 
 Pendiente:
 1. **Dominio propio** (opcional, cuando el dueño lo compre): conectarlo en Cloudflare (Worker `divani` → Settings → Domains & Routes), cambiar `PUBLIC_SITE_URL` en `.env.local`, volver a publicar y actualizar Site URL y Redirect URLs en Supabase.
-2. **Cloudinary**: el dueño genera una API Key nueva y pega API Key + API Secret en el panel (Configuración → Conexiones → Guardar → Probar subida).
+2. ~~Cloudinary~~ Listo (19 de octubre de 2026): API Key «divani-tienda» guardada en el panel y subida de prueba correcta. La llave «Root» no se usa (Cloudinary no permite borrarla).
 3. **Seguridad** (lo hace el dueño): quitar de `.env.local` `SUPABASE_ACCESS_TOKEN`, `ADMIN_PASSWORD` y `CLOUDINARY_API_SECRET`; borrar el token personal «divani» en Supabase; cambiar la contraseña del administrador.
 4. **Datos reales**: cambiar las 45 prendas de ejemplo por las reales; configurar WhatsApp, horario y redes en Configuración → Tienda y contacto.
 5. Completar `src/pages/aviso-de-privacidad.astro` (datos marcados con `<mark>`).
