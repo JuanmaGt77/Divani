@@ -228,6 +228,17 @@ export interface CashView {
 }
 
 /* ---------- contenido del sitio ---------- */
+/** De dónde salen las prendas que muestra un banner de la portada. */
+export type ShowcaseSource = 'nuevo' | 'ofertas' | 'populares' | 'categoria' | 'elegidas' | 'ninguna';
+
+export interface BannerShowcase {
+  source: ShowcaseSource;
+  /** Con source «categoria». */
+  category?: string;
+  /** Con source «elegidas»: slugs en orden. */
+  products?: string[];
+}
+
 export interface Banner {
   id?: string;
   placement: string;
@@ -238,7 +249,9 @@ export interface Banner {
   ctaHref: string;
   image: string;
   imageMobile: string;
+  /** Color de fondo de la portada (arena, marfil, tinta, rosa, salvia). */
   theme: string;
+  showcase: BannerShowcase;
   sort?: number;
   active: boolean;
   startsAt: string | null;
@@ -271,19 +284,8 @@ export interface Faq {
   active: boolean;
 }
 
-export interface HeroContent {
-  eyebrow?: string;
-  title?: string;
-  subtitle?: string;
-  video?: string;
-  videoPortrait?: string;
-  poster?: string;
-  posterPortrait?: string;
-}
-
-/** Fotos y textos de la portada (tabla site_content: una llave por sección). */
+/** Fotos y textos de las secciones de la página de inicio (tabla site_content: una llave por sección). */
 export interface SiteContent {
-  hero?: HeroContent;
   ribbons?: { primary?: string[]; secondary?: string[] };
   editorial?: { image?: string; eyebrow?: string; title?: string };
   kids?: { title?: string; lead?: string; girlsImage?: string; boysImage?: string };
@@ -436,6 +438,7 @@ export interface StoreBanner {
   image: string;
   imageMobile: string;
   theme: string;
+  showcase?: Partial<BannerShowcase>;
 }
 
 export interface StoreLookbook {

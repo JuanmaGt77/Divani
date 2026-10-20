@@ -10,8 +10,8 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { makeSku, mergeSettings, round2, sizeRank } from '../src/lib/model';
-import type { Hotspot, PublicSettings, SiteContent } from '../src/lib/types';
+import { bannerTheme, makeSku, mergeSettings, normalizeShowcase, round2, sizeRank } from '../src/lib/model';
+import type { BannerShowcase, Hotspot, PublicSettings, SiteContent } from '../src/lib/types';
 
 /* ---------- lo que traen los JSON ---------- */
 interface RawProduct {
@@ -48,6 +48,7 @@ interface RawTaxonomy {
 }
 interface RawBanner {
   id?: string;
+  showcase?: Partial<BannerShowcase>;
   placement?: string;
   eyebrow?: string;
   title?: string;
@@ -209,7 +210,8 @@ const banners = read<RawBanner[]>('banners')
     ctaHref: b.cta?.href || '',
     image: b.image || '',
     imageMobile: '',
-    theme: b.theme || 'light',
+    theme: bannerTheme(b.theme),
+    showcase: normalizeShowcase(b.showcase),
     sort: i,
     active: true,
   }));
@@ -315,7 +317,7 @@ ${rows(movements, (m) => [q(m.variantId), q(m.productId), q(m.sku), q(m.productN
 ) as v (variant_id, product_id, sku, product_name, variant_label, qty, unit_cost, created_at)
 where not exists (select 1 from public.inventory_movements m where m.type = 'inicial' and m.variant_id = v.variant_id::uuid);
 `,
-  `insert into public.banners (id, placement, eyebrow, title, text, cta_label, cta_href, image, image_mobile, theme, sort, active) values
+  `insert into public.banners (id, placement, eyebrow, title, text, cta_label, cta_href, image, image_mobile, theme, showcase, sort, active) values
 ${rows(banners, (b) => [
   q(b.id),
   q(b.placement),
@@ -327,6 +329,7 @@ ${rows(banners, (b) => [
   q(b.image),
   q(b.imageMobile),
   q(b.theme),
+  json(b.showcase),
   num(b.sort),
   bool(b.active),
 ])}

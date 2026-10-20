@@ -1,13 +1,4 @@
 {
-  "hero": {
-    "eyebrow": "Otoño · Invierno 2026",
-    "title": "Moda americana, *elegida para ti.*",
-    "subtitle": "Ropa americana premium, seleccionada para mujer, niñas, niños y hombre.",
-    "video": "media/video/divani-hero.mp4",
-    "videoPortrait": "media/video/divani-hero-portrait.mp4",
-    "poster": "media/video/divani-hero-poster.webp",
-    "posterPortrait": "media/video/divani-hero-portrait-poster.webp"
-  },
   "ribbons": {
     "primary": [
       "Nueva temporada",

@@ -1,248 +1,319 @@
 /**
- * Portada con video: elige la versión vertical u horizontal, controla pausa y sonido, dibuja el
- * progreso y se pausa cuando no está en pantalla (ahorra batería). El video, las fotos de respaldo
- * y los textos se cambian en el panel (Sitio web → Portada con video).
+ * Portada: carrusel de «vitrinas» (Sitio web → Portada). Cada banner es una campaña con su color,
+ * su foto y una repisa de prendas con su precio, en marcos de arco como ventanas de boutique.
+ * Sin banners publicados se muestra una vitrina de novedades. Avanza sola y se detiene con el
+ * cursor encima, con el foco del teclado, fuera de pantalla o con «reducir movimiento».
  */
-import { useEffect, useRef, useState } from 'react';
-import { cdn } from '@/lib/model';
+import { useEffect, useMemo, useRef, useState, type FocusEvent } from 'react';
+import { money } from '@/lib/format';
+import { SHOWCASE_SIZE, bannerTheme, cdn, normalizeShowcase, storeHref } from '@/lib/model';
+import type { StoreBanner, StoreProduct, StorefrontPayload } from '@/lib/types';
 import { Emph, Icon } from '../../components/Icon';
 import { cx } from '../../components/cx';
-import { useContent } from '../../data/content';
-import { useSettings } from '../../data/storefront';
+import { onProductLink } from '../../components/ProductCard';
+import { listProducts, useStorefront } from '../../data/storefront';
 import { reduceMotion } from '../../lib/hydration';
-import { greetingMessage, waLink } from '../../lib/whatsapp';
+import { discountPct, firstAvailableColor, totalStock } from '../../lib/product';
+import { productPath } from '../../lib/url';
 
-const DEFAULT_VIDEO = /media\/video\/divani-hero(-portrait)?\.mp4$/;
+const DURATION = 7000;
+
+/** Vitrina de respaldo cuando no hay banners publicados. */
+const FALLBACK: StoreBanner = {
+  id: 'novedades',
+  placement: 'home-carousel',
+  eyebrow: 'Nueva temporada',
+  title: 'Ropa americana *premium*',
+  text: 'Prendas seleccionadas para mujer, niñas, niños y hombre. Pocas piezas por modelo.',
+  cta: { label: 'Ver novedades', href: '/tienda?orden=nuevo' },
+  image: '',
+  imageMobile: '',
+  theme: 'arena',
+  showcase: { source: 'nuevo' },
+};
+
+/** Prendas con existencias que muestra cada banner. */
+function pickProducts(data: StorefrontPayload, banner: StoreBanner): StoreProduct[] {
+  const s = normalizeShowcase(banner.showcase);
+  const query = { inStock: true, pageSize: 24 };
+  let list: StoreProduct[];
+  switch (s.source) {
+    case 'ninguna':
+      return [];
+    case 'elegidas': {
+      const bySlug = new Map(data.products.map((p) => [p.slug, p]));
+      list = (s.products || [])
+        .map((slug) => bySlug.get(slug))
+        .filter((p): p is StoreProduct => !!p && totalStock(p) > 0);
+      break;
+    }
+    case 'ofertas':
+      list = listProducts(data, { ...query, onSale: true }).data.sort((a, b) => discountPct(b) - discountPct(a));
+      break;
+    case 'populares':
+      list = listProducts(data, { ...query, sort: 'populares' }).data;
+      break;
+    case 'categoria':
+      list = listProducts(data, { ...query, category: s.category, sort: 'destacados' }).data;
+      break;
+    default:
+      list = listProducts(data, { ...query, sort: 'nuevo' }).data;
+  }
+  return list.slice(0, SHOWCASE_SIZE);
+}
+
+interface Slide {
+  banner: StoreBanner;
+  products: StoreProduct[];
+}
 
 export default function Hero() {
-  const content = useContent();
-  const settings = useSettings();
-  const video = useRef<HTMLVideoElement>(null);
-  const progress = useRef<HTMLSpanElement>(null);
-  // El ícono empieza en «pausa» (el video arranca solo) y la foto de respaldo se oculta al empezar
-  const [paused, setPaused] = useState(false);
-  const [started, setStarted] = useState(false);
-  const [userPaused, setUserPaused] = useState(false);
-  const [muted, setMuted] = useState(true);
-  const pausedRef = useRef(false);
-  pausedRef.current = userPaused;
+  const { data, status } = useStorefront();
+  const slides = useMemo<Slide[]>(() => {
+    if (!data)
+      return status === 'error'
+        ? [{ banner: { ...FALLBACK, cta: { label: 'Ver la tienda', href: '/tienda' } }, products: [] }]
+        : [];
+    const banners = data.banners.filter((b) => (b.placement || 'home-carousel') === 'home-carousel');
+    return (banners.length ? banners : [FALLBACK]).map((banner) => ({ banner, products: pickProducts(data, banner) }));
+  }, [data, status]);
+  const count = slides.length;
 
-  const hero = {
-    eyebrow: content.get('hero', 'eyebrow'),
-    title: content.get('hero', 'title'),
-    subtitle: content.get('hero', 'subtitle'),
-    video: content.get('hero', 'video'),
-    videoPortrait: content.get('hero', 'videoPortrait'),
-    poster: content.get('hero', 'poster'),
-    posterPortrait: content.get('hero', 'posterPortrait'),
-  };
-  // Video subido desde el panel (si es el de fábrica se usan sus versiones webm/mp4 locales)
-  const custom =
-    hero.video && !DEFAULT_VIDEO.test(hero.video)
-      ? { landscape: cdn(hero.video), portrait: cdn(hero.videoPortrait || hero.video) }
-      : null;
-  const customKey = custom ? `${custom.landscape}|${custom.portrait}` : '';
+  const track = useRef<HTMLDivElement>(null);
+  const root = useRef<HTMLDivElement>(null);
+  const [index, setIndex] = useState(0);
+  const [hold, setHold] = useState({ hover: false, focus: false, away: false });
+  const paused = hold.hover || hold.focus || hold.away;
+  const current = Math.min(index, Math.max(0, count - 1));
+  const currentRef = useRef(current);
+  currentRef.current = current;
 
-  const play = () => {
-    const v = video.current;
-    if (!v) return;
-    v.muted = v.muted || muted;
-    v.play().catch(() => setPaused(true)); // Reproducción automática bloqueada (modo de ahorro de energía)
+  const go = (i: number, smooth = true) => {
+    const el = track.current;
+    if (!el || !count) return;
+    el.scrollTo({
+      left: el.clientWidth * ((i + count) % count),
+      behavior: smooth && !reduceMotion() ? 'smooth' : 'auto',
+    });
   };
 
-  // Arranque, orientación correcta y video personalizado
+  // La vitrina actual sale del desplazamiento (también al deslizar con el dedo)
   useEffect(() => {
-    const v = video.current;
-    if (!v) return undefined;
-    v.muted = true;
-    const portrait = matchMedia('(max-width: 767px)');
-    const urlFor = (kind: 'portrait' | 'landscape', ext: string) =>
-      custom
-        ? new URL(custom[kind], location.href).href
-        : new URL(`/media/video/divani-hero${kind === 'portrait' ? '-portrait' : ''}.${ext}`, location.href).href;
-    // Asegura la fuente correcta aunque el navegador ignore <source media>
-    const pick = () => {
-      if (!v.currentSrc && !custom) return;
-      const ext = v.currentSrc.split('?')[0]?.endsWith('.webm') ? 'webm' : 'mp4';
-      const want = urlFor(portrait.matches ? 'portrait' : 'landscape', ext);
-      if (v.currentSrc !== want) {
-        const t = v.currentTime;
-        v.src = want;
-        v.currentTime = t;
-        if (!pausedRef.current) play();
-      }
-    };
-    if (custom) {
-      v.querySelectorAll('source').forEach((s) => s.remove());
-      v.src = urlFor(portrait.matches ? 'portrait' : 'landscape', 'mp4');
-      v.load();
-    }
-    if (reduceMotion()) {
-      v.pause();
-      setUserPaused(true);
-    } else play();
-    portrait.addEventListener('change', pick);
-    v.addEventListener('loadedmetadata', pick, { once: true });
+    const el = track.current;
+    if (!el || count < 2) return undefined;
+    const onScroll = () => setIndex(Math.round(el.scrollLeft / Math.max(1, el.clientWidth)));
+    const onResize = () => el.scrollTo({ left: el.clientWidth * currentRef.current });
+    el.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onResize);
+    const io = new IntersectionObserver(([en]) => setHold((h) => ({ ...h, away: !en?.isIntersecting })), {
+      threshold: 0.35,
+    });
+    if (root.current) io.observe(root.current);
     return () => {
-      portrait.removeEventListener('change', pick);
-      v.removeEventListener('loadedmetadata', pick);
+      el.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+      io.disconnect();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [customKey]);
+  }, [count]);
 
-  // Barra de progreso y pausa automática fuera de pantalla
+  // Avance automático
   useEffect(() => {
-    const v = video.current;
-    if (!v) return undefined;
-    let raf = 0;
-    const tick = () => {
-      if (v.duration) progress.current?.style.setProperty('--p', (v.currentTime / v.duration).toFixed(4));
-      raf = requestAnimationFrame(tick);
-    };
-    const onPlay = () => {
-      setPaused(false);
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(tick);
-    };
-    const onPause = () => {
-      setPaused(true);
-      cancelAnimationFrame(raf);
-    };
-    const onPlaying = () => setStarted(true);
-    v.addEventListener('play', onPlay);
-    v.addEventListener('pause', onPause);
-    v.addEventListener('playing', onPlaying);
-    let io: IntersectionObserver | undefined;
-    if ('IntersectionObserver' in window) {
-      io = new IntersectionObserver(
-        ([entry]) => {
-          if (pausedRef.current) return;
-          if (entry?.isIntersecting) play();
-          else v.pause();
-        },
-        { threshold: 0.15 },
-      );
-      io.observe(v);
-    }
-    return () => {
-      cancelAnimationFrame(raf);
-      v.removeEventListener('play', onPlay);
-      v.removeEventListener('pause', onPause);
-      v.removeEventListener('playing', onPlaying);
-      io?.disconnect();
-    };
+    if (count < 2 || paused || reduceMotion()) return undefined;
+    const timer = setTimeout(() => go(current + 1), DURATION);
+    return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [current, paused, count]);
 
-  const toggle = () => {
-    const v = video.current;
-    if (!v) return;
-    if (v.paused) {
-      setUserPaused(false);
-      play();
-    } else {
-      setUserPaused(true);
-      v.pause();
-    }
+  const onBlur = (e: FocusEvent<HTMLDivElement>) => {
+    if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setHold((h) => ({ ...h, focus: false }));
   };
-  const toggleSound = () => {
-    const v = video.current;
-    if (!v) return;
-    v.muted = !v.muted;
-    setMuted(v.muted);
-    if (!v.muted && v.paused) {
-      setUserPaused(false);
-      play();
-    }
-  };
-
-  const posterLandscape = hero.poster ? cdn(hero.poster, { w: 1920 }) : '/media/video/divani-hero-poster.webp';
-  const posterPortrait =
-    hero.posterPortrait || hero.poster
-      ? cdn(hero.posterPortrait || hero.poster, { w: 900 })
-      : '/media/video/divani-hero-portrait-poster.webp';
 
   return (
-    <section className="hero" aria-label="Divani, ropa americana premium" data-edit="hero">
-      <div className="hero__media">
-        <video
-          ref={video}
-          className="hero__video"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          aria-label="Video de presentación de Divani: una tela de seda se desliza y aparece el logotipo."
+    <section className="vitrina" aria-label="Portada" data-edit="banners">
+      <h1 className="visually-hidden">Divani · Ropa americana premium</h1>
+      <div className="container">
+        <div
+          ref={root}
+          className={cx('vitrina__frame', paused && 'is-paused')}
+          aria-roledescription="carrusel"
+          style={{ '--vit-dur': `${DURATION}ms` }}
+          onPointerEnter={(e) => e.pointerType === 'mouse' && setHold((h) => ({ ...h, hover: true }))}
+          onPointerLeave={(e) => e.pointerType === 'mouse' && setHold((h) => ({ ...h, hover: false }))}
+          onFocus={() => setHold((h) => ({ ...h, focus: true }))}
+          onBlur={onBlur}
         >
-          <source src="/media/video/divani-hero-portrait.webm" type="video/webm" media="(max-width: 767px)" />
-          <source src="/media/video/divani-hero-portrait.mp4" type="video/mp4" media="(max-width: 767px)" />
-          <source src="/media/video/divani-hero.webm" type="video/webm" />
-          <source src="/media/video/divani-hero.mp4" type="video/mp4" />
-        </video>
-        <picture className={cx('hero__poster', started && 'is-hidden')}>
-          <source media="(max-width: 767px)" srcSet={posterPortrait} />
-          <img src={posterLandscape} alt="" width={1280} height={720} fetchPriority="high" decoding="async" />
-        </picture>
-        <div className="hero__veil" aria-hidden="true" />
-      </div>
-
-      <div className="hero__content container">
-        <div className="hero__panel glass glass--live">
-          {hero.eyebrow ? (
-            <p className="eyebrow rise" style={{ '--i': 0 }}>
-              {hero.eyebrow}
-            </p>
-          ) : null}
-          {hero.title ? (
-            <h1 className="hero__title rise" style={{ '--i': 1 }}>
-              <Emph text={hero.title} />
-            </h1>
-          ) : null}
-          {hero.subtitle ? (
-            <p className="hero__sub rise" style={{ '--i': 2 }}>
-              {hero.subtitle}
-            </p>
-          ) : null}
-          <div className="hero__actions rise" style={{ '--i': 3 }}>
-            <a className="btn btn--ink btn--lg" href="/tienda">
-              Comprar ahora
-              <Icon name="arrow-right" />
-            </a>
-            <a
-              className="btn btn--glass btn--wa btn--lg glass"
-              href={waLink(settings, greetingMessage(settings))}
-              target="_blank"
-              rel="noopener"
-            >
-              <Icon name="whatsapp" />
-              Pedir por WhatsApp
-            </a>
+          <div className="vitrina__track" ref={track}>
+            {!count ? (
+              <SkeletonSlide />
+            ) : (
+              slides.map((s, i) => (
+                <VitrinaSlide
+                  key={s.banner.id || i}
+                  slide={s}
+                  index={i}
+                  count={count}
+                  current={i === current}
+                  eager={i === 0}
+                />
+              ))
+            )}
           </div>
-        </div>
-
-        <div className="hero__controls rise" style={{ '--i': 4 }}>
-          <div className="hero__progress" aria-hidden="true">
-            <span ref={progress} />
-          </div>
-          <button
-            className="icon-btn glass round"
-            type="button"
-            onClick={toggle}
-            aria-label={paused ? 'Reproducir video' : 'Pausar video'}
-          >
-            <Icon name={paused ? 'play' : 'pause'} />
-          </button>
-          <button
-            className="icon-btn glass round"
-            type="button"
-            onClick={toggleSound}
-            aria-label={muted ? 'Activar sonido' : 'Silenciar'}
-          >
-            <Icon name={muted ? 'volume-off' : 'volume'} />
-          </button>
+          {count > 1 ? (
+            <div className="vitrina__nav">
+              <button
+                className="icon-btn vitrina__arrow"
+                type="button"
+                onClick={() => go(current - 1)}
+                aria-label="Anterior"
+              >
+                <Icon name="chevron-left" />
+              </button>
+              <div className="vitrina__dots">
+                {slides.map((s, i) => (
+                  <button
+                    key={s.banner.id || i}
+                    className="vitrina__dot"
+                    type="button"
+                    aria-label={`Ir a la portada ${i + 1}`}
+                    aria-current={i === current}
+                    onClick={() => go(i)}
+                  >
+                    {/* La barra de progreso vuelve a empezar en cada vitrina */}
+                    <span key={i === current ? 'on' : 'off'} />
+                  </button>
+                ))}
+              </div>
+              <button
+                className="icon-btn vitrina__arrow"
+                type="button"
+                onClick={() => go(current + 1)}
+                aria-label="Siguiente"
+              >
+                <Icon name="chevron-right" />
+              </button>
+            </div>
+          ) : null}
         </div>
       </div>
     </section>
+  );
+}
+
+function VitrinaSlide({
+  slide: { banner: b, products },
+  index,
+  count,
+  current,
+  eager,
+}: {
+  slide: Slide;
+  index: number;
+  count: number;
+  current: boolean;
+  eager: boolean;
+}) {
+  const photo = b.image || b.imageMobile;
+  return (
+    <article
+      className={cx('vit', photo && 'vit--photo', products.length > 0 && 'vit--shelf', current && 'is-current')}
+      data-theme={bannerTheme(b.theme)}
+      aria-roledescription="diapositiva"
+      aria-label={`${index + 1} de ${count}`}
+    >
+      {photo ? (
+        <picture className="vit__media">
+          {b.imageMobile ? <source media="(max-width: 767px)" srcSet={cdn(b.imageMobile, { w: 900 })} /> : null}
+          <img
+            src={cdn(photo, { w: 1600 })}
+            alt=""
+            width={1600}
+            height={900}
+            loading={eager ? undefined : 'lazy'}
+            fetchPriority={eager ? 'high' : undefined}
+            decoding="async"
+          />
+        </picture>
+      ) : null}
+      <div className="vit__copy">
+        <p className="vit__eyebrow">
+          {count > 1 ? <span className="vit__num">{String(index + 1).padStart(2, '0')}</span> : null}
+          {b.eyebrow ? <span>{b.eyebrow}</span> : null}
+        </p>
+        <h2 className="vit__title">
+          <Emph text={b.title} />
+        </h2>
+        {b.text ? <p className="vit__text">{b.text}</p> : null}
+        <a className="btn vit__cta" href={storeHref(b.cta?.href)}>
+          {b.cta?.label || 'Ver más'}
+          <Icon name="arrow-right" />
+        </a>
+      </div>
+      {products.length ? (
+        <ul className="vit__shelf list-reset" aria-label="Prendas de esta portada">
+          {products.map((p, k) => (
+            <ShelfItem key={p.slug} product={p} k={k} />
+          ))}
+        </ul>
+      ) : null}
+    </article>
+  );
+}
+
+function ShelfItem({ product: p, k }: { product: StoreProduct; k: number }) {
+  const color = firstAvailableColor(p) || p.colors[0];
+  const pct = discountPct(p);
+  const sale = pct > 0 && p.compareAtPrice;
+  return (
+    <li className="vit__item" style={{ '--k': k }}>
+      <a
+        className="vit__card"
+        href={productPath(p.slug)}
+        onClick={(e) => onProductLink(e, p.slug, color?.name)}
+        aria-label={`${p.name}, ${money(p.price)}${sale ? `, antes ${money(p.compareAtPrice)}` : ''}`}
+      >
+        <span className="vit__arch">
+          <img
+            src={cdn(color?.images[0], { w: 480 })}
+            alt=""
+            width={360}
+            height={480}
+            loading="lazy"
+            decoding="async"
+          />
+          {pct >= 5 ? <span className="vit__off">−{pct}%</span> : null}
+        </span>
+        <span className="vit__price" aria-hidden="true">
+          <span className={sale ? 'is-sale' : undefined}>{money(p.price)}</span>
+          {sale ? <s>{money(p.compareAtPrice)}</s> : null}
+        </span>
+        <span className="vit__name" aria-hidden="true">
+          {p.name}
+        </span>
+      </a>
+    </li>
+  );
+}
+
+/** Mientras llegan los datos: la misma vitrina, sin textos ni prendas. */
+function SkeletonSlide() {
+  return (
+    <article className="vit vit--shelf vit--skeleton" data-theme="arena" aria-busy="true" aria-label="Cargando portada">
+      <div className="vit__copy">
+        <span className="vit__ph vit__ph--eyebrow" />
+        <span className="vit__ph vit__ph--title" />
+        <span className="vit__ph vit__ph--title vit__ph--short" />
+        <span className="vit__ph vit__ph--btn" />
+      </div>
+      <ul className="vit__shelf list-reset" aria-hidden="true">
+        {Array.from({ length: SHOWCASE_SIZE }, (_, k) => (
+          <li key={k} className="vit__item">
+            <span className="vit__card">
+              <span className="vit__arch skeleton" />
+              <span className="vit__ph vit__ph--price" />
+            </span>
+          </li>
+        ))}
+      </ul>
+    </article>
   );
 }

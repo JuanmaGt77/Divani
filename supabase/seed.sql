@@ -695,10 +695,10 @@ from (values
 ) as v (variant_id, product_id, sku, product_name, variant_label, qty, unit_cost, created_at)
 where not exists (select 1 from public.inventory_movements m where m.type = 'inicial' and m.variant_id = v.variant_id::uuid);
 
-insert into public.banners (id, placement, eyebrow, title, text, cta_label, cta_href, image, image_mobile, theme, sort, active) values
-  ('9d11ee3b-de41-4e89-9e18-cb9fe79aa53c', 'home-carousel', 'Temporada Otoño · Invierno', 'Capas que se sienten *tan bien* como se ven', 'Gabardinas, satines y tejidos americanos recién llegados. Pocas piezas por modelo.', 'Ver novedades', '/tienda?orden=nuevo', 'media/banners/nueva-coleccion.webp', '', 'light', 0, true),
-  ('5f120398-e20c-4f86-b1a7-5a9ced9e2aa3', 'home-carousel', 'Rebajas de temporada', 'Hasta *30%* en piezas seleccionadas', 'Vestidos, suéteres y satines con precio especial mientras haya existencias.', 'Ver ofertas', '/tienda?oferta=1', 'media/banners/rebajas.webp', '', 'light', 1, true),
-  ('e94095ef-2743-4861-8270-2bebc53c3c10', 'home-carousel', 'Denim americano', 'Mezclilla *americana*', 'Wide leg, rectos, faldas y chamarras. Cortes clásicos que mejoran con cada uso.', 'Ver mezclilla', '/tienda?q=mezclilla', 'media/banners/denim.webp', '', 'light', 2, true)
+insert into public.banners (id, placement, eyebrow, title, text, cta_label, cta_href, image, image_mobile, theme, showcase, sort, active) values
+  ('9d11ee3b-de41-4e89-9e18-cb9fe79aa53c', 'home-carousel', 'Temporada Otoño · Invierno', 'Capas que se sienten *tan bien* como se ven', 'Gabardinas, satines y tejidos americanos recién llegados. Pocas piezas por modelo.', 'Ver novedades', '/tienda?orden=nuevo', 'media/banners/nueva-coleccion.webp', '', 'arena', '{"source":"nuevo"}'::jsonb, 0, true),
+  ('5f120398-e20c-4f86-b1a7-5a9ced9e2aa3', 'home-carousel', 'Rebajas de temporada', 'Hasta *30%* en piezas seleccionadas', 'Vestidos, suéteres y satines con precio especial mientras haya existencias.', 'Ver ofertas', '/tienda?oferta=1', 'media/banners/rebajas.webp', '', 'rosa', '{"source":"ofertas"}'::jsonb, 1, true),
+  ('e94095ef-2743-4861-8270-2bebc53c3c10', 'home-carousel', 'Denim americano', 'Mezclilla *americana*', 'Wide leg, rectos, faldas y chamarras. Cortes clásicos que mejoran con cada uso.', 'Ver mezclilla', '/tienda?q=mezclilla', 'media/banners/denim.webp', '', 'salvia', '{"source":"categoria","category":"jeans-y-pantalones"}'::jsonb, 2, true)
 on conflict (id) do nothing;
 
 insert into public.lookbooks (id, eyebrow, title, text, image, hotspots, sort, active) values
@@ -715,7 +715,6 @@ insert into public.faq (id, question, answer, sort, active) values
 on conflict (id) do nothing;
 
 insert into public.site_content (key, value) values
-  ('hero', '{"eyebrow":"Otoño · Invierno 2026","title":"Moda americana, *elegida para ti.*","subtitle":"Ropa americana premium, seleccionada para mujer, niñas, niños y hombre.","video":"media/video/divani-hero.mp4","videoPortrait":"media/video/divani-hero-portrait.mp4","poster":"media/video/divani-hero-poster.webp","posterPortrait":"media/video/divani-hero-portrait-poster.webp"}'::jsonb),
   ('ribbons', '{"primary":["Nueva temporada","*Divani*","Ropa americana","*Fashion in you*","Calidad premium","*Divani*","Piezas limitadas"],"secondary":["Compra por WhatsApp","*Mujer*","Envíos a toda Guatemala","*Niñas & niños*","Atención personal","*Hombre*"]}'::jsonb),
   ('editorial', '{"image":"media/editorial/silk-02.webp","eyebrow":"Divani · Fashion in you","title":"Ropa americana. *Calidad premium.*"}'::jsonb),
   ('kids', '{"title":"Para los *más pequeños*","lead":"Vestidos de fiesta, mezclilla y básicos suaves en tallas americanas de 2T a 12.","girlsImage":"images/categories/ninas.webp","boysImage":"images/categories/ninos.webp"}'::jsonb),

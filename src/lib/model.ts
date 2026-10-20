@@ -7,6 +7,7 @@
  */
 import type {
   Banner,
+  BannerShowcase,
   CashMovementType,
   Channel,
   ColorFamily,
@@ -21,6 +22,7 @@ import type {
   RegionPreset,
   RegionSettings,
   Settings,
+  ShowcaseSource,
   Tone,
 } from './types';
 
@@ -514,9 +516,51 @@ export function cdn(url: string | null | undefined, { w, h, crop = 'limit', ar }
   return `${u.slice(0, i + 8)}${t.join(',')}/${rest}`;
 }
 
+/* ---------- portada: color y prendas de cada banner ---------- */
+export const BANNER_THEMES = [
+  { id: 'arena', label: 'Arena', swatch: '#e6dac7' },
+  { id: 'marfil', label: 'Marfil', swatch: '#f3ece1' },
+  { id: 'rosa', label: 'Rosa palo', swatch: '#e8d0c5' },
+  { id: 'salvia', label: 'Salvia', swatch: '#d5dbc9' },
+  { id: 'tinta', label: 'Tinta', swatch: '#1f1b18' },
+] as const;
+
+export type BannerTheme = (typeof BANNER_THEMES)[number]['id'];
+
+/** Color válido de un banner (los anteriores decían «light» o «dark»). */
+export function bannerTheme(theme: unknown): BannerTheme {
+  if (theme === 'dark') return 'tinta';
+  return BANNER_THEMES.some((t) => t.id === theme) ? (theme as BannerTheme) : 'arena';
+}
+
+/** Cuántas prendas muestra cada banner de la portada. */
+export const SHOWCASE_SIZE = 3;
+
+export const SHOWCASE_SOURCES: { id: ShowcaseSource; label: string; hint: string }[] = [
+  { id: 'nuevo', label: 'Novedades', hint: 'Las prendas más recientes con existencias.' },
+  { id: 'ofertas', label: 'Ofertas', hint: 'Las que tienen el descuento más alto.' },
+  { id: 'populares', label: 'Más vendidas', hint: 'Las marcadas como «Lo más deseado».' },
+  { id: 'categoria', label: 'Una categoría', hint: 'Las destacadas de la categoría que elijas.' },
+  { id: 'elegidas', label: 'Elegir prendas', hint: `Tú eliges cuáles (hasta ${SHOWCASE_SIZE}).` },
+  { id: 'ninguna', label: 'Sin prendas', hint: 'Solo la foto y el texto.' },
+];
+
+export function normalizeShowcase(s: Partial<BannerShowcase> | null | undefined): BannerShowcase {
+  const source = SHOWCASE_SOURCES.find((x) => x.id === s?.source)?.id || 'nuevo';
+  if (source === 'categoria') return { source, category: clean(s?.category, 80) };
+  if (source === 'elegidas') {
+    const products = [...new Set((s?.products || []).map((p) => clean(p, 120)).filter(Boolean))];
+    return { source, products: products.slice(0, SHOWCASE_SIZE) };
+  }
+  return { source };
+}
+
 /* ---------- contenido: validación antes de guardar ---------- */
 export function normalizeBanner(b: Partial<Banner> = {}): Banner {
-  if (!b.image) fail('Sube la imagen del banner.');
+  const showcase = normalizeShowcase(b.showcase);
+  if (showcase.source === 'categoria' && !showcase.category) fail('Elige la categoría de las prendas.');
+  if (showcase.source === 'elegidas' && !showcase.products?.length) fail('Elige al menos una prenda.');
+  if (showcase.source === 'ninguna' && !b.image) fail('Sube una foto o elige prendas para mostrar.');
   return {
     ...(b.id ? { id: b.id } : {}),
     placement: b.placement || 'home-carousel',
@@ -525,9 +569,10 @@ export function normalizeBanner(b: Partial<Banner> = {}): Banner {
     text: clean(b.text, 240),
     ctaLabel: clean(b.ctaLabel, 40),
     ctaHref: clean(b.ctaHref, 300) || '/tienda',
-    image: String(b.image),
+    image: b.image ? String(b.image) : '',
     imageMobile: b.imageMobile || '',
-    theme: b.theme || 'light',
+    theme: bannerTheme(b.theme),
+    showcase,
     active: b.active !== false,
     startsAt: b.startsAt || null,
     endsAt: b.endsAt || null,

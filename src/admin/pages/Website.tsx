@@ -9,7 +9,6 @@ import {
   BookHeart,
   ChevronRight,
   CircleHelp,
-  Clapperboard,
   Crown,
   ExternalLink,
   Eye,
@@ -37,7 +36,6 @@ import {
   AnnouncementsEditor,
   EditorialEditor,
   HOME_SECTIONS,
-  HeroEditor,
   KidsEditor,
   MenEditor,
   RibbonsEditor,
@@ -57,8 +55,8 @@ import { Card, PageHeader, Tabs } from '../ui/surfaces';
 type Tab = 'portada' | 'banners' | 'categorias' | 'look' | 'preguntas';
 
 const TABS = [
-  { value: 'portada' as Tab, label: 'Portada', icon: House },
-  { value: 'banners' as Tab, label: 'Banners', icon: GalleryHorizontal },
+  { value: 'portada' as Tab, label: 'Secciones', icon: House },
+  { value: 'banners' as Tab, label: 'Portada', icon: GalleryHorizontal },
   { value: 'categorias' as Tab, label: 'Categorías', icon: LayoutGrid },
   { value: 'look' as Tab, label: 'Arma tu look', icon: Shirt },
   { value: 'preguntas' as Tab, label: 'Preguntas', icon: CircleHelp },
@@ -66,7 +64,6 @@ const TABS = [
 
 const ICONS: Record<string, LucideIcon> = {
   announcements: Megaphone,
-  hero: Clapperboard,
   ribbons: Ribbon,
   categories: LayoutGrid,
   banners: GalleryHorizontal,
@@ -131,7 +128,7 @@ export default function Website() {
           setPreviewOpen={setPreviewOpen}
         />
       )}
-      {tab === 'banners' && <BannersTab data={data} tax={tax} loading={loading} onSaved={bump} />}
+      {tab === 'banners' && <BannersTab data={data} tax={tax} products={products} loading={loading} onSaved={bump} />}
       {tab === 'categorias' && <CategoriesTab tax={tax} products={products} loading={taxLoading} onSaved={bump} />}
       {tab === 'look' && <LookTab data={data} products={products} loading={loading || !products} onSaved={bump} />}
       {tab === 'preguntas' && <FaqTab data={data} loading={loading} onSaved={bump} />}
@@ -288,7 +285,6 @@ function HomeTab({
       )}
 
       <AnnouncementsEditor open={editing === 'announcements'} onClose={close} settings={settings} />
-      <HeroEditor open={editing === 'hero'} onClose={close} content={content} />
       <RibbonsEditor open={editing === 'ribbons'} onClose={close} content={content} />
       <EditorialEditor open={editing === 'editorial'} onClose={close} content={content} />
       <KidsEditor open={editing === 'kids'} onClose={close} content={content} />

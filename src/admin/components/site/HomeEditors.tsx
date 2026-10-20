@@ -1,5 +1,5 @@
 /**
- * Editores de cada sección de la portada (fotos, video y textos). Cada uno guarda su llave
+ * Editores de cada sección de la página de inicio (fotos y textos). Cada uno guarda su llave
  * en el contenido del sitio (site_content) y la tienda lo aplica al cargar.
  */
 import { useEffect, useState, type ReactNode } from 'react';
@@ -25,14 +25,13 @@ export interface HomeSection {
 export const HOME_SECTIONS: HomeSection[] = [
   { id: 'announcements', title: 'Cinta de avisos', sub: 'Los mensajes que corren arriba del menú' },
   {
-    id: 'hero',
-    title: 'Portada con video',
-    sub: 'Video de marca, foto de respaldo y textos de bienvenida',
-    thumb: (c) => c.hero?.poster,
+    id: 'banners',
+    title: 'Portada',
+    sub: 'Lo primero que se ve: campañas con color, foto y prendas con su precio',
+    tab: 'banners',
   },
   { id: 'ribbons', title: 'Cintas cruzadas', sub: 'Frases que se deslizan debajo de la portada' },
   { id: 'categories', title: 'Compra por categoría', sub: 'Fotos y nombres de las categorías', tab: 'categorias' },
-  { id: 'banners', title: 'Banners de promociones', sub: 'Carrusel de ofertas y temporadas', tab: 'banners' },
   { id: 'look', title: 'Arma tu look', sub: 'Foto con puntos que llevan a cada prenda', tab: 'look' },
   {
     id: 'editorial',
@@ -121,67 +120,6 @@ const lines = (t: unknown): string[] =>
     .split('\n')
     .map((x) => x.trim())
     .filter(Boolean);
-
-export function HeroEditor({ open, onClose, content }: EditorProps & { content: SiteContent }) {
-  const [d, set] = useDraft(open, content.hero);
-  return (
-    <EditorSheet
-      open={open}
-      onClose={onClose}
-      title="Portada con video"
-      sub="Lo primero que ven tus clientas"
-      onSave={() => api.content.save('hero', d)}
-    >
-      <div className="stack">
-        <div className="grid" style={{ '--cols': 2 }}>
-          <MediaField
-            kind="video"
-            label="Video horizontal (computadora)"
-            value={d.video}
-            onChange={(v) => set({ video: v })}
-            aspect="16 / 9"
-            folder="divani/sitio"
-            hint="MP4, idealmente 1920 × 1080 y menos de 20 s."
-          />
-          <MediaField
-            kind="video"
-            label="Video vertical (celular)"
-            value={d.videoPortrait}
-            onChange={(v) => set({ videoPortrait: v })}
-            aspect="16 / 9"
-            folder="divani/sitio"
-            hint="Opcional. Si no lo subes se usa el horizontal."
-          />
-        </div>
-        <div className="grid" style={{ '--cols': 2 }}>
-          <MediaField
-            label="Foto de respaldo (computadora)"
-            value={d.poster}
-            onChange={(v) => set({ poster: v })}
-            aspect="16 / 9"
-            folder="divani/sitio"
-            hint="Se ve mientras carga el video."
-          />
-          <MediaField
-            label="Foto de respaldo (celular)"
-            value={d.posterPortrait}
-            onChange={(v) => set({ posterPortrait: v })}
-            aspect="16 / 9"
-            folder="divani/sitio"
-          />
-        </div>
-        <TextField
-          label="Texto pequeño"
-          value={d.eyebrow}
-          onValue={(v) => set({ eyebrow: v })}
-          placeholder="Otoño · Invierno 2026"
-        />
-        <TextField label="Título" value={d.title} onValue={(v) => set({ title: v })} hint={EMPH} />
-        <TextField label="Subtítulo" multiline rows={2} value={d.subtitle} onValue={(v) => set({ subtitle: v })} />
-      </div>
-    </EditorSheet>
-  );
-}
 
 export function RibbonsEditor({ open, onClose, content }: EditorProps & { content: SiteContent }) {
   const [d, set] = useDraft(open, {

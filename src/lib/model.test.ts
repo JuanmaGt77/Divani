@@ -8,7 +8,9 @@ import {
   makeSku,
   mergeSettings,
   normalize,
+  bannerTheme,
   normalizeBanner,
+  normalizeShowcase,
   normalizeFaq,
   normalizeLookbook,
   orderTotals,
@@ -160,12 +162,29 @@ describe('enlaces de la tienda', () => {
 
 describe('contenido', () => {
   it('valida banners', () => {
-    expect(() => normalizeBanner({ title: 'Hola' })).toThrow('Sube la imagen del banner.');
     expect(() => normalizeBanner({ image: 'x.jpg' })).toThrow('Escribe el título del banner.');
     const b = normalizeBanner({ image: 'x.jpg', title: '  Rebajas  ', ctaHref: '' });
     expect(b.title).toBe('Rebajas');
     expect(b.ctaHref).toBe('/tienda');
     expect(b.active).toBe(true);
+    // Sin foto basta con mostrar prendas; sin prendas hace falta la foto
+    expect(normalizeBanner({ title: 'Novedades' }).showcase).toEqual({ source: 'nuevo' });
+    expect(() => normalizeBanner({ title: 'Hola', showcase: { source: 'ninguna' } })).toThrow('Sube una foto');
+    expect(() => normalizeBanner({ title: 'Hola', showcase: { source: 'categoria' } })).toThrow('Elige la categoría');
+    expect(() => normalizeBanner({ title: 'Hola', showcase: { source: 'elegidas', products: [] } })).toThrow(
+      'Elige al menos una prenda',
+    );
+  });
+
+  it('acomoda el color y las prendas de la portada', () => {
+    expect(bannerTheme('light')).toBe('arena');
+    expect(bannerTheme('dark')).toBe('tinta');
+    expect(bannerTheme('rosa')).toBe('rosa');
+    expect(normalizeShowcase({ source: 'elegidas', products: ['a', 'a', ' b ', '', 'c', 'd'] })).toEqual({
+      source: 'elegidas',
+      products: ['a', 'b', 'c'],
+    });
+    expect(normalizeShowcase({ source: 'otra' as never })).toEqual({ source: 'nuevo' });
   });
 
   it('acomoda los puntos del look dentro de la foto', () => {

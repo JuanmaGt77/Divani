@@ -1,5 +1,5 @@
 /** Filas tal como llegan de Supabase (snake_case). Reflejan las tablas de supabase/schema.sql. */
-import type { CashSummary } from '@/lib/types';
+import type { BannerShowcase, CashSummary } from '@/lib/types';
 
 type Num = number | string;
 
@@ -181,6 +181,7 @@ export interface BannerRow {
   image: string;
   image_mobile: string;
   theme: string;
+  showcase: Partial<BannerShowcase> | null;
   sort: number;
   active: boolean;
   starts_at: string | null;

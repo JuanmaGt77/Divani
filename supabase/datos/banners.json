@@ -10,7 +10,10 @@
       "href": "/tienda?orden=nuevo"
     },
     "image": "media/banners/nueva-coleccion.webp",
-    "theme": "light"
+    "theme": "arena",
+    "showcase": {
+      "source": "nuevo"
+    }
   },
   {
     "id": "bn-rebajas",
@@ -23,7 +26,10 @@
       "href": "/tienda?oferta=1"
     },
     "image": "media/banners/rebajas.webp",
-    "theme": "light"
+    "theme": "rosa",
+    "showcase": {
+      "source": "ofertas"
+    }
   },
   {
     "id": "bn-denim",
@@ -36,7 +42,11 @@
       "href": "/tienda?q=mezclilla"
     },
     "image": "media/banners/denim.webp",
-    "theme": "light"
+    "theme": "salvia",
+    "showcase": {
+      "source": "categoria",
+      "category": "jeans-y-pantalones"
+    }
   },
   {
     "id": "bn-kids",

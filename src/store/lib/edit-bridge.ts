@@ -7,11 +7,10 @@ import { isEditMode } from './hydration';
 
 const LABELS: Record<string, string> = {
   announcements: 'Cinta de avisos',
-  hero: 'Portada con video',
   ribbons: 'Cintas cruzadas',
   categories: 'Compra por categoría',
   products: 'Productos',
-  banners: 'Banners de promociones',
+  banners: 'Portada',
   look: 'Arma tu look',
   editorial: 'Banda editorial',
   kids: 'Niñas y niños',

@@ -24,7 +24,7 @@ export function friendly(err: DbError | null | undefined): string {
   if (/Failed to fetch|NetworkError|Load failed|fetch failed/i.test(msg))
     return 'Sin conexión con la base de datos. Revisa tu internet.';
   if (/Could not find the function|schema cache/i.test(msg)) {
-    return 'La base de datos no está actualizada: ejecuta supabase/schema.sql en Supabase (SQL Editor).';
+    return 'La base de datos no está actualizada: en Supabase (SQL Editor) ejecuta supabase/schema.sql y los archivos de supabase/actualizaciones.';
   }
   if (/relation .* does not exist/i.test(msg))
     return 'Faltan tablas en la base de datos: ejecuta supabase/schema.sql en Supabase.';

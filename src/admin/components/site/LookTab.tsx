@@ -2,20 +2,19 @@
  * «Arma tu look»: una foto con puntos que llevan a cada prenda.
  * Toca la foto para poner un punto, elige la prenda y arrástralo a su lugar.
  */
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type MouseEvent, type PointerEvent } from 'react';
+import { useMemo, useRef, useState, type KeyboardEvent, type MouseEvent, type PointerEvent } from 'react';
 import { ImagePlus, MousePointerClick, Plus, Save, Shirt, Star, Trash2 } from 'lucide-react';
 import { money } from '@/lib/format';
 import { cdn, round2 } from '@/lib/model';
 import type { Hotspot, Lookbook, Product } from '@/lib/types';
 import { api } from '../../api';
-import { matches } from '../../lib/hooks';
 import { useUnsavedChanges } from '../../lib/navigation';
 import { invalidate } from '../../lib/query';
-import { Button, Chip, SearchField, SwitchRow, TextField, cx } from '../../ui/controls';
+import { Button, Chip, SwitchRow, TextField, cx } from '../../ui/controls';
 import { MediaField } from '../../ui/media';
-import { Sheet, confirmDialog, toast, toastError } from '../../ui/overlays';
+import { confirmDialog, toast, toastError } from '../../ui/overlays';
 import { Card, Empty, Menu, SkeletonRows, Thumb } from '../../ui/surfaces';
-import { EMPH } from './shared';
+import { EMPH, ProductPicker } from './shared';
 
 const NEW_LOOK: Lookbook = { eyebrow: 'Arma tu look', title: '', text: '', image: '', hotspots: [], active: true };
 const editable = (l: Lookbook) =>
@@ -452,59 +451,5 @@ function HotspotCanvas({
         </button>
       ))}
     </div>
-  );
-}
-
-function ProductPicker({
-  open,
-  products,
-  onPick,
-  onClose,
-}: {
-  open: boolean;
-  products: Product[] | undefined;
-  onPick: (p: Product) => void;
-  onClose: () => void;
-}) {
-  const [q, setQ] = useState('');
-  useEffect(() => {
-    if (open) setQ('');
-  }, [open]);
-  const list = (products || [])
-    .filter(
-      (p) =>
-        p.status === 'activo' &&
-        matches(
-          q,
-          p.name,
-          p.code,
-          p.tags,
-          p.colors.map((c) => c.name),
-        ),
-    )
-    .slice(0, 60);
-  return (
-    <Sheet open={open} onClose={onClose} title="Elige la prenda" sub="Solo aparecen productos activos">
-      <div className="stack" style={{ '--gap': '12px' }}>
-        <SearchField value={q} onValue={setQ} placeholder="Buscar por nombre, color o código" />
-        <div className="pick-list" style={{ maxHeight: 'min(56vh, 520px)' }}>
-          {list.map((p) => (
-            <button key={p.id} type="button" className="pick-row" onClick={() => onPick(p)}>
-              <Thumb src={p.colors[0]?.images?.[0]} size={36} />
-              <span className="grow">
-                <strong>{p.name}</strong>
-                <small>{p.colors.map((c) => c.name).join(' · ')}</small>
-              </span>
-              <span className="num strong">{money(p.price)}</span>
-            </button>
-          ))}
-          {!list.length && (
-            <p className="small muted" style={{ padding: '18px', textAlign: 'center' }}>
-              No hay productos con esa búsqueda.
-            </p>
-          )}
-        </div>
-      </div>
-    </Sheet>
   );
 }

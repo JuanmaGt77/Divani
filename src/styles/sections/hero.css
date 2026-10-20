@@ -1,199 +1,373 @@
 /* ==========================================================================
-   Hero: el video de marca es el protagonista; la interfaz de vidrio enmarca el
-   logotipo central sin taparlo (tarjeta abajo a la izquierda, controles a la derecha).
+   Portada: carrusel de «vitrinas». Cada campaña es un ventanal de color con su foto y una
+   repisa de prendas en marcos de arco (como las ventanas de una boutique) con su precio.
+   Sin foto, la repisa ocupa la mitad derecha; con foto, la foto se funde con el color y la
+   repisa baja junto al texto. En celular todo va en una columna: foto, texto y repisa.
    ========================================================================== */
-.hero {
-  position: relative;
+.vitrina { padding-top: 14px; }
+
+.vitrina__frame { position: relative; }
+
+.vitrina__track {
+  display: flex;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  border-radius: var(--r-xl);
   isolation: isolate;
-  margin-top: calc(-1 * (var(--header-h) + 10px));
-  height: clamp(600px, calc(100svh - 38px - var(--safe-top)), 980px);
-  overflow: clip;
+}
+.vitrina__track::-webkit-scrollbar { display: none; }
+
+/* ---------------- Colores de campaña ---------------- */
+.vit {
+  --vit-bg: #e6dac7;
+  --vit-ink: var(--ink);
+  --vit-soft: #5c4d40;
+  --vit-accent: #7a5a3c;
+  --vit-card: #f4ede2;
+  --vit-sale: var(--sale);
+  --vit-btn-bg: var(--ink);
+  --vit-btn-ink: var(--on-ink);
+  --vit-line: rgb(23 21 19 / 0.14);
+}
+.vit[data-theme="marfil"] { --vit-bg: #f3ece1; --vit-card: #fbf8f2; }
+.vit[data-theme="rosa"] {
+  --vit-bg: #e8d0c5;
+  --vit-soft: #66473d;
+  --vit-accent: #8a4636;
+  --vit-card: #f5e9e3;
+}
+.vit[data-theme="salvia"] {
+  --vit-bg: #d5dbc9;
+  --vit-soft: #485241;
+  --vit-accent: #4b5d42;
+  --vit-card: #eef1e7;
+}
+.vit[data-theme="tinta"] {
+  --vit-bg: #1f1b18;
+  --vit-ink: #f6f1e8;
+  --vit-soft: #c9bcaa;
+  --vit-accent: #d8c7ab;
+  --vit-card: #2d2824;
+  --vit-sale: #f2a58f;
+  --vit-btn-bg: #f6f1e8;
+  --vit-btn-ink: #171513;
+  --vit-line: rgb(246 241 232 / 0.2);
 }
 
-.hero__media {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: radial-gradient(120% 90% at 50% 40%, #f1ede4 0%, #e5dccb 70%, #d9cdb7 100%);
+/* ---------------- Vitrina ---------------- */
+.vit {
+  position: relative;
+  isolation: isolate;
+  flex: 0 0 100%;
+  min-width: 0;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  grid-template-areas: "copy shelf";
+  align-items: center;
+  column-gap: clamp(24px, 4vw, 64px);
+  padding: clamp(32px, 4.4vw, 68px);
+  min-height: clamp(440px, 60vh, 580px);
+  overflow: hidden;
+  background: var(--vit-bg);
+  color: var(--vit-ink);
 }
-.hero__video,
-.hero__poster img {
+/* Arco de fondo: el ventanal de la boutique detrás de la repisa */
+.vit--shelf:not(.vit--photo)::before {
+  content: "";
   position: absolute;
-  inset: 0;
+  z-index: -1;
+  right: 9%;
+  bottom: -18%;
+  width: min(46%, 520px);
+  aspect-ratio: 3 / 4;
+  border: 1px solid var(--vit-line);
+  border-radius: 999px 999px 0 0;
+  pointer-events: none;
+}
+
+.vit__copy { grid-area: copy; display: grid; justify-items: start; align-content: center; min-width: 0; }
+.vit__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 22px;
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--vit-soft);
+}
+.vit__num {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  letter-spacing: 0;
+  color: var(--vit-ink);
+}
+.vit__num::after { content: ""; width: 26px; height: 1px; background: currentColor; opacity: 0.45; }
+.vit__title {
+  margin-top: 14px;
+  max-width: 13ch;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 1.2rem + 2.4vw, 3.5rem);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+.vit__title em { font-style: italic; color: var(--vit-accent); }
+.vit__text {
+  margin-top: 16px;
+  max-width: 40ch;
+  color: var(--vit-soft);
+  line-height: 1.55;
+}
+.vit .vit__cta {
+  margin-top: 26px;
+  background: var(--vit-btn-bg);
+  color: var(--vit-btn-ink);
+  border-color: transparent;
+}
+.vit .vit__cta:hover { filter: brightness(1.12); }
+.vit[data-theme="tinta"] .vit__cta:hover { filter: brightness(0.94); }
+
+/* ---------------- Foto de la campaña ---------------- */
+.vit__media {
+  display: block;
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 60%;
+  /* La foto se funde con el color de la vitrina por la izquierda */
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 38%);
+  mask-image: linear-gradient(to right, transparent 0%, #000 38%);
+}
+.vit__media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 42%;
+  object-position: 78% center;
+  transform: scale(1.04);
+  transition: transform 1.6s var(--ease-out);
 }
-@media (min-width: 1024px) and (orientation: landscape) {
-  /* El video se dibuja un poco más ancho que la pantalla y se ancla a la izquierda:
-     el logo queda corrido a la derecha y la tarjeta de vidrio no lo tapa. */
-  .hero__video,
-  .hero__poster img {
-    right: auto;
-    width: 112%;
-    max-width: none;
-    object-position: 0% 42%;
+.vit.is-current .vit__media img { transform: scale(1); }
+/* En la vitrina oscura la foto se oscurece un poco y se funde más despacio */
+.vit[data-theme="tinta"] .vit__media img { filter: brightness(0.8) contrast(1.05); }
+@media (min-width: 768px) {
+  .vit[data-theme="tinta"] .vit__media {
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, rgb(0 0 0 / 0.55) 30%, #000 60%);
+    mask-image: linear-gradient(to right, transparent 0%, rgb(0 0 0 / 0.55) 30%, #000 60%);
   }
 }
-/* El póster (con el logo) se desvanece cuando el video empieza */
-.hero__poster {
-  position: absolute;
-  inset: 0;
-  transition: opacity 1.4s var(--ease-out);
-}
-.hero__poster.is-hidden { opacity: 0; }
-.hero__veil {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(180deg, rgb(244 238 229 / 0.35) 0%, rgb(244 238 229 / 0) 22%),
-    linear-gradient(0deg, rgb(251 248 242 / 0.5) 0%, rgb(251 248 242 / 0) 28%);
-}
 
-.hero__content {
-  position: absolute;
-  inset: auto 0 0;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 24px;
-  padding-bottom: clamp(20px, 3vw, 40px);
-}
-
-.hero__panel {
+/* ---------------- Repisa de prendas ---------------- */
+.vit__shelf {
+  grid-area: shelf;
+  justify-self: end;
+  align-self: center;
   display: grid;
-  gap: 12px;
-  max-width: 430px;
-  padding: clamp(22px, 2.2vw, 30px);
-  border-radius: 34px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: end;
+  gap: clamp(12px, 1.8vw, 26px);
+  width: min(100%, 620px);
 }
-.hero__title {
-  font-size: clamp(2.1rem, 1.3rem + 1.7vw, 3rem);
-  line-height: 0.98;
-  letter-spacing: -0.03em;
+/* La prenda de en medio sube un poco: ritmo de vitrina */
+.vit__item:nth-child(2) { transform: translateY(-14px); }
+
+.vit__card {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  color: inherit;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
 }
-.hero__title em { display: inline-block; }
-.hero__sub {
-  font-size: 0.9375rem;
-  color: var(--ink-soft);
-  max-width: 42ch;
+.vit__arch {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: 999px 999px var(--r-sm) var(--r-sm);
+  background: var(--vit-card);
+  box-shadow: 0 18px 40px -26px rgb(40 28 16 / 0.55), inset 0 0 0 1px rgb(255 255 255 / 0.35);
 }
-.hero__actions {
+.vit[data-theme="tinta"] .vit__arch { box-shadow: 0 18px 40px -24px rgb(0 0 0 / 0.7), inset 0 0 0 1px rgb(255 255 255 / 0.08); }
+.vit__arch img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s var(--ease-out);
+}
+.vit__card:hover .vit__arch img { transform: scale(1.05); }
+.vit__card:focus-visible { outline: none; }
+.vit__card:focus-visible .vit__arch { outline: 2px solid var(--vit-ink); outline-offset: 4px; }
+.vit__off {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  padding: 3px 9px;
+  border-radius: var(--r-pill);
+  background: var(--sale);
+  color: #fbf8f2;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.vit__price {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 6px;
+  justify-content: center;
+  align-items: baseline;
+  gap: 2px 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
 }
-.hero__actions .btn { flex: 1 1 auto; }
-@media (min-width: 768px) {
-  /* deja libre la esquina del botón flotante de WhatsApp */
-  .hero__controls { margin-right: 78px; }
-}
-@media (min-width: 768px) and (max-width: 1300px) {
-  .hero__panel { max-width: 396px; }
+.vit__price .is-sale { color: var(--vit-sale); }
+.vit__price s { font-size: 0.8em; font-weight: 400; color: var(--vit-soft); }
+.vit__name {
+  max-width: 100%;
+  margin-top: -6px;
+  overflow: hidden;
+  font-size: var(--fs-xs);
+  color: var(--vit-soft);
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-.hero__controls {
+/* Con foto: la repisa baja junto al texto, más pequeña, y la foto llena la derecha */
+.vit--photo { grid-template-areas: "copy ." "shelf ."; grid-template-rows: auto auto; align-content: center; row-gap: 26px; }
+.vit--photo .vit__shelf { justify-self: start; align-self: start; width: min(100%, 380px); gap: 14px; }
+.vit--photo .vit__item:nth-child(2) { transform: none; }
+.vit--photo .vit__name { display: none; }
+.vit--photo .vit__price { font-size: 0.9rem; }
+.vit--photo:not(.vit--shelf) { grid-template-areas: "copy ."; }
+
+/* Entrada de la repisa al cargar la portada */
+.js-motion .vit__item { animation: vit-rise 0.8s var(--ease-out) both; animation-delay: calc(var(--k, 0) * 90ms + 160ms); }
+.js-motion .vit__item:nth-child(2) { animation-name: vit-rise-mid; }
+.js-motion .vit--photo .vit__item:nth-child(2) { animation-name: vit-rise; }
+@keyframes vit-rise { from { opacity: 0; transform: translateY(18px); } }
+@keyframes vit-rise-mid { from { opacity: 0; transform: translateY(4px); } to { transform: translateY(-14px); } }
+
+/* ---------------- Carga ---------------- */
+.vit__ph { display: block; border-radius: var(--r-pill); background: rgb(23 21 19 / 0.08); }
+.vit__ph--eyebrow { width: 120px; height: 12px; }
+.vit__ph--title { width: min(340px, 100%); height: 34px; margin-top: 18px; border-radius: 10px; }
+.vit__ph--short { width: min(220px, 70%); margin-top: 10px; }
+.vit__ph--btn { width: 170px; height: 50px; margin-top: 28px; }
+.vit__ph--price { width: 60%; height: 12px; }
+.vit--skeleton .vit__arch { box-shadow: none; }
+
+/* ---------------- Controles ---------------- */
+.vitrina__nav {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 12px;
 }
-.hero__progress {
-  width: 120px;
-  height: 3px;
-  border-radius: 3px;
-  background: rgb(23 21 19 / 0.14);
-  overflow: hidden;
-  margin-right: 6px;
+.vitrina__arrow { width: 44px; height: 44px; color: var(--ink); }
+.vitrina__dots { display: flex; align-items: center; }
+.vitrina__dot {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 44px;
+  transition: width 0.45s var(--ease-out);
 }
-.hero__progress span {
+.vitrina__dot span {
+  position: relative;
   display: block;
-  height: 100%;
-  width: 100%;
+  width: 8px;
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--r-pill);
+  background: rgb(23 21 19 / 0.18);
+  transition: width 0.45s var(--ease-out);
+}
+.vitrina__dot[aria-current="true"] { width: 58px; }
+.vitrina__dot[aria-current="true"] span { width: 44px; }
+.vitrina__dot[aria-current="true"] span::after {
+  content: "";
+  position: absolute;
+  inset: 0;
   background: var(--ink);
+  transform: scaleX(0);
   transform-origin: left;
-  transform: scaleX(var(--p, 0));
+  animation: vit-progress var(--vit-dur, 7s) linear forwards;
+}
+.vitrina__frame.is-paused .vitrina__dot span::after { animation-play-state: paused; }
+@keyframes vit-progress { to { transform: scaleX(1); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .js-motion .vit__item { animation: none; }
+  .vit__media img, .vit.is-current .vit__media img { transform: none; transition: none; }
+  .vitrina__dot[aria-current="true"] span::after { animation: none; transform: scaleX(1); }
 }
 
-/* Al salir de pantalla, el video se recoge en una tarjeta redondeada */
-@supports (animation-timeline: view()) {
-  @media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
-    .hero__media {
-      animation: hero-tuck linear both;
-      animation-timeline: view();
-      animation-range: exit 0% exit 90%;
-    }
-    .hero__content {
-      animation: hero-fade linear both;
-      animation-timeline: view();
-      animation-range: exit 0% exit 60%;
-    }
-  }
-}
-@keyframes hero-tuck {
-  to {
-    clip-path: inset(3% 2% 0 2% round 40px);
-    transform: translateY(8%) scale(0.98);
-  }
-}
-@keyframes hero-fade {
-  to { opacity: 0; transform: translateY(40px); }
+/* ---------------- Tableta ---------------- */
+@media (max-width: 1023px) {
+  .vit { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding: 36px; min-height: 420px; }
+  .vit__text { display: none; }
+  .vit--photo .vit__shelf { width: min(100%, 320px); }
 }
 
-/* ---------------- Celular y tableta vertical: video arriba que se funde con la página ---------------- */
-@media (max-width: 767px), (max-width: 1100px) and (orientation: portrait) {
-  .hero {
-    height: auto;
-    overflow: visible;
-  }
-  .hero__media {
-    position: relative;
-    inset: auto;
-    z-index: 0;
-    aspect-ratio: 1 / 1;
-    max-height: 64svh;
-    width: 100%;
-    background: radial-gradient(120% 90% at 50% 40%, #f1ede4, #e2d8c6);
-    -webkit-mask: linear-gradient(180deg, #000 78%, transparent 100%);
-    mask: linear-gradient(180deg, #000 78%, transparent 100%);
-  }
-  .hero__video,
-  .hero__poster img { object-position: center 30%; }
-  .hero__content {
-    position: relative;
-    inset: auto;
-    z-index: 1;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-    margin-top: -46px;
-    padding-bottom: 8px;
-  }
-  /* Controles del video dentro de la esquina de la tarjeta (no tapan el logo) */
-  .hero__controls {
-    position: absolute;
-    top: 14px;
-    right: calc(max(var(--gutter), var(--safe-right)) + 14px);
-    z-index: 2;
-    gap: 6px;
-  }
-  .hero__controls .icon-btn { --s: 36px; }
-  .hero__controls .icon-btn .icon { width: 17px; height: 17px; }
-  .hero__progress { display: none; }
-  .hero__panel {
-    max-width: none;
-    padding: 22px 20px 20px;
-    border-radius: 30px;
-  }
-  .hero__actions .btn { flex: 1 1 auto; --h: 52px; padding-inline: 18px; }
-}
+/* ---------------- Celular: una columna (foto, texto y repisa) ---------------- */
 @media (max-width: 767px) {
-  .hero__title { font-size: clamp(2.1rem, 9vw, 2.6rem); }
-  .hero__sub { display: none; }
-}
-@media (min-width: 768px) and (max-width: 1100px) and (orientation: portrait) {
-  .hero__panel { padding: 30px 32px; }
-  .hero__controls { margin-right: 0; }
+  .vitrina { padding-top: 10px; }
+  .vitrina__track { border-radius: var(--r-lg); }
+  .vit,
+  .vit--photo,
+  .vit--photo:not(.vit--shelf) {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    grid-template-areas: "media" "copy" "shelf";
+    /* Todas las vitrinas miden lo que la más alta: el contenido va centrado */
+    align-content: center;
+    row-gap: 22px;
+    padding: 22px 20px 24px;
+    min-height: 0;
+  }
+  .vit--shelf:not(.vit--photo)::before { display: none; }
+  .vit__eyebrow { letter-spacing: 0.16em; }
+  .vit__media {
+    grid-area: media;
+    position: relative;
+    z-index: auto;
+    /* De orilla a orilla de la vitrina (la columna mide 40px menos por el relleno) */
+    width: calc(100% + 40px);
+    max-width: none;
+    height: 46vw;
+    max-height: 260px;
+    margin: -22px -20px -34px;
+    -webkit-mask-image: linear-gradient(to bottom, #000 58%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 58%, transparent 100%);
+  }
+  .vit__media img { object-position: 88% 35%; }
+  .vit__title { margin-top: 10px; font-size: 2rem; max-width: 15ch; }
+  .vit .vit__cta { margin-top: 18px; }
+  .vit__shelf,
+  .vit--photo .vit__shelf { justify-self: stretch; width: 100%; gap: 12px; }
+  .vit__item:nth-child(2) { transform: none; }
+  .js-motion .vit__item:nth-child(2) { animation-name: vit-rise; }
+  .vit__price { font-size: 0.875rem; }
+  .vit__price s { display: none; }
+  .vit__name { display: none; }
+  .vit__off { bottom: 7px; padding: 2px 7px; font-size: 0.65rem; }
+  .vitrina__arrow { display: none; }
+  .vitrina__nav { margin-top: 6px; }
 }

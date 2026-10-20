@@ -1,12 +1,17 @@
-/** Piezas comunes de la sección Sitio web: texto con énfasis, enlaces de la tienda y reordenar listas. */
+/**
+ * Piezas comunes de la sección Sitio web: texto con énfasis, enlaces de la tienda, reordenar listas
+ * y el selector de prendas.
+ */
 import { useEffect, useId, useState, type MouseEvent } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { dateMedium } from '@/lib/format';
+import { dateMedium, money } from '@/lib/format';
 import { storeHref } from '@/lib/model';
-import type { Taxonomy, Tone } from '@/lib/types';
+import type { Product, Taxonomy, Tone } from '@/lib/types';
+import { matches } from '../../lib/hooks';
 import { invalidate, type Topic } from '../../lib/query';
-import { Field, IconButton, TextField } from '../../ui/controls';
-import { toastError } from '../../ui/overlays';
+import { Field, IconButton, SearchField, TextField } from '../../ui/controls';
+import { Sheet, toastError } from '../../ui/overlays';
+import { Thumb } from '../../ui/surfaces';
 
 export const EMPH = 'Escribe entre *asteriscos* la parte que va en cursiva elegante.';
 
@@ -220,3 +225,62 @@ export const toLocalInput = (iso: string | null | undefined): string => {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 };
 export const fromLocalInput = (v: string): string | null => (v ? new Date(v).toISOString() : null);
+
+/** Hoja para elegir una prenda publicada (con buscador). */
+export function ProductPicker({
+  open,
+  products,
+  onPick,
+  onClose,
+  exclude,
+}: {
+  open: boolean;
+  products: Product[] | undefined;
+  onPick: (p: Product) => void;
+  onClose: () => void;
+  /** Slugs que ya están elegidos (no se muestran). */
+  exclude?: string[];
+}) {
+  const [q, setQ] = useState('');
+  useEffect(() => {
+    if (open) setQ('');
+  }, [open]);
+  const list = (products || [])
+    .filter(
+      (p) =>
+        p.status === 'activo' &&
+        !exclude?.includes(p.slug) &&
+        matches(
+          q,
+          p.name,
+          p.code,
+          p.tags,
+          p.colors.map((c) => c.name),
+        ),
+    )
+    .slice(0, 60);
+  return (
+    <Sheet open={open} onClose={onClose} title="Elige la prenda" sub="Solo aparecen productos activos">
+      <div className="stack" style={{ '--gap': '12px' }}>
+        <SearchField value={q} onValue={setQ} placeholder="Buscar por nombre, color o código" />
+        <div className="pick-list" style={{ maxHeight: 'min(56vh, 520px)' }}>
+          {list.map((p) => (
+            <button key={p.id} type="button" className="pick-row" onClick={() => onPick(p)}>
+              <Thumb src={p.colors[0]?.images?.[0]} size={36} />
+              <span className="grow">
+                <strong>{p.name}</strong>
+                <small>{p.colors.map((c) => c.name).join(' · ')}</small>
+              </span>
+              <span className="num strong">{money(p.price)}</span>
+            </button>
+          ))}
+          {!list.length && (
+            <p className="small muted" style={{ padding: '18px', textAlign: 'center' }}>
+              No hay productos con esa búsqueda.
+            </p>
+          )}
+        </div>
+      </div>
+    </Sheet>
+  );
+}

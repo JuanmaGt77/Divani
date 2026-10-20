@@ -1,5 +1,5 @@
 /** Filas de Supabase (snake_case) ↔ objetos del panel (camelCase). */
-import { bySort } from '@/lib/model';
+import { bannerTheme, bySort, normalizeShowcase } from '@/lib/model';
 import type {
   Banner,
   CashMovement,
@@ -202,7 +202,8 @@ export const bannerFromRow = (b: BannerRow): Banner => ({
   ctaHref: b.cta_href,
   image: b.image,
   imageMobile: b.image_mobile,
-  theme: b.theme,
+  theme: bannerTheme(b.theme),
+  showcase: normalizeShowcase(b.showcase),
   sort: b.sort,
   active: b.active,
   startsAt: b.starts_at,
@@ -219,6 +220,7 @@ export const bannerToRow = (b: Banner): Omit<BannerRow, 'id' | 'sort'> => ({
   image: b.image,
   image_mobile: b.imageMobile,
   theme: b.theme,
+  showcase: b.showcase,
   active: b.active,
   starts_at: b.startsAt,
   ends_at: b.endsAt,
