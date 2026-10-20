@@ -12,7 +12,6 @@ import {
   ChevronUp,
   CircleAlert,
   CreditCard,
-  MessageCircle,
   Percent,
   Plus,
   Printer,
@@ -40,6 +39,7 @@ import { ticketMessage, waLink } from '../lib/whatsapp';
 import { Button, Chip, Field, IconButton, MoneyInput, Segmented, Stepper, cx, type MoneyValue } from '../ui/controls';
 import { Sheet, confirmDialog, toast, toastError } from '../ui/overlays';
 import { Banner, Card, Empty, PageHeader, SkeletonRows, Thumb } from '../ui/surfaces';
+import { WhatsAppIcon } from '../ui/icons';
 
 interface TicketLine {
   variantId: string;
@@ -906,7 +906,7 @@ function CheckoutSheet({
             {done.customer?.phone && (
               <Button
                 variant="wa"
-                icon={MessageCircle}
+                icon={WhatsAppIcon}
                 onClick={() =>
                   window.open(waLink(done.customer.phone, ticketMessage(done, store), prefix), '_blank', 'noopener')
                 }

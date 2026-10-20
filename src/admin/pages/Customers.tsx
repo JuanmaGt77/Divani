@@ -2,18 +2,7 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { useStore } from '@nanostores/react';
-import {
-  ChevronRight,
-  Clock,
-  Crown,
-  Download,
-  MapPin,
-  MessageCircle,
-  Phone,
-  ShoppingBag,
-  Sparkles,
-  Users,
-} from 'lucide-react';
+import { ChevronRight, Clock, Crown, Download, MapPin, Phone, ShoppingBag, Sparkles, Users } from 'lucide-react';
 import { dateMedium, phone as fmtPhone, money, moneyR, number, plural, relative } from '@/lib/format';
 import { api } from '../api';
 import { exportCsv, fileStamp } from '../lib/csv';
@@ -26,6 +15,7 @@ import { Button, SearchField, Segmented } from '../ui/controls';
 import { Sheet } from '../ui/overlays';
 import { Avatar, Badge, Card, Empty, PageHeader, SkeletonRows, Stat, StatusBadge } from '../ui/surfaces';
 import { SortTh } from '../ui/table';
+import { WhatsAppIcon } from '../ui/icons';
 
 const DAY = 864e5;
 type Segment = 'todas' | 'frecuentes' | 'nuevas' | 'reactivar';
@@ -226,7 +216,7 @@ export default function Customers() {
                           aria-label={`Escribir a ${c.name} por WhatsApp`}
                           title="WhatsApp"
                         >
-                          <MessageCircle aria-hidden="true" />
+                          <WhatsAppIcon aria-hidden="true" />
                         </a>
                       )}
                     </td>
@@ -281,7 +271,7 @@ export default function Customers() {
                 target="_blank"
                 rel="noopener"
               >
-                <MessageCircle aria-hidden="true" />
+                <WhatsAppIcon aria-hidden="true" />
                 Escribir por WhatsApp
               </a>
             )}

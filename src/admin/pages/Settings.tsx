@@ -20,7 +20,6 @@ import {
   Info,
   KeyRound,
   LogOut,
-  MessageCircle,
   PlugZap,
   Plus,
   Printer,
@@ -72,6 +71,7 @@ import {
 } from '../ui/controls';
 import { confirmDialog, toast, toastError } from '../ui/overlays';
 import { Badge, Card, PageHeader, Skeleton } from '../ui/surfaces';
+import { WhatsAppIcon } from '../ui/icons';
 
 /* Íconos de redes (lucide ya no trae logotipos de marcas) */
 const svgProps: SVGProps<SVGSVGElement> = {
@@ -355,7 +355,7 @@ function StoreSection({ settings }: { settings: SettingsData }) {
         </div>
       </Card>
 
-      <Card title="WhatsApp de ventas" sub="Aquí llegan los pedidos de la tienda en línea" icon={MessageCircle}>
+      <Card title="WhatsApp de ventas" sub="Aquí llegan los pedidos de la tienda en línea" icon={WhatsAppIcon}>
         <div className="stack">
           <Field
             label="Número con lada"
