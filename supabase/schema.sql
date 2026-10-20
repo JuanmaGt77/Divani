@@ -263,19 +263,16 @@ create table if not exists public.banners (
   cta_href     text not null default '',
   image        text not null default '',
   image_mobile text not null default '',
-  theme        text not null default 'arena',
-  -- Prendas que se muestran en la portada: {"source": "nuevo|ofertas|populares|categoria|elegidas|ninguna",
-  -- "category": "slug", "products": ["slug", …]}
-  showcase     jsonb not null default '{}'::jsonb,
+  -- Presentación en la portada: un color («arena», «rosa»…) o un JSON con el color y las prendas
+  -- que muestra: {"color": "rosa", "showcase": {"source": "nuevo|ofertas|populares|categoria|elegidas|ninguna",
+  -- "category": "slug", "products": ["slug", …]}}. La tienda y el panel lo leen con readBannerTheme.
+  theme        text not null default 'light',
   sort         int not null default 0,
   active       boolean not null default true,
   starts_at    timestamptz,
   ends_at      timestamptz,
   created_at   timestamptz not null default now()
 );
--- Bases creadas antes de la portada con prendas
-alter table public.banners add column if not exists showcase jsonb not null default '{}'::jsonb;
-alter table public.banners alter column theme set default 'arena';
 
 create table if not exists public.lookbooks (
   id       uuid primary key default gen_random_uuid(),
@@ -578,7 +575,7 @@ language sql stable security definer set search_path = public, pg_temp as $$
     'banners', coalesce((select jsonb_agg(jsonb_build_object(
                       'id', b.id, 'placement', b.placement, 'eyebrow', b.eyebrow, 'title', b.title, 'text', b.text,
                       'cta', jsonb_build_object('label', coalesce(nullif(b.cta_label, ''), 'Ver más'), 'href', coalesce(nullif(b.cta_href, ''), '/tienda')),
-                      'image', b.image, 'imageMobile', b.image_mobile, 'theme', b.theme, 'showcase', b.showcase) order by b.sort)
+                      'image', b.image, 'imageMobile', b.image_mobile, 'theme', b.theme) order by b.sort)
                     from public.banners b
                     where b.active and (b.starts_at is null or b.starts_at <= now()) and (b.ends_at is null or b.ends_at >= now())), '[]'::jsonb),
     'lookbooks', coalesce((select jsonb_agg(jsonb_build_object('id', l.id, 'eyebrow', l.eyebrow, 'title', l.title, 'text', l.text, 'image', l.image, 'hotspots', l.hotspots) order by l.sort)

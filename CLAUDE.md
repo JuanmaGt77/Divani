@@ -37,7 +37,7 @@ Para verificar a mano: `npm run verify`, abrir tienda y panel sin errores en la 
 
 **Tienda** (`src/pages/index.astro`, `tienda.astro`, `404.astro`, `aviso-de-privacidad.astro` estáticas; `producto/[slug].astro`, `sitemap.xml.ts`, `robots.txt.ts` en el servidor):
 - `src/layouts/StoreLayout.astro`: `<head>` (SEO, og, JSON-LD), `Sprite.astro` (íconos `#i-…`), `SiteHeader` (`client:load`), `SiteFooter` (`client:visible`), `StoreOverlays` (`client:load`) y `initEditBridge/initReveal/initGlassLight`.
-- `src/store/islands/`: islas de React (`home/*` con `client:visible`, `ShopPage`, `ProductPage`, encabezado, pie y hojas). La portada (`home/Hero.tsx`, `client:load`) es un carrusel de «vitrinas» hecho con los banners: color (`theme`), foto opcional y prendas con precio (`showcase`), editable en Sitio web → Portada.
+- `src/store/islands/`: islas de React (`home/*` con `client:visible`, `ShopPage`, `ProductPage`, encabezado, pie y hojas). La portada (`home/Hero.tsx`, `client:load`) es un carrusel de «vitrinas» hecho con los banners: color, foto opcional y prendas con precio, editable en Sitio web → Portada. El color y las prendas se guardan juntos en la columna `banners.theme` como JSON (`readBannerTheme`/`writeBannerTheme` en `src/lib/model.ts`); así no hizo falta cambiar la estructura de la base.
 - `src/store/data/storefront.ts`: el «paquete» de la rpc `storefront` (una vez por página, caché en localStorage), `useStorefront()` (sin datos hasta hidratar), `useSettings()`, `applySettings()` (región/moneda).
 - `src/store/data/content.ts`: textos y fotos editables de la portada (`useContent().get(seccion, campo)`); los de fábrica salen de `supabase/datos/content.json`.
 - `src/store/state/`: `cart`, `favorites`, `ui` (nanostores compartidos entre islas). `src/store/lib/hydration.ts`: `useHydrated()` evita diferencias al hidratar.
@@ -74,7 +74,6 @@ Hecho:
 - Supabase conectado: tablas y catálogo de ejemplo cargados, registro público cerrado, `somosdivani@gmail.com` con acceso de administrador. `.env.local` tiene `PUBLIC_SUPABASE_URL` y `PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
 
 Pendiente:
-0. **Aplicar en Supabase (SQL Editor)** `supabase/schema.sql` y después `supabase/actualizaciones/2026-10-19-portada-vitrina.sql` (columna `showcase` de los banners y la función `storefront` que la envía). El token personal ya no sirve, así que lo hace el dueño. Mientras tanto la portada muestra novedades en color arena y guardar un banner en el panel avisa que falta actualizar la base.
 1. **Dominio propio** (opcional, cuando el dueño lo compre): conectarlo en Cloudflare (Worker `divani` → Settings → Domains & Routes), cambiar `PUBLIC_SITE_URL` en `.env.local`, volver a publicar y actualizar Site URL y Redirect URLs en Supabase.
 2. ~~Cloudinary~~ Listo (19 de octubre de 2026): API Key «divani-tienda» guardada en el panel y subida de prueba correcta. La llave «Root» no se usa (Cloudinary no permite borrarla).
 3. **Seguridad** (lo hace el dueño): quitar de `.env.local` `SUPABASE_ACCESS_TOKEN`, `ADMIN_PASSWORD` y `CLOUDINARY_API_SECRET`; borrar el token personal «divani» en Supabase; cambiar la contraseña del administrador.

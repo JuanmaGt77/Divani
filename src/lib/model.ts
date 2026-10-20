@@ -555,6 +555,27 @@ export function normalizeShowcase(s: Partial<BannerShowcase> | null | undefined)
   return { source };
 }
 
+/**
+ * Presentación de un banner en la portada. Se guarda en la columna `theme` de la tabla banners:
+ * puede ser solo un color («arena», o «light»/«dark» de antes) o un JSON con el color y las
+ * prendas: {"color": "rosa", "showcase": {"source": "ofertas"}}. Así no hace falta otra columna.
+ */
+export function readBannerTheme(raw: unknown): { theme: BannerTheme; showcase: BannerShowcase } {
+  if (typeof raw === 'string' && raw.trim().startsWith('{')) {
+    try {
+      const j = JSON.parse(raw) as { color?: unknown; showcase?: Partial<BannerShowcase> };
+      return { theme: bannerTheme(j.color), showcase: normalizeShowcase(j.showcase) };
+    } catch {
+      // Texto dañado: se usa la presentación de fábrica
+    }
+  }
+  return { theme: bannerTheme(raw), showcase: normalizeShowcase(null) };
+}
+
+/** Lo que se guarda en la columna `theme` (ver readBannerTheme). */
+export const writeBannerTheme = (theme: unknown, showcase: Partial<BannerShowcase> | null | undefined): string =>
+  JSON.stringify({ color: bannerTheme(theme), showcase: normalizeShowcase(showcase) });
+
 /* ---------- contenido: validación antes de guardar ---------- */
 export function normalizeBanner(b: Partial<Banner> = {}): Banner {
   const showcase = normalizeShowcase(b.showcase);

@@ -695,10 +695,10 @@ from (values
 ) as v (variant_id, product_id, sku, product_name, variant_label, qty, unit_cost, created_at)
 where not exists (select 1 from public.inventory_movements m where m.type = 'inicial' and m.variant_id = v.variant_id::uuid);
 
-insert into public.banners (id, placement, eyebrow, title, text, cta_label, cta_href, image, image_mobile, theme, showcase, sort, active) values
-  ('9d11ee3b-de41-4e89-9e18-cb9fe79aa53c', 'home-carousel', 'Temporada Otoño · Invierno', 'Capas que se sienten *tan bien* como se ven', 'Gabardinas, satines y tejidos americanos recién llegados. Pocas piezas por modelo.', 'Ver novedades', '/tienda?orden=nuevo', 'media/banners/nueva-coleccion.webp', '', 'arena', '{"source":"nuevo"}'::jsonb, 0, true),
-  ('5f120398-e20c-4f86-b1a7-5a9ced9e2aa3', 'home-carousel', 'Rebajas de temporada', 'Hasta *30%* en piezas seleccionadas', 'Vestidos, suéteres y satines con precio especial mientras haya existencias.', 'Ver ofertas', '/tienda?oferta=1', 'media/banners/rebajas.webp', '', 'rosa', '{"source":"ofertas"}'::jsonb, 1, true),
-  ('e94095ef-2743-4861-8270-2bebc53c3c10', 'home-carousel', 'Denim americano', 'Mezclilla *americana*', 'Wide leg, rectos, faldas y chamarras. Cortes clásicos que mejoran con cada uso.', 'Ver mezclilla', '/tienda?q=mezclilla', 'media/banners/denim.webp', '', 'salvia', '{"source":"categoria","category":"jeans-y-pantalones"}'::jsonb, 2, true)
+insert into public.banners (id, placement, eyebrow, title, text, cta_label, cta_href, image, image_mobile, theme, sort, active) values
+  ('9d11ee3b-de41-4e89-9e18-cb9fe79aa53c', 'home-carousel', 'Temporada Otoño · Invierno', 'Capas que se sienten *tan bien* como se ven', 'Gabardinas, satines y tejidos americanos recién llegados. Pocas piezas por modelo.', 'Ver novedades', '/tienda?orden=nuevo', 'media/banners/nueva-coleccion.webp', '', '{"color":"arena","showcase":{"source":"nuevo"}}', 0, true),
+  ('5f120398-e20c-4f86-b1a7-5a9ced9e2aa3', 'home-carousel', 'Rebajas de temporada', 'Hasta *30%* en piezas seleccionadas', 'Vestidos, suéteres y satines con precio especial mientras haya existencias.', 'Ver ofertas', '/tienda?oferta=1', 'media/banners/rebajas.webp', '', '{"color":"rosa","showcase":{"source":"ofertas"}}', 1, true),
+  ('e94095ef-2743-4861-8270-2bebc53c3c10', 'home-carousel', 'Denim americano', 'Mezclilla *americana*', 'Wide leg, rectos, faldas y chamarras. Cortes clásicos que mejoran con cada uso.', 'Ver mezclilla', '/tienda?q=mezclilla', 'media/banners/denim.webp', '', '{"color":"salvia","showcase":{"source":"categoria","category":"jeans-y-pantalones"}}', 2, true)
 on conflict (id) do nothing;
 
 insert into public.lookbooks (id, eyebrow, title, text, image, hotspots, sort, active) values

@@ -437,8 +437,8 @@ export interface StoreBanner {
   cta: { label: string; href: string };
   image: string;
   imageMobile: string;
+  /** Color o JSON con color y prendas (ver readBannerTheme en model.ts). */
   theme: string;
-  showcase?: Partial<BannerShowcase>;
 }
 
 export interface StoreLookbook {

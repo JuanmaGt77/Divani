@@ -11,6 +11,8 @@ import {
   bannerTheme,
   normalizeBanner,
   normalizeShowcase,
+  readBannerTheme,
+  writeBannerTheme,
   normalizeFaq,
   normalizeLookbook,
   orderTotals,
@@ -185,6 +187,14 @@ describe('contenido', () => {
       products: ['a', 'b', 'c'],
     });
     expect(normalizeShowcase({ source: 'otra' as never })).toEqual({ source: 'nuevo' });
+  });
+
+  it('guarda color y prendas juntos en la columna theme', () => {
+    expect(readBannerTheme('light')).toEqual({ theme: 'arena', showcase: { source: 'nuevo' } });
+    expect(readBannerTheme('{roto')).toEqual({ theme: 'arena', showcase: { source: 'nuevo' } });
+    const raw = writeBannerTheme('rosa', { source: 'categoria', category: 'vestidos' });
+    expect(JSON.parse(raw)).toEqual({ color: 'rosa', showcase: { source: 'categoria', category: 'vestidos' } });
+    expect(readBannerTheme(raw)).toEqual({ theme: 'rosa', showcase: { source: 'categoria', category: 'vestidos' } });
   });
 
   it('acomoda los puntos del look dentro de la foto', () => {

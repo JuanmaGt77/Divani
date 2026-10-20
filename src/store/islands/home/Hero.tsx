@@ -6,7 +6,7 @@
  */
 import { useEffect, useMemo, useRef, useState, type FocusEvent } from 'react';
 import { money } from '@/lib/format';
-import { SHOWCASE_SIZE, bannerTheme, cdn, normalizeShowcase, storeHref } from '@/lib/model';
+import { SHOWCASE_SIZE, cdn, readBannerTheme, storeHref } from '@/lib/model';
 import type { StoreBanner, StoreProduct, StorefrontPayload } from '@/lib/types';
 import { Emph, Icon } from '../../components/Icon';
 import { cx } from '../../components/cx';
@@ -29,12 +29,11 @@ const FALLBACK: StoreBanner = {
   image: '',
   imageMobile: '',
   theme: 'arena',
-  showcase: { source: 'nuevo' },
 };
 
 /** Prendas con existencias que muestra cada banner. */
 function pickProducts(data: StorefrontPayload, banner: StoreBanner): StoreProduct[] {
-  const s = normalizeShowcase(banner.showcase);
+  const s = readBannerTheme(banner.theme).showcase;
   const query = { inStock: true, pageSize: 24 };
   let list: StoreProduct[];
   switch (s.source) {
@@ -216,7 +215,7 @@ function VitrinaSlide({
   return (
     <article
       className={cx('vit', photo && 'vit--photo', products.length > 0 && 'vit--shelf', current && 'is-current')}
-      data-theme={bannerTheme(b.theme)}
+      data-theme={readBannerTheme(b.theme).theme}
       aria-roledescription="diapositiva"
       aria-label={`${index + 1} de ${count}`}
     >

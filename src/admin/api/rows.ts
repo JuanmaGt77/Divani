@@ -1,5 +1,5 @@
 /** Filas tal como llegan de Supabase (snake_case). Reflejan las tablas de supabase/schema.sql. */
-import type { BannerShowcase, CashSummary } from '@/lib/types';
+import type { CashSummary } from '@/lib/types';
 
 type Num = number | string;
 
@@ -180,8 +180,8 @@ export interface BannerRow {
   cta_href: string;
   image: string;
   image_mobile: string;
+  /** Color o JSON con color y prendas (ver readBannerTheme). */
   theme: string;
-  showcase: Partial<BannerShowcase> | null;
   sort: number;
   active: boolean;
   starts_at: string | null;
