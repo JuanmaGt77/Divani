@@ -8,6 +8,7 @@ Un solo proyecto de **Astro 7** con **React 19** y **TypeScript** estricto, publ
 | Página de cada prenda: `/producto/[slug]` | En el Worker, en cada visita (consulta `product_page`) | `src/pages/producto/[slug].astro`, `src/store/islands/ProductPage.tsx` |
 | Panel: `/admin/…` | En el Worker (cualquier dirección abre la aplicación) + React en el navegador | `src/pages/admin/[...ruta].astro`, `src/admin/` |
 | `sitemap.xml`, `robots.txt` | En el Worker | `src/pages/*.ts` |
+| `/api/visita` (contador de visitas) | En el Worker | `src/pages/api/visita.ts` |
 
 ## Configuración y variables
 
@@ -50,6 +51,14 @@ producto/[slug].astro ─┘          │
 3. Al enviar: se abre una pestaña en el mismo toque, `place_order` registra el pedido (valida existencias y precios en el servidor), la bolsa se vacía y la pestaña abre WhatsApp con el número de pedido oficial. Si el navegador bloquea la pestaña, aparece un botón para abrirlo.
 4. El pedido aparece al instante en el panel (aviso en tiempo real).
 
+### Contador de visitas (Panel → Visitas)
+
+1. `StoreLayout` llama a `trackPage()` (`src/store/lib/analytics.ts`) cuando el navegador está libre; la vista rápida llama a `trackProduct(slug)`.
+2. El navegador guarda un número al azar (`divani.visitante`) y la visita en curso (`divani.visita`, termina tras 30 minutos sin actividad, con su origen: Instagram, Facebook, WhatsApp, TikTok, Google… según `utm_source`, la app o la página de origen). Sin cookies ni datos personales.
+3. Envía la vista con `sendBeacon` a `/api/visita` (`src/pages/api/visita.ts`), que descarta robots y envíos de otros sitios, le agrega país, departamento y ciudad aproximados (`request.cf` de Cloudflare) y llama a `track_visit` en segundo plano (`waitUntil`). Nunca guarda la IP.
+4. No se cuentan: navegadores automatizados, la vista previa del panel (`?editar=1`) ni el equipo. Al entrar al panel, `excludeThisBrowser()` (`src/admin/lib/visits.ts`) marca el navegador (`divani.no-contar`) y borra sus vistas anteriores con `visits_forget`.
+5. El panel lee `visits_summary` (totales, comparación, por día, por hora, orígenes, dispositivos, ciudades, páginas y prendas) y `visits_live` (personas en los últimos 5 minutos). Las reglas compartidas (orígenes, dispositivos, robots, nombres de lugares) están en `src/lib/visits.ts`.
+
 ### Contenido editable y vista previa
 
 - Cada sección lleva `data-edit="…"`. Con `?editar=1` dentro del panel (`src/store/lib/edit-bridge.ts`), tocar una sección abre su editor; la comunicación con el panel es por `postMessage`.
@@ -64,7 +73,7 @@ producto/[slug].astro ─┘          │
 
 ## Base de datos (Supabase)
 
-- `supabase/schema.sql`: tablas, seguridad por fila (RLS) y **todas** las reglas del negocio como funciones: `storefront`, `product_page`, `storefront_sitemap`, `place_order` (públicas) y `pos_checkout`, `order_set_status`, `order_set_payment`, `order_update`, `cash_*`, `inventory_*`, `save_product`, `delete_product`, `save_category`, `delete_category`, `save_department`, `reorder_rows`, `set_integration_secret`, `integrations_status`, `cloudinary_signature`, `whoami` (equipo). Se puede volver a ejecutar.
+- `supabase/schema.sql`: tablas, seguridad por fila (RLS) y **todas** las reglas del negocio como funciones: `storefront`, `product_page`, `storefront_sitemap`, `place_order`, `track_visit` (públicas) y `pos_checkout`, `order_set_status`, `order_set_payment`, `order_update`, `cash_*`, `inventory_*`, `save_product`, `delete_product`, `save_category`, `delete_category`, `save_department`, `reorder_rows`, `set_integration_secret`, `integrations_status`, `cloudinary_signature`, `whoami`, `visits_summary`, `visits_live`, `visits_forget` (equipo). Las visitas viven en `page_views` (solo lectura para el equipo; se borran solas a los 13 meses). Se puede volver a ejecutar.
 - `private.store_products` (vista): cada prenda a la venta ya en el formato de la tienda; la usan `storefront()` y `product_page()`.
 - `supabase/datos/*.json` → `npm run seed:build` → `supabase/seed.sql` (no se edita a mano).
 - `supabase/actualizaciones/*.sql`: correcciones de datos para bases que ya existían.

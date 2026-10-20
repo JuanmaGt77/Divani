@@ -33,6 +33,7 @@ const routes: RouteObject[] = [
           { path: 'inventario', ...page(() => import('./pages/Inventory')) },
           { path: 'clientes', ...page(() => import('./pages/Customers')) },
           { path: 'reportes', ...page(() => import('./pages/Reports')) },
+          { path: 'visitas', ...page(() => import('./pages/Visits')) },
           { path: 'sitio', ...page(() => import('./pages/Website')) },
           { path: 'ajustes', ...page(() => import('./pages/Settings')) },
           { path: '*', Component: NotFound },

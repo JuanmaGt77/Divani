@@ -475,3 +475,29 @@ export interface ProductPagePayload {
   department: StoreDepartment | null;
   related: StoreProduct[];
 }
+
+/* ---------- visitas de la tienda (función visits_summary) ---------- */
+export interface VisitTotals {
+  /** Visitas (una visita termina tras 30 minutos sin actividad). */
+  visits: number;
+  /** Personas distintas (navegadores). */
+  visitors: number;
+  newVisitors: number;
+  pageViews: number;
+  productViews: number;
+  /** Pedidos de la tienda en línea en el mismo periodo. */
+  orders: number;
+}
+
+export interface VisitsSummary {
+  totals: VisitTotals;
+  previous: VisitTotals;
+  byDay: { day: string; visits: number; visitors: number; pageViews: number }[];
+  previousByDay: { day: string; visits: number }[];
+  byHour: { hour: number; visits: number }[];
+  sources: { source: string; visits: number }[];
+  devices: { device: string; visits: number }[];
+  places: { country: string | null; region: string | null; city: string | null; visits: number }[];
+  pages: { path: string; views: number }[];
+  products: { slug: string; name: string; image: string | null; views: number }[];
+}

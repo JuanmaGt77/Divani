@@ -116,10 +116,14 @@ const year = new Date().getFullYear();
     <StoreOverlays client:load tab={tab} />
     <script>
       import { initEditBridge } from '@/store/lib/edit-bridge';
+      import { trackPage } from '@/store/lib/analytics';
       import { initGlassLight, initReveal } from '@/store/lib/motion';
 
       initEditBridge();
       initReveal();
+      // Contador de visitas anónimo (Panel → Visitas), cuando el navegador esté libre
+      if ('requestIdleCallback' in window) requestIdleCallback(trackPage, { timeout: 3000 });
+      else setTimeout(trackPage, 1200);
       initGlassLight();
     </script>
   </body>

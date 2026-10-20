@@ -399,6 +399,79 @@ details.advanced[open] summary::before { content: "－ "; }
 @media (max-width: 599px) { .report-search { width: 100%; } }
 .is-refreshing-block { opacity: 0.6; transition: opacity 0.2s; }
 
+/* ---------- Visitas ---------- */
+/* Píldora «en la tienda ahora»: punto verde que late (quieto si no hay nadie o sin animaciones) */
+.live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  height: 34px;
+  padding: 0 14px 0 12px;
+  border-radius: var(--r-pill);
+  background: var(--green-soft);
+  color: var(--green);
+  font-size: 13.5px;
+  white-space: nowrap;
+}
+.live-pill strong { font-weight: 600; }
+.live-pill__dot { position: relative; width: 8px; height: 8px; flex: none; border-radius: 50%; background: var(--switch-on); }
+.live-pill__dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--switch-on);
+  animation: live-ring 2.2s var(--ease-out) infinite;
+}
+@keyframes live-ring { from { transform: scale(1); opacity: 0.55; } to { transform: scale(2.8); opacity: 0; } }
+.live-pill.is-quiet { background: var(--fill); color: var(--text-2); }
+.live-pill.is-quiet .live-pill__dot { background: var(--text-3); }
+.live-pill.is-quiet .live-pill__dot::after { display: none; }
+@media (prefers-reduced-motion: reduce) { .live-pill__dot::after { display: none; } }
+
+/* Horas con más visitas: 24 barras, la de más visitas en bronce */
+.hours { display: flex; flex-direction: column; gap: 8px; }
+.hours__bars { display: flex; align-items: flex-end; gap: 3px; height: 150px; border-bottom: 1px solid var(--line); }
+.hours__bar { flex: 1 1 0; max-width: 24px; height: var(--h); border-radius: 4px 4px 0 0; background: rgb(176 111 42 / 0.3); transition: background 0.15s; }
+.hours__bar:hover { background: rgb(176 111 42 / 0.55); }
+.hours__bar.is-peak { background: #b06f2a; }
+.hours__bar.is-zero { background: var(--fill-2); }
+.hours__axis { display: grid; grid-template-columns: repeat(4, 1fr); font-size: 11px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.visits-hint { margin-top: 16px; font-size: 12.5px; color: var(--text-3); }
+.visits-note { margin-top: 22px; max-width: 70ch; font-size: 12.5px; color: var(--text-3); }
+
+/* Franja «Visitas de hoy» del Resumen */
+.visits-strip {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, 180px) auto;
+  align-items: center;
+  gap: 12px 20px;
+  margin-bottom: 20px;
+  padding: 16px 20px;
+  color: inherit;
+  transition: box-shadow 0.2s, transform 0.2s var(--ease-out);
+}
+a.visits-strip:hover { box-shadow: var(--shadow-2); transform: translateY(-1px); }
+.visits-strip__icon { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 13px; background: var(--accent-soft); color: var(--accent-ink); }
+.visits-strip__icon svg { width: 21px; height: 21px; }
+.visits-strip__text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.visits-strip__label { font-size: 13.5px; color: var(--text-2); }
+.visits-strip__value { display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 8px; font-size: 14px; color: var(--text-2); }
+.visits-strip__value strong { font-size: 26px; font-weight: 500; letter-spacing: -0.02em; line-height: 1.1; color: var(--text); font-variant-numeric: proportional-nums; }
+.visits-strip__foot { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; font-size: 12.5px; color: var(--text-2); }
+.visits-strip__spark .sparkline { margin-top: 0; }
+.visits-strip__end { display: flex; align-items: center; gap: 10px; }
+.visits-strip__chev { width: 18px; height: 18px; color: var(--text-3); flex: none; }
+@media (max-width: 899px) {
+  .visits-strip { grid-template-columns: auto minmax(0, 1fr) auto; padding: 14px 16px; gap: 10px 14px; }
+  .visits-strip__spark { display: none; }
+}
+@media (max-width: 599px) {
+  .visits-strip { grid-template-columns: auto minmax(0, 1fr); align-items: start; }
+  .visits-strip__end { grid-column: 2; }
+  .visits-strip__chev { margin-left: auto; }
+}
+
 /* ---------- Clientes ---------- */
 .mini-stat { display: flex; flex-direction: column; align-items: center; padding: 12px 8px; border-radius: 14px; background: var(--fill); text-align: center; }
 .mini-stat strong { font-size: 18px; font-weight: 600; font-variant-numeric: proportional-nums; }

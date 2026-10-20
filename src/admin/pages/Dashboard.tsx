@@ -1,6 +1,6 @@
 /**
  * Resumen: lo importante del día de un vistazo — ventas con su tendencia, pedidos por atender,
- * caja, lo más vendido, canales, formas de pago y alertas de inventario.
+ * visitas de hoy, caja, lo más vendido, canales, formas de pago y alertas de inventario.
  */
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router';
@@ -36,6 +36,7 @@ import {
 } from '@/lib/format';
 import { productStock } from '@/lib/model';
 import { api } from '../api';
+import { VisitsToday } from '../components/VisitsToday';
 import { addDays, endOfDay, previousRange, rangeFor, startOfDay, startOfMonth } from '../lib/dates';
 import { navigate } from '../lib/navigation';
 import { useData } from '../lib/query';
@@ -231,6 +232,8 @@ export default function Dashboard() {
           )}
         </Card>
       </div>
+
+      <VisitsToday />
 
       <Card
         className="sales-card"

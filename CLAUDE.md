@@ -42,16 +42,17 @@ Para verificar a mano: `npm run verify`, abrir tienda y panel sin errores en la 
 - `src/store/data/content.ts`: textos y fotos editables de la portada (`useContent().get(seccion, campo)`); los de fábrica salen de `supabase/datos/content.json`.
 - `src/store/state/`: `cart`, `favorites`, `ui` (nanostores compartidos entre islas). `src/store/lib/hydration.ts`: `useHydrated()` evita diferencias al hidratar.
 - `src/store/lib/edit-bridge.ts`: con `?editar=1` dentro del panel, tocar una sección (`data-edit="…"`) abre su editor.
+- Contador de visitas anónimo: `src/store/lib/analytics.ts` (`trackPage`/`trackProduct`, sin cookies) → `src/pages/api/visita.ts` (Worker: descarta robots, agrega ciudad aproximada de Cloudflare, nunca la IP) → rpc `track_visit` → tabla `page_views`. No cuenta al equipo: al entrar al panel, `excludeThisBrowser()` (`src/admin/lib/visits.ts`) marca el navegador y borra sus vistas. Reglas compartidas en `src/lib/visits.ts`.
 - `src/lib/`: tipos (`types.ts`), reglas puras de presentación y validación (`model.ts`: SKU, regiones, `DEFAULT_SETTINGS`, `cdn()`…), formato (`format.ts`), filtros del catálogo (`catalog-query.ts`), `rpc.ts` y `env.ts`. Pruebas en `*.test.ts` (vitest).
 
 **Panel** (`src/pages/admin/[...ruta].astro` → `src/admin/App.tsx`, `client:only`):
-- React Router con `basename '/admin'` (`routes.tsx`): `/` resumen, `/pedidos`, `/vender`, `/caja`, `/productos`, `/inventario`, `/clientes`, `/reportes`, `/sitio`, `/ajustes` (`?seccion=tienda|region|pedidos|caja|inventario|integraciones|cuenta|datos`).
+- React Router con `basename '/admin'` (`routes.tsx`): `/` resumen, `/pedidos`, `/vender`, `/caja`, `/productos`, `/inventario`, `/clientes`, `/reportes`, `/visitas` (contador de visitas; la franja «Visitas de hoy» del resumen está en `components/VisitsToday.tsx`), `/sitio`, `/ajustes` (`?seccion=tienda|region|pedidos|caja|inventario|integraciones|cuenta|datos`).
 - Datos con TanStack Query: `useData(clave, fn, temas)` + `invalidate(tema)` (`lib/query.ts`); avisos con `toast()`; hojas con `<Sheet>` (`ui/overlays.tsx`).
 - `api/index.ts` es la única puerta a Supabase (supabase-js); `api/mappers.ts` convierte filas.
 - Ya **no existe modo demostración**.
 
 **Supabase** (`supabase/`):
-- `schema.sql`: tablas, RLS y **todas las reglas del negocio** (la tienda y el panel solo llaman funciones): `storefront, product_page, storefront_sitemap, place_order, pos_checkout, order_set_status, order_set_payment, order_update, cash_open, cash_movement, cash_close, cash_session_summary, inventory_adjust, inventory_receive, save_product, delete_product, save_category, delete_category, save_department, reorder_rows, set_integration_secret, integrations_status, cloudinary_signature, whoami`. Vista `private.store_products`. Es idempotente.
+- `schema.sql`: tablas, RLS y **todas las reglas del negocio** (la tienda y el panel solo llaman funciones): `storefront, product_page, storefront_sitemap, place_order, pos_checkout, order_set_status, order_set_payment, order_update, cash_open, cash_movement, cash_close, cash_session_summary, inventory_adjust, inventory_receive, save_product, delete_product, save_category, delete_category, save_department, reorder_rows, set_integration_secret, integrations_status, cloudinary_signature, whoami, track_visit, visits_summary, visits_live, visits_forget`. Vista `private.store_products`. Es idempotente. El bloque de visitas (`-- >>> visitas` … `-- <<< visitas`) se puede ejecutar solo en el SQL Editor.
 - `seed.sql`: **generado** por `scripts/build-seed.ts`; no editarlo a mano.
 - `actualizaciones/*.sql`: correcciones de datos para la base que ya existe (idempotentes, en orden por fecha).
 - Administradores: los correos de `private.bootstrap_admins` (incluye `somosdivani@gmail.com`) reciben acceso al crear su usuario.
@@ -81,5 +82,7 @@ Pendiente:
 5. Completar `src/pages/aviso-de-privacidad.astro` (datos marcados con `<mark>`).
 
 **Publicada** en Cloudflare Workers: https://divani.divani.workers.dev (cuenta con sesión de wrangler en esta computadora; para actualizar: `npm run deploy`, que usa `.env.local` con `PUBLIC_SITE_URL=https://divani.divani.workers.dev`). Supabase Auth: Site URL esa dirección; Redirect URLs `…/**` y `http://localhost:5173/**`.
+
+Ya aplicado en Supabase (20 de octubre de 2026): bloque de visitas de `schema.sql` (tabla `page_views` y funciones `track_visit`, `visits_summary`, `visits_live`, `visits_forget`), probado de punta a punta en la tienda publicada.
 
 Ya aplicado en Supabase (18 de octubre de 2026): `schema.sql` nuevo y `actualizaciones/2026-10-18-guatemala-ropa-americana.sql` (región GTQ, textos sin «etiqueta», enlaces `/tienda`). La migración ya está en `main` (GitHub).

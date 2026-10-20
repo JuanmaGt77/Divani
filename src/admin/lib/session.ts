@@ -4,6 +4,7 @@ import { setRegion } from '@/lib/format';
 import type { Settings } from '@/lib/types';
 import { api, type StaffUser } from '../api';
 import { clearCache } from './query';
+import { excludeThisBrowser } from './visits';
 
 export interface SessionState {
   status: 'loading' | 'signedIn' | 'signedOut';
@@ -38,6 +39,7 @@ export async function boot(): Promise<void> {
     if (s?.user) {
       await loadSettings();
       session.set({ status: 'signedIn', user: s.user });
+      void excludeThisBrowser();
     } else {
       session.set({ status: 'signedOut', user: null });
     }
@@ -54,6 +56,7 @@ export async function boot(): Promise<void> {
 export async function signedIn(user: StaffUser): Promise<void> {
   await loadSettings();
   session.set({ status: 'signedIn', user });
+  void excludeThisBrowser();
 }
 
 export async function signOut(): Promise<void> {

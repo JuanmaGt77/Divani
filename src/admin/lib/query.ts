@@ -6,7 +6,7 @@
  */
 import { QueryCache, QueryClient, useQuery, type QueryKey } from '@tanstack/react-query';
 
-export type Topic = 'orders' | 'products' | 'inventory' | 'taxonomy' | 'cash' | 'content' | 'settings';
+export type Topic = 'orders' | 'products' | 'inventory' | 'taxonomy' | 'cash' | 'content' | 'settings' | 'visits';
 
 export const queryClient = new QueryClient({
   queryCache: new QueryCache({ onError: (err) => console.error(err) }),
@@ -33,12 +33,20 @@ export function useData<T>(
   key: QueryKey,
   fetcher: () => Promise<T>,
   topics: Topic[] = [],
-  { enabled = true }: { enabled?: boolean } = {},
+  {
+    enabled = true,
+    refetchInterval,
+  }: {
+    enabled?: boolean;
+    /** Vuelve a pedir los datos cada tantos milisegundos (solo con la pestaña visible). */
+    refetchInterval?: number;
+  } = {},
 ): DataState<T> {
   const query = useQuery({
     queryKey: key,
     queryFn: fetcher,
     enabled,
+    refetchInterval,
     meta: { topics },
   });
   return {

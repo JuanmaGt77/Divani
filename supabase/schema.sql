@@ -1531,6 +1531,194 @@ select u.id, 'Administración', 'admin'
 from auth.users u join private.bootstrap_admins b on lower(b.email) = lower(u.email)
 on conflict (user_id) do update set role = 'admin', active = true;
 
+-- >>> visitas (este bloque también se puede ejecutar solo en el SQL Editor)
+-- =============================================================================
+--  Visitas de la tienda (Panel → Visitas)
+--  Cada vista de una página o de una prenda que llega desde /api/visita. Sin datos personales:
+--  visitor es un número al azar que identifica al navegador y session a la visita (30 minutos
+--  sin actividad = visita nueva). País, departamento y ciudad son aproximados (Cloudflare).
+--  No se guarda la dirección IP. El equipo (navegadores con el panel abierto) no se cuenta.
+-- =============================================================================
+create table if not exists public.page_views (
+  id         bigint generated always as identity primary key,
+  created_at timestamptz not null default now(),
+  visitor    uuid not null,
+  session    uuid not null,
+  kind       text not null default 'page' check (kind in ('page', 'product')),
+  path       text not null default '/',
+  product    text,
+  source     text not null default 'directo',
+  device     text not null default 'celular',
+  country    text,
+  region     text,
+  city       text,
+  is_new     boolean not null default false
+);
+create index if not exists page_views_created_idx on public.page_views (created_at);
+create index if not exists page_views_session_idx on public.page_views (session, created_at);
+create index if not exists page_views_visitor_idx on public.page_views (visitor);
+alter table public.page_views enable row level security;
+drop policy if exists divani_staff_read on public.page_views;
+create policy divani_staff_read on public.page_views for select to authenticated using (public.is_staff());
+
+-- Registra una vista (público: lo llama /api/visita). Ignora lo que no tenga forma de visita real.
+create or replace function public.track_visit(payload jsonb) returns void
+language plpgsql security definer set search_path = public, pg_temp as $$
+declare
+  v_visitor uuid;
+  v_session uuid;
+  v_kind    text := case when payload->>'kind' = 'product' then 'product' else 'page' end;
+  v_path    text := left(coalesce(nullif(payload->>'path', ''), '/'), 200);
+  v_product text := nullif(private.clean(payload->>'product', 120), '');
+  v_source  text := coalesce(payload->>'source', '');
+  v_device  text := coalesce(payload->>'device', '');
+begin
+  begin
+    v_visitor := (payload->>'visitor')::uuid;
+    v_session := (payload->>'session')::uuid;
+  exception when others then
+    return;
+  end;
+  if v_visitor is null or v_session is null or left(v_path, 1) <> '/' or v_path like '/admin%' then
+    return;
+  end if;
+  if v_source not in ('instagram', 'facebook', 'whatsapp', 'tiktok', 'google', 'buscador', 'directo', 'otro') then
+    v_source := 'otro';
+  end if;
+  if v_device not in ('celular', 'tableta', 'computadora') then
+    v_device := 'celular';
+  end if;
+  -- La misma vista dos veces en pocos segundos (recargas o envíos repetidos) cuenta una sola vez
+  if exists (select 1 from public.page_views
+              where session = v_session and kind = v_kind and path = v_path
+                and product is not distinct from v_product and created_at > now() - interval '5 seconds') then
+    return;
+  end if;
+  -- Límite por visita: un error o un abuso no llena la tabla
+  if (select count(*) from public.page_views
+       where session = v_session and created_at > now() - interval '1 hour') >= 300 then
+    return;
+  end if;
+  insert into public.page_views (visitor, session, kind, path, product, source, device, country, region, city, is_new)
+  values (v_visitor, v_session, v_kind, v_path, v_product, v_source, v_device,
+          nullif(upper(private.clean(payload->>'country', 2)), ''),
+          nullif(private.clean(payload->>'region', 80), ''),
+          nullif(private.clean(payload->>'city', 80), ''),
+          coalesce(payload->>'isNew', '') = 'true');
+  -- De vez en cuando se borran las vistas de hace más de 13 meses
+  if random() < 0.002 then
+    delete from public.page_views where created_at < now() - interval '13 months';
+  end if;
+end $$;
+
+-- Resumen para el panel: totales, comparación con el periodo anterior y de dónde llegan
+create or replace function public.visits_summary(
+  p_from timestamptz,
+  p_to timestamptz,
+  p_prev_from timestamptz default null,
+  p_prev_to timestamptz default null,
+  p_tz text default 'America/Guatemala'
+) returns jsonb
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+declare
+  v_tz text := coalesce(nullif(p_tz, ''), 'America/Guatemala');
+  v_pf timestamptz := coalesce(p_prev_from, p_from - (p_to - p_from));
+  v_pt timestamptz := coalesce(p_prev_to, p_from);
+  -- Los pedidos se comparan solo desde que existe el contador (antes no hay visitas con qué compararlos)
+  v_since timestamptz;
+  result jsonb;
+begin
+  perform private.require_staff();
+  v_since := coalesce((select min(created_at) from public.page_views), 'infinity'::timestamptz);
+  if not exists (select 1 from pg_timezone_names where name = v_tz) then
+    v_tz := 'America/Guatemala';
+  end if;
+  with cur as (select * from public.page_views where created_at >= p_from and created_at < p_to),
+       prev as (select * from public.page_views where created_at >= v_pf and created_at < v_pt)
+  select jsonb_build_object(
+    'totals', jsonb_build_object(
+      'visits', (select count(distinct session) from cur),
+      'visitors', (select count(distinct visitor) from cur),
+      'newVisitors', (select count(distinct visitor) from cur where is_new),
+      'pageViews', (select count(*) from cur where kind = 'page'),
+      'productViews', (select count(*) from cur where product is not null),
+      'orders', (select count(*) from public.orders o
+                  where o.channel = 'web' and o.status <> 'cancelado'
+                    and o.created_at >= greatest(p_from, v_since) and o.created_at < p_to)),
+    'previous', jsonb_build_object(
+      'visits', (select count(distinct session) from prev),
+      'visitors', (select count(distinct visitor) from prev),
+      'newVisitors', (select count(distinct visitor) from prev where is_new),
+      'pageViews', (select count(*) from prev where kind = 'page'),
+      'productViews', (select count(*) from prev where product is not null),
+      'orders', (select count(*) from public.orders o
+                  where o.channel = 'web' and o.status <> 'cancelado'
+                    and o.created_at >= greatest(v_pf, v_since) and o.created_at < v_pt)),
+    'byDay', coalesce((select jsonb_agg(jsonb_build_object('day', d.day, 'visits', d.visits, 'visitors', d.visitors,
+                                                           'pageViews', d.views) order by d.day)
+                         from (select (created_at at time zone v_tz)::date as day, count(distinct session) as visits,
+                                      count(distinct visitor) as visitors, count(*) filter (where kind = 'page') as views
+                                 from cur group by 1) d), '[]'::jsonb),
+    'previousByDay', coalesce((select jsonb_agg(jsonb_build_object('day', d.day, 'visits', d.visits) order by d.day)
+                         from (select (created_at at time zone v_tz)::date as day, count(distinct session) as visits
+                                 from prev group by 1) d), '[]'::jsonb),
+    'byHour', coalesce((select jsonb_agg(jsonb_build_object('hour', h.hour, 'visits', h.visits) order by h.hour)
+                         from (select extract(hour from created_at at time zone v_tz)::int as hour,
+                                      count(distinct session) as visits
+                                 from cur group by 1) h), '[]'::jsonb),
+    'sources', coalesce((select jsonb_agg(jsonb_build_object('source', x.source, 'visits', x.visits) order by x.visits desc)
+                         from (select source, count(distinct session) as visits from cur group by source) x), '[]'::jsonb),
+    'devices', coalesce((select jsonb_agg(jsonb_build_object('device', x.device, 'visits', x.visits) order by x.visits desc)
+                         from (select device, count(distinct session) as visits from cur group by device) x), '[]'::jsonb),
+    'places', coalesce((select jsonb_agg(jsonb_build_object('country', x.country, 'region', x.region, 'city', x.city,
+                                                            'visits', x.visits) order by x.visits desc)
+                         from (select country, region, city, count(distinct session) as visits
+                                 from cur group by country, region, city order by visits desc limit 10) x), '[]'::jsonb),
+    'pages', coalesce((select jsonb_agg(jsonb_build_object('path', x.path, 'views', x.views) order by x.views desc)
+                         from (select path, count(*) as views from cur where kind = 'page'
+                                group by path order by views desc limit 10) x), '[]'::jsonb),
+    'products', coalesce((select jsonb_agg(jsonb_build_object('slug', x.product, 'name', p.name, 'views', x.views,
+                                   'image', (select c.images[1] from public.product_colors c
+                                              where c.product_id = p.id order by c.sort limit 1)) order by x.views desc)
+                         from (select product, count(*) as views from cur where product is not null
+                                group by product order by views desc limit 8) x
+                         join public.products p on p.slug = x.product), '[]'::jsonb)
+  ) into result;
+  return result;
+end $$;
+
+-- Personas en la tienda en este momento (vistas de los últimos 5 minutos)
+create or replace function public.visits_live() returns jsonb
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+begin
+  perform private.require_staff();
+  return jsonb_build_object(
+    'now', (select count(distinct visitor) from public.page_views where created_at > now() - interval '5 minutes'));
+end $$;
+
+-- Quita las vistas de un navegador (el del equipo antes de iniciar sesión en el panel)
+create or replace function public.visits_forget(p_visitor uuid) returns integer
+language plpgsql security definer set search_path = public, pg_temp as $$
+declare
+  n integer;
+begin
+  perform private.require_staff();
+  delete from public.page_views where visitor = p_visitor;
+  get diagnostics n = row_count;
+  return n;
+end $$;
+
+revoke execute on function public.track_visit(jsonb) from public;
+revoke execute on function public.visits_summary(timestamptz, timestamptz, timestamptz, timestamptz, text) from public, anon;
+revoke execute on function public.visits_live() from public, anon;
+revoke execute on function public.visits_forget(uuid) from public, anon;
+grant execute on function public.track_visit(jsonb) to anon, authenticated;
+grant execute on function public.visits_summary(timestamptz, timestamptz, timestamptz, timestamptz, text) to authenticated;
+grant execute on function public.visits_live() to authenticated;
+grant execute on function public.visits_forget(uuid) to authenticated;
+grant select on public.page_views to authenticated;
+-- <<< visitas
+
 -- =============================================================================
 --  Seguridad: políticas por fila y permisos
 -- =============================================================================
@@ -1540,7 +1728,7 @@ declare
 begin
   foreach t in array array['staff', 'settings', 'departments', 'categories', 'products', 'product_colors', 'product_variants',
                            'cash_sessions', 'cash_movements', 'orders', 'order_items', 'order_events', 'inventory_movements',
-                           'banners', 'lookbooks', 'faq', 'site_content'] loop
+                           'banners', 'lookbooks', 'faq', 'site_content', 'page_views'] loop
     execute format('alter table public.%I enable row level security', t);
     execute format('drop policy if exists divani_staff_read on public.%I', t);
     execute format('drop policy if exists divani_admin_write on public.%I', t);
@@ -1577,6 +1765,7 @@ grant execute on function public.storefront() to anon, authenticated;
 grant execute on function public.product_page(text) to anon, authenticated;
 grant execute on function public.storefront_sitemap() to anon, authenticated;
 grant execute on function public.place_order(jsonb) to anon, authenticated;
+grant execute on function public.track_visit(jsonb) to anon, authenticated;
 grant execute on function public.size_rank(text) to anon, authenticated;
 
 -- Avisos en tiempo real de pedidos nuevos para el panel

@@ -19,6 +19,7 @@ import type {
   SiteContentKey,
   Settings,
   Taxonomy,
+  VisitsSummary,
 } from '@/lib/types';
 import { compressImage, cloudinaryUpload, validateFile, type MediaKind, type SignedUpload } from '../lib/images';
 import { all, client, friendly, q, rpc } from './client';
@@ -399,6 +400,22 @@ export const api = {
       const s = await q<CashSessionRow | null>((sb) => sb.from('cash_sessions').select('*').eq(col, id).maybeSingle());
       return s ? sessionView(s) : null;
     },
+  },
+
+  visits: {
+    /** Visitas del periodo y del anterior (para comparar). Los días se cuentan con la hora de este navegador. */
+    summary: (range: { from: Date; to: Date }, previous?: { from: Date; to: Date }) =>
+      rpc<VisitsSummary>('visits_summary', {
+        p_from: range.from.toISOString(),
+        p_to: range.to.toISOString(),
+        p_prev_from: previous ? previous.from.toISOString() : null,
+        p_prev_to: previous ? previous.to.toISOString() : null,
+        p_tz: Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Guatemala',
+      }),
+    /** Personas en la tienda ahora mismo (vistas de los últimos 5 minutos). */
+    live: () => rpc<{ now: number }>('visits_live'),
+    /** Borra las vistas que hizo un navegador (el del equipo, antes de entrar al panel). */
+    forget: (visitor: string) => rpc<number>('visits_forget', { p_visitor: visitor }),
   },
 
   content: {

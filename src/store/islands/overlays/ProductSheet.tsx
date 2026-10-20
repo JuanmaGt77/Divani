@@ -6,6 +6,7 @@ import { Icon } from '../../components/Icon';
 import { ProductDetail } from '../../components/ProductDetail';
 import { Sheet } from '../../components/Sheet';
 import { categoryName, findProduct } from '../../data/storefront';
+import { trackProduct } from '../../lib/analytics';
 import { setParams } from '../../lib/url';
 import { $quickView, notify } from '../../state/ui';
 
@@ -36,6 +37,8 @@ export function ProductSheet({
   const shownSlug = useRef<string | null>(null);
   useEffect(() => {
     if (open && product) {
+      // Cada prenda abierta cuenta para «prendas más vistas» (Panel → Visitas)
+      if (shownSlug.current !== product.slug) trackProduct(product.slug);
       setParams({ p: product.slug });
       shownSlug.current = product.slug;
     } else if (!open && shownSlug.current) {

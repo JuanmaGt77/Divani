@@ -8,6 +8,7 @@ import { useStore } from '@nanostores/react';
 import {
   Boxes,
   ChartColumn,
+  Eye,
   Globe,
   KeyRound,
   LayoutDashboard,
@@ -43,6 +44,7 @@ export const NAV: NavEntry[] = [
   { path: '/inventario', label: 'Inventario', icon: Boxes },
   { group: 'Análisis' },
   { path: '/reportes', label: 'Reportes', icon: ChartColumn },
+  { path: '/visitas', label: 'Visitas', icon: Eye },
   { path: '/clientes', label: 'Clientes', icon: Users },
   { group: 'Sitio' },
   { path: '/sitio', label: 'Sitio web', icon: Globe },
