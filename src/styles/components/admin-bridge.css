@@ -3,19 +3,37 @@
    vista previa (/?editar=1 dentro del panel)
    ========================================================================== */
 
-/* Acceso a la administración */
+/* Acceso a la administración: con sesión iniciada es una píldora «Panel» (ícono y texto en una línea) */
 .site-actions__admin { position: relative; }
 .site-actions__admin-label { display: none; }
 .site-actions__admin.is-signed-in {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   width: auto;
-  gap: 6px;
-  padding: 0 12px 0 10px;
+  padding: 0 15px 0 13px;
   border-radius: var(--r-pill);
-  background: rgb(23 21 19 / 0.06);
   font-size: var(--fs-sm);
   font-weight: 500;
+  white-space: nowrap;
+  isolation: isolate;
 }
-.site-actions__admin.is-signed-in .site-actions__admin-label { display: inline; }
+/* El fondo es más bajo que el área táctil (44 px) para que la píldora no pese en la barra */
+.site-actions__admin.is-signed-in::before {
+  content: "";
+  position: absolute;
+  inset: 4px 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: rgb(23 21 19 / 0.06);
+  transition: background-color var(--dur) var(--ease-out);
+}
+@media (hover: hover) {
+  .site-actions .site-actions__admin.is-signed-in:hover { background: none; }
+  .site-actions .site-actions__admin.is-signed-in:hover::before { background: rgb(23 21 19 / 0.1); }
+}
+.site-actions__admin.is-signed-in .icon { width: 18px; height: 18px; flex: none; }
+.site-actions__admin.is-signed-in .site-actions__admin-label { display: inline; line-height: 1; }
 @media (max-width: 767px) {
   .site-actions__admin { display: none; }
 }
