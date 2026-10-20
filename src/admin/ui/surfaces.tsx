@@ -13,6 +13,7 @@ import {
 import { initials, type Delta as DeltaValue } from '@/lib/format';
 import { cdn, paymentInfo, statusInfo } from '@/lib/model';
 import type { Tone } from '@/lib/types';
+import { useFitText, useScrollEdges } from '../lib/hooks';
 import { cx } from './controls';
 
 type CardProps = Omit<HTMLAttributes<HTMLElement>, 'title'> & {
@@ -139,13 +140,17 @@ export function Stat({
   children?: ReactNode;
   className?: string;
 }) {
+  const valueRef = useRef<HTMLSpanElement>(null);
+  useFitText(valueRef);
   return (
     <div className={cx('stat', className)}>
       <span className="stat__label">
         {Icon && <Icon aria-hidden="true" />}
         {label}
       </span>
-      <span className={cx('stat__value', small && 'stat__value--sm')}>{value}</span>
+      <span ref={valueRef} className={cx('stat__value', small && 'stat__value--sm')}>
+        {value}
+      </span>
       {(delta || foot) && (
         <span className="stat__foot">
           <Delta d={delta} />
@@ -335,8 +340,10 @@ export function Tabs<V extends string>({
   items: TabItem<V>[];
   label?: string;
 }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useScrollEdges(ref, [items.length]);
   return (
-    <div className="tabs" role="tablist" aria-label={label}>
+    <div ref={ref} className="tabs" role="tablist" aria-label={label}>
       {items.map((t) => (
         <button
           key={t.value}

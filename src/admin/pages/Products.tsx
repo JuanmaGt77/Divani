@@ -16,7 +16,7 @@ import {
   Shirt,
   Trash2,
 } from 'lucide-react';
-import { money, number, plural, relative } from '@/lib/format';
+import { money, plural, relative } from '@/lib/format';
 import { COLOR_FAMILIES, lowStockOf, productStock } from '@/lib/model';
 import type { Product, ProductStatus, ProductVariant, ProductColor, Tone } from '@/lib/types';
 import { api, type ProductPayload } from '../api';
@@ -262,7 +262,7 @@ export default function Products() {
         title="Productos"
         sub={
           products
-            ? `${plural(counts.activo || 0, 'producto publicado', 'productos publicados')} · ${number(units)} piezas en existencia`
+            ? `${plural(counts.activo || 0, 'producto publicado', 'productos publicados')} · ${plural(units, 'pieza', 'piezas')} en existencia`
             : 'Cargando catálogo…'
         }
         actions={

@@ -1,5 +1,5 @@
 /** Hooks pequeños de uso común. */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react';
 import { normalize } from '@/lib/model';
 
 export function useMedia(query: string): boolean {
@@ -84,4 +84,58 @@ export function useHotkey(key: string, fn: (e: KeyboardEvent) => void): void {
     document.addEventListener('keydown', h);
     return () => document.removeEventListener('keydown', h);
   }, [key]);
+}
+
+/**
+ * Marca con data-more="start|end|both" un contenedor que se desliza de lado y todavía tiene contenido
+ * escondido: el CSS desvanece ese borde para que se note que hay más (pestañas, segmentos).
+ */
+export function useScrollEdges(ref: RefObject<HTMLElement | null>, deps: unknown[] = []): void {
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+    const update = () => {
+      const max = el.scrollWidth - el.clientWidth;
+      const more = max <= 2 ? '' : el.scrollLeft <= 2 ? 'end' : el.scrollLeft >= max - 2 ? 'start' : 'both';
+      if (more) el.dataset.more = more;
+      else delete el.dataset.more;
+    };
+    update();
+    el.addEventListener('scroll', update, { passive: true });
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => {
+      el.removeEventListener('scroll', update);
+      ro.disconnect();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
+}
+
+/**
+ * Achica la letra de un número grande (por ejemplo «Q 1,250,480.00») para que quepa completo en su
+ * recuadro. Usa la variable CSS --fit (1 = tamaño normal; mínimo `min`).
+ */
+export function useFitText(ref: RefObject<HTMLElement | null>, min = 0.5): void {
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+    const fit = () => {
+      el.style.removeProperty('--fit');
+      const ratio = el.clientWidth / Math.max(1, el.scrollWidth);
+      if (ratio < 1) el.style.setProperty('--fit', String(Math.max(min, Math.floor(ratio * 100) / 100)));
+    };
+    fit();
+    // Solo cuando cambia el ancho (al achicar la letra cambia la altura y no debe repetirse)
+    let width = -1;
+    const ro = new ResizeObserver(([entry]) => {
+      const w = Math.round(entry?.contentRect.width ?? 0);
+      if (w !== width) {
+        width = w;
+        fit();
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  });
 }

@@ -17,6 +17,7 @@ import {
 import { Link, type LinkProps } from 'react-router';
 import { Eye, EyeOff, Minus, Plus, Search, X, type LucideIcon } from 'lucide-react';
 import { currencySymbol } from '@/lib/format';
+import { useScrollEdges } from '../lib/hooks';
 
 export const cx = (...a: unknown[]): string => a.filter(Boolean).join(' ');
 
@@ -443,6 +444,7 @@ export function Segmented<V extends string | number>({
   const ref = useRef<HTMLDivElement>(null);
   const [thumb, setThumb] = useState<{ x: number; w: number } | null>(null);
   const counts = options.map((o) => o.count).join();
+  useScrollEdges(ref, [options.length, counts]);
   useLayoutEffect(() => {
     const root = ref.current;
     const btn = root?.querySelector<HTMLElement>('[aria-pressed="true"]');

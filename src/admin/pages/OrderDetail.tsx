@@ -14,7 +14,6 @@ import {
   Globe,
   History,
   MapPin,
-  MessageCircle,
   Pencil,
   Phone,
   Printer,
@@ -37,6 +36,7 @@ import { settingsStore } from '../lib/session';
 import { orderTemplates, ticketMessage, waLink } from '../lib/whatsapp';
 import { Button, IconButton, MoneyField, SelectField, Stepper, TextField, cx, type MoneyValue } from '../ui/controls';
 import { Sheet, confirmDialog, promptDialog, toast, toastError, type ToastOptions } from '../ui/overlays';
+import { WhatsAppIcon } from '../ui/icons';
 import {
   Banner,
   Card,
@@ -191,8 +191,15 @@ export default function OrderDetail() {
                 },
               ]}
               trigger={({ toggle, open }) => (
-                <Button icon={Printer} iconEnd={ChevronDown} aria-expanded={open} onClick={toggle}>
-                  Imprimir
+                <Button
+                  icon={Printer}
+                  iconEnd={ChevronDown}
+                  aria-expanded={open}
+                  aria-label="Imprimir"
+                  onClick={toggle}
+                >
+                  {/* En celular solo el ícono: así caben los tres botones en un renglón */}
+                  <span className="hide-m">Imprimir</span>
                 </Button>
               )}
             />
@@ -343,13 +350,13 @@ export default function OrderDetail() {
                           ]
                         : templates.map((t) => ({ label: t.label, onClick: () => openWa(t.text) }))),
                       '-',
-                      { label: 'Abrir chat sin mensaje', icon: MessageCircle, onClick: () => openWa('') },
+                      { label: 'Abrir chat sin mensaje', icon: WhatsAppIcon, onClick: () => openWa('') },
                     ]}
                     trigger={({ toggle, open }) => (
                       <Button
                         variant="wa"
                         block
-                        icon={MessageCircle}
+                        icon={WhatsAppIcon}
                         iconEnd={ChevronDown}
                         aria-expanded={open}
                         onClick={toggle}

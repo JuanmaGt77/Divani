@@ -29,12 +29,16 @@ function useWidth(ref: RefObject<HTMLElement | null>, fallback = 600): number {
   return w;
 }
 
-/** Máximo «redondo» para el eje: 1, 1.2, 1.5, 2, 2.5… × 10ⁿ */
-function niceMax(v: number): number {
-  if (v <= 0) return 1;
-  const p = 10 ** Math.floor(Math.log10(v));
-  for (const m of [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]) if (m * p >= v) return m * p;
-  return 10 * p;
+/**
+ * Escala del eje con marcas redondas y enteras (1, 2 o 5 × 10ⁿ): nunca se repite una etiqueta
+ * (con montos pequeños, 0.25, 0.5 y 0.75 se veían todos como «Q 1»).
+ */
+function niceScale(v: number, count = 4): { max: number; ticks: number[] } {
+  const raw = Math.max(v, 1) / count;
+  const p = 10 ** Math.floor(Math.log10(raw));
+  const step = Math.max(1, [1, 2, 5, 10].map((m) => m * p).find((x) => x >= raw) ?? 10 * p);
+  const n = Math.max(1, Math.ceil(v / step));
+  return { max: n * step, ticks: Array.from({ length: n + 1 }, (_, i) => i * step) };
 }
 
 type Pt = [number, number];
@@ -128,7 +132,7 @@ export function AreaChart<P extends ChartPoint>({
   const H = height;
   const iw = W - pad.l - pad.r;
   const ih = H - pad.t - pad.b;
-  const max = niceMax(Math.max(1, ...points.map((p) => p.value), ...(compare || []).map((c) => c.value)));
+  const { max, ticks } = niceScale(Math.max(0, ...points.map((p) => p.value), ...(compare || []).map((c) => c.value)));
   const x = (i: number) => pad.l + (points.length <= 1 ? iw / 2 : (i / (points.length - 1)) * iw);
   const y = (v: number) => pad.t + ih - (v / max) * ih;
   const line = useMemo(
@@ -142,7 +146,6 @@ export function AreaChart<P extends ChartPoint>({
     [compare, points, width, max],
   );
   const area = line ? `${line}L${x(points.length - 1)},${pad.t + ih}L${x(0)},${pad.t + ih}Z` : '';
-  const ticks = [0, 0.25, 0.5, 0.75, 1].map((f) => f * max);
   const every = Math.max(1, Math.ceil(points.length / Math.max(2, Math.floor(iw / 78))));
 
   const pick = (clientX: number) => {

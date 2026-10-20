@@ -23,7 +23,7 @@ import {
   Trash2,
   WandSparkles,
 } from 'lucide-react';
-import { money, number, percent } from '@/lib/format';
+import { money, number, percent, plural } from '@/lib/format';
 import { COLOR_FAMILIES, SIZE_PRESETS, cdn, guessFamily, makeSku, round2, sizeRank, slugify } from '@/lib/model';
 import type { Product, ProductStatus } from '@/lib/types';
 import { api, type ProductPayload } from '../api';
@@ -557,7 +557,7 @@ export default function ProductEditor() {
         sub={
           isNew
             ? 'Completa la información, sube las fotos de cada color y define tallas y existencias.'
-            : `${draft.code || ''} · ${number(totalStock)} piezas en existencia`
+            : `${draft.code || ''} · ${plural(totalStock, 'pieza', 'piezas')} en existencia`
         }
         actions={
           !isNew && (
