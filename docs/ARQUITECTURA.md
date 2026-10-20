@@ -24,7 +24,7 @@ src/pages/tienda.astro ─┼─► src/layouts/StoreLayout.astro  (<head>, íco
 producto/[slug].astro ─┘          │
                                   ▼
                  src/store/islands/   islas de React (cada sección es una)
-                       ├── home/       Hero, Ribbons, Categories, NewArrivals, Promos, Bestsellers, Lookbook,
+                       ├── home/       Hero (portada), Ribbons, Categories, NewArrivals, Bestsellers, Lookbook,
                        │               Editorial, Kids, About, HowTo, Men, Faq, Vip
                        ├── ShopPage.tsx, ProductPage.tsx
                        ├── SiteHeader.tsx, SiteFooter.tsx
@@ -40,6 +40,7 @@ producto/[slug].astro ─┘          │
 - **Paquete de la tienda**: `storefront()` devuelve en una sola consulta productos con existencias por color y talla, categorías, banners vigentes, looks, preguntas, contenido de la portada y ajustes públicos. Se pide una vez por página y se guarda en `localStorage` (`divani.storefront.v2`) para pintar al instante la siguiente visita; luego se actualiza.
 - **Hidratación sin saltos**: el HTML generado no trae datos del navegador. `useHydrated()` hace que el primer render en el navegador sea igual al HTML; después se muestran datos, bolsa y favoritos. Los textos de la portada usan los de fábrica (`supabase/datos/content.json`) hasta que llegan los guardados.
 - **Región**: `applySettings()` aplica moneda e idioma (`src/lib/format.ts`). La página de producto la aplica en el servidor antes de mostrar precios.
+- **Portada** (`home/Hero.tsx`): carrusel de «vitrinas» hecho con los banners (`placement` home-carousel). Cada banner tiene color (`theme`: arena, marfil, rosa, salvia, tinta), foto opcional y `showcase` (qué prendas muestra: novedades, ofertas, más vendidas, una categoría, elegidas o ninguna). Las prendas se eligen en el navegador con el paquete de la tienda y solo con existencias. Sin banners se muestra una vitrina de novedades.
 - **Filtros**: `src/lib/catalog-query.ts` filtra, ordena, pagina y calcula facetas (función pura con pruebas). El estado de `/tienda` vive en la URL.
 
 ### Flujo de compra

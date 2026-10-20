@@ -15,7 +15,7 @@ Tienda de ropa americana premium (Guatemala) con compra por WhatsApp y un panel 
 ## Qué incluye
 
 ### Tienda (`/`, `/tienda`, `/producto/…`)
-- Portada con video de marca, cintas, categorías, novedades, banners, «arma tu look», niñas y niños, acerca de nosotros, cómo comprar, hombre, preguntas frecuentes y lista VIP. **Todo lo de la portada se cambia desde el panel.**
+- Portada con campañas que se turnan: cada una con su color, su foto y una vitrina de prendas con su precio. Después: cintas, categorías, novedades, lo más deseado, «arma tu look», niñas y niños, acerca de nosotros, cómo comprar, hombre, preguntas frecuentes y lista VIP. **Todo lo de la portada se cambia desde el panel.**
 - Catálogo con filtros (departamento, categoría, talla, color, precio, ofertas), búsqueda y vista rápida con existencias **por color y talla**. Los filtros quedan en la dirección para poder compartirlos.
 - Una página por prenda (`/producto/vestido-slip-satinado`) con foto, nombre y precio para que se vea bien al compartirla por WhatsApp o redes, y datos para buscadores.
 - Bolsa y pedido por WhatsApp: el pedido se registra primero (el servidor valida existencias y precios) y WhatsApp se abre con el número de pedido oficial.
@@ -32,7 +32,7 @@ Tienda de ropa americana premium (Guatemala) con compra por WhatsApp y un panel 
 | **Inventario** | Existencias por variante, ajustes con motivo, entrada de mercancía, kardex completo y alertas de últimas piezas. |
 | **Clientes** | Se registran solos con cada pedido: historial, frecuentes, por reactivar y contacto por WhatsApp. |
 | **Reportes** | Ventas por periodo con filtros, comparación con el periodo anterior, productos, cortes de caja y exportación a CSV/impresión. |
-| **Sitio web** | Vista previa en vivo (computadora o iPhone): toca cualquier sección para cambiar sus fotos y textos. Banners con fechas, categorías, «arma tu look» y preguntas frecuentes. |
+| **Sitio web** | Vista previa en vivo (computadora o iPhone): toca cualquier sección para cambiar sus fotos y textos. Portada con campañas (color, foto, prendas y fechas), categorías, «arma tu look» y preguntas frecuentes. |
 | **Configuración** | Tienda y contacto, región y moneda, pedidos en línea, punto de venta y caja, inventario, conexiones (Cloudinary), cuenta y respaldo. |
 
 ---
