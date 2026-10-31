@@ -24,9 +24,10 @@ import {
   WandSparkles,
 } from 'lucide-react';
 import { money, number, percent, plural } from '@/lib/format';
-import { COLOR_FAMILIES, SIZE_PRESETS, cdn, guessFamily, makeSku, round2, sizeRank, slugify } from '@/lib/model';
+import { SIZE_PRESETS, cdn, guessFamily, makeSku, round2, sizeRank, slugify, swatchFill } from '@/lib/model';
 import type { Product, ProductStatus } from '@/lib/types';
 import { api, type ProductPayload } from '../api';
+import { CategorySheet, type CategoryDraft } from '../components/CategorySheets';
 import { navigate, useSearch, useUnsavedChanges } from '../lib/navigation';
 import { invalidate, useData } from '../lib/query';
 import { settingsStore } from '../lib/session';
@@ -44,6 +45,7 @@ import {
   cx,
   type MoneyValue,
 } from '../ui/controls';
+import { ColorPicker, SUGGESTED_NAMES } from '../ui/color';
 import { Gallery } from '../ui/media';
 import { confirmDialog, promptDialog, toast, toastError } from '../ui/overlays';
 import { Badge, Card, Empty, Menu, PageHeader, SkeletonRows } from '../ui/surfaces';
@@ -53,9 +55,9 @@ interface DraftColor {
   key: string;
   id?: string;
   name: string;
+  /** Liso o multicolor (ver colorStops). La familia del filtro de la tienda se calcula sola. */
   hex: string;
   family: string;
-  familyAuto: boolean;
   images: string[];
 }
 
@@ -124,7 +126,6 @@ function toDraft(p: Product): Draft {
       name: c.name,
       hex: c.hex,
       family: c.family,
-      familyAuto: false,
       images: c.images || [],
     })),
     variants: p.variants.map((v) => ({
@@ -229,6 +230,7 @@ export default function ProductEditor() {
   const [base, setBase] = useState<string | null>(() => (isNew ? JSON.stringify(blank(query.depto)) : null));
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [newCat, setNewCat] = useState<CategoryDraft | null>(null);
   const formRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -305,7 +307,7 @@ export default function ProductEditor() {
   const addColor = () =>
     set((d) => {
       const key = newKey();
-      const color: DraftColor = { key, name: '', hex: '#D9C6A6', family: 'beige', familyAuto: true, images: [] };
+      const color: DraftColor = { key, name: '', hex: '#D9C6A6', family: 'beige', images: [] };
       return {
         colors: [...d.colors, color],
         variants: [
@@ -327,8 +329,7 @@ export default function ProductEditor() {
       colors: d.colors.map((c) => {
         if (c.key !== key) return c;
         const next = { ...c, ...patch };
-        if (patch.hex !== undefined && c.familyAuto) next.family = guessFamily(patch.hex);
-        if (patch.family !== undefined) next.familyAuto = false;
+        if (patch.hex !== undefined && patch.hex !== c.hex) next.family = guessFamily(patch.hex);
         return next;
       }),
     }));
@@ -647,7 +648,7 @@ export default function ProductEditor() {
           <Card
             title="Colores y fotos"
             icon={Palette}
-            sub="La primera foto de cada color es la principal; la segunda aparece al pasar el cursor."
+            sub="Toca el círculo para elegir el tono o hacerlo multicolor. La primera foto de cada color es la principal; la segunda aparece al pasar el cursor."
             actions={
               <Button size="sm" variant="tinted" icon={Plus} onClick={addColor}>
                 Agregar color
@@ -671,15 +672,14 @@ export default function ProductEditor() {
                 {draft.colors.map((c, i) => (
                   <div key={c.key} className="color-block">
                     <div className="color-block__head">
-                      <label className="color-dot" title="Elegir color">
-                        <span className="swatch" style={{ '--c': c.hex, '--s': '34px' }} />
-                        <input
-                          type="color"
-                          value={c.hex}
-                          onChange={(e) => updateColor(c.key, { hex: e.currentTarget.value.toUpperCase() })}
-                          aria-label={`Tono del color ${c.name}`}
-                        />
-                      </label>
+                      <ColorPicker
+                        value={c.hex}
+                        onChange={(hex) => updateColor(c.key, { hex })}
+                        onSuggestName={(name) => {
+                          if (!c.name.trim() || SUGGESTED_NAMES.has(c.name.trim())) updateColor(c.key, { name });
+                        }}
+                        label={`Color ${c.name || 'sin nombre'}`}
+                      />
                       <div className={cx('field grow', errors[`color-${c.key}`] && 'is-invalid')}>
                         <input
                           className="input"
@@ -691,19 +691,6 @@ export default function ProductEditor() {
                         />
                         {errors[`color-${c.key}`] && <p className="field__error">{errors[`color-${c.key}`]}</p>}
                       </div>
-                      <select
-                        className="input color-block__family"
-                        value={c.family}
-                        onChange={(e) => updateColor(c.key, { family: e.currentTarget.value })}
-                        aria-label="Familia de color para el filtro de la tienda"
-                        title="Familia de color (filtro de la tienda)"
-                      >
-                        {COLOR_FAMILIES.map((f) => (
-                          <option key={f.id} value={f.id}>
-                            {f.name}
-                          </option>
-                        ))}
-                      </select>
                       <Menu
                         items={[
                           i > 0 && { label: 'Mover arriba', onClick: () => moveColor(i, i - 1) },
@@ -796,7 +783,7 @@ export default function ProductEditor() {
                     return (
                       <div key={c.key} className="variant-group">
                         <div className="variant-group__head">
-                          <span className="swatch" style={{ '--c': c.hex }} />
+                          <span className="swatch" style={{ '--c': swatchFill(c.hex) }} />
                           <strong>{c.name || 'Color sin nombre'}</strong>
                           <span className="muted small">{number(sum)} pzs</span>
                         </div>
@@ -970,6 +957,18 @@ export default function ProductEditor() {
                 onValue={(v) => set({ category: v })}
                 placeholder="Sin categoría"
                 options={cats.map((c) => ({ value: c.slug, label: c.name }))}
+                action={
+                  <button
+                    type="button"
+                    className="link-btn small"
+                    onClick={() =>
+                      setNewCat({ department: draft.department, name: '', description: '', image: '', active: true })
+                    }
+                  >
+                    <Plus aria-hidden="true" />
+                    Nueva
+                  </button>
+                }
               />
               <Field label="Etiquetas" optional hint="Ayudan a la búsqueda de la tienda (satín, fiesta, básico…).">
                 <TagInput value={draft.tags} onChange={(tags) => set({ tags })} />
@@ -1019,7 +1018,7 @@ export default function ProductEditor() {
               {draft.colors.length > 0 && (
                 <div className="row" style={{ '--gap': '5px' }}>
                   {draft.colors.map((c) => (
-                    <span key={c.key} className="swatch" style={{ '--c': c.hex, '--s': '14px' }} />
+                    <span key={c.key} className="swatch" style={{ '--c': swatchFill(c.hex), '--s': '14px' }} />
                   ))}
                   <span className="xsmall muted">
                     {draft.colors.length === 1 ? draft.colors[0]?.name : `${draft.colors.length} colores`}
@@ -1030,6 +1029,15 @@ export default function ProductEditor() {
           </Card>
         </aside>
       </div>
+
+      <CategorySheet
+        cat={newCat}
+        deps={deps}
+        onClose={(saved) => {
+          setNewCat(null);
+          if (saved) set({ department: saved.department, category: saved.slug });
+        }}
+      />
 
       <div className={cx('savebar glass', dirty && 'is-dirty')} role="region" aria-label="Guardar cambios">
         <span className="savebar__text">

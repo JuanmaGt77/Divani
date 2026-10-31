@@ -1247,7 +1247,8 @@ begin
   for col in select * from jsonb_array_elements(coalesce(payload->'colors', '[]'::jsonb)) loop
     v_cname := private.clean(col->>'name', 60);
     if v_cname = '' then raise exception 'Cada color necesita un nombre.'; end if;
-    v_hex := case when coalesce(col->>'hex', '') ~* '^#[0-9a-f]{6}$' then upper(col->>'hex') else '#D9C6A6' end;
+    -- Liso (#RRGGBB) o multicolor: de 2 a 6 tonos separados por coma, que la tienda pinta como rayas
+    v_hex := case when coalesce(col->>'hex', '') ~* '^#[0-9a-f]{6}(,#[0-9a-f]{6}){0,5}$' then upper(col->>'hex') else '#D9C6A6' end;
     v_color := null;
     if coalesce(col->>'id', '') ~ '^[0-9a-f-]{36}$' then
       select id into v_color from public.product_colors where id = (col->>'id')::uuid and product_id = v_id;

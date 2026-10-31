@@ -772,6 +772,101 @@ dialog.alert[open] { animation: alert-in 0.3s var(--spring); }
 .swatch { width: var(--s, 18px); height: var(--s, 18px); border-radius: 50%; flex: none; background: var(--c, #ccc); box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.12); }
 .swatch--pattern { background: conic-gradient(#d9c6a6 0 25%, #8a6547 0 50%, #e7c6bd 0 75%, #5f7fa3 0); }
 
+/* ---------- Selector de color (ui/color.tsx) ---------- */
+.color-dot { position: relative; display: grid; place-items: center; width: 44px; height: 44px; flex: none; border-radius: 50%; transition: box-shadow 0.2s; }
+.color-dot .swatch { transition: transform 0.25s var(--ease-out); }
+.color-dot:hover .swatch, .color-dot.is-open .swatch { transform: scale(1.08); }
+.color-dot.is-open { box-shadow: 0 0 0 2px var(--surface-solid), 0 0 0 4px var(--accent); }
+
+.cpk {
+  position: fixed;
+  z-index: 90;
+  width: 304px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px;
+  border-radius: 22px;
+  background: rgb(255 253 249 / 0.95);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-3), var(--glass-edge);
+  animation: menu-in 0.2s var(--ease-out);
+  transition: opacity 0.15s;
+}
+.cpk.is-dropping { opacity: 0; pointer-events: none; }
+.cpk-veil { display: none; }
+.cpk__line { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.cpk__label { font-size: 12.5px; font-weight: 500; color: var(--text-2); }
+.cpk__hint { margin-top: -6px; font-size: 12.5px; color: var(--text-3); }
+
+.cpk__area {
+  position: relative;
+  height: 150px;
+  border-radius: 14px;
+  cursor: crosshair;
+  touch-action: none;
+  background: linear-gradient(to top, #000, rgb(0 0 0 / 0)), linear-gradient(to right, #fff, var(--hue));
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.06);
+}
+.cpk__thumb {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: 0 0 0 3px #fff, 0 2px 10px rgb(0 0 0 / 0.35);
+  pointer-events: none;
+}
+
+/* Barra de tono: el riel es el arcoíris y la perilla muestra el tono elegido */
+.cpk__hue { -webkit-appearance: none; appearance: none; width: 100%; height: 28px; margin: -4px 0; background: transparent; cursor: pointer; }
+.cpk__hue::-webkit-slider-runnable-track { height: 14px; border-radius: 999px; background: linear-gradient(to right, #f00, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00); box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.06); }
+.cpk__hue::-moz-range-track { height: 14px; border-radius: 999px; background: linear-gradient(to right, #f00, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00); }
+.cpk__hue::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; margin-top: -5px; border-radius: 50%; background: var(--hue); box-shadow: 0 0 0 3px #fff, 0 2px 10px rgb(0 0 0 / 0.35); }
+.cpk__hue::-moz-range-thumb { width: 24px; height: 24px; border: 0; border-radius: 50%; background: var(--hue); box-shadow: 0 0 0 3px #fff, 0 2px 10px rgb(0 0 0 / 0.35); }
+.cpk__hue:focus-visible { box-shadow: none; }
+.cpk__hue:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px #fff, 0 0 0 6px rgb(168 133 92 / 0.5); }
+
+.cpk__code { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; height: 40px; padding: 0 10px 0 8px; border-radius: 12px; background: var(--surface-solid); box-shadow: inset 0 0 0 1px var(--line-2); }
+.cpk__code:focus-within { box-shadow: inset 0 0 0 1px var(--accent), var(--focus-ring); }
+.cpk__code input { flex: 1; min-width: 0; border: 0; background: none; outline: none; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 14px; letter-spacing: 0.04em; text-transform: uppercase; }
+
+.cpk__presets-wrap { display: flex; flex-direction: column; gap: 8px; }
+.cpk__presets { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+.cpk__preset { aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; background: var(--c); box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.12); color: var(--ink); transition: transform 0.2s var(--ease-out); }
+.cpk__preset.is-dark { color: #fff; }
+.cpk__preset:hover { transform: scale(1.1); }
+.cpk__preset[aria-pressed="true"] { box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.12), 0 0 0 2px var(--surface-solid), 0 0 0 4px var(--ink); }
+.cpk__preset svg { width: 16px; height: 16px; stroke-width: 3; }
+
+.cpk__multi { display: flex; flex-direction: column; gap: 10px; }
+.cpk__stripes { display: flex; height: 52px; padding: 3px; gap: 3px; border-radius: 16px; background: var(--fill-2); }
+.cpk__stripe { flex: 1; display: grid; place-items: center; border-radius: 12px; background: var(--c); box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.1); color: var(--ink); transition: transform 0.2s var(--ease-out), box-shadow 0.2s; }
+.cpk__stripe.is-dark { color: #fff; }
+.cpk__stripe[aria-checked="true"] { transform: translateY(-2px); box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.1), 0 0 0 2px var(--surface-solid), 0 0 0 4px var(--ink); }
+.cpk__stripe svg { width: 16px; height: 16px; stroke-width: 3; }
+
+/* Celular: hoja que sube desde abajo, con velo */
+@media (max-width: 599px) {
+  .cpk-veil { display: block; position: fixed; inset: 0; z-index: 89; background: rgb(23 21 19 / 0.28); animation: fade-in 0.25s; }
+  .cpk {
+    top: auto !important;
+    left: 8px !important;
+    right: 8px;
+    bottom: calc(8px + var(--safe-b));
+    width: auto;
+    max-height: calc(100dvh - 24px - var(--safe-t));
+    overflow-y: auto;
+    padding: 16px;
+    border-radius: 28px;
+    animation: sheet-up 0.42s var(--ease-ios);
+  }
+  .cpk__area { height: 170px; }
+  .cpk__presets { grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 7px; }
+}
+
 /* ---------- Contenido que se desliza de lado (pestañas, segmentos) ----------
    useScrollEdges pone data-more cuando queda contenido escondido: ese borde se desvanece
    para que se note que hay más opciones al deslizar. */

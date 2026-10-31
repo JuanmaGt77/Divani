@@ -4,7 +4,9 @@ import {
   REGION_PRESETS,
   cdn,
   colorCode,
+  colorStops,
   guessFamily,
+  isMulticolor,
   makeSku,
   mergeSettings,
   normalize,
@@ -21,6 +23,7 @@ import {
   sizeRank,
   slugify,
   storeHref,
+  swatchFill,
 } from './model';
 import type { Product } from './types';
 
@@ -60,6 +63,26 @@ describe('textos', () => {
     expect(guessFamily('#F6F2EA')).toBe('blanco');
     expect(guessFamily('#2E5FA3')).toBe('azul');
     expect(guessFamily('nada')).toBe('beige');
+    expect(guessFamily('#1B1A19,#F0E8D8')).toBe('estampado');
+  });
+});
+
+describe('colores lisos y multicolor', () => {
+  it('lee los tonos guardados', () => {
+    expect(colorStops('#d9c6a6')).toEqual(['#D9C6A6']);
+    expect(colorStops('#111, #F0E8D8 ,nada')).toEqual(['#111111', '#F0E8D8']);
+    expect(colorStops('')).toEqual(['#D9C6A6']);
+    expect(colorStops(Array(8).fill('#123456').join(','))).toHaveLength(6);
+    expect(isMulticolor('#111111')).toBe(false);
+    expect(isMulticolor('#111111,#222222')).toBe(true);
+  });
+
+  it('pinta rayas iguales, una por tono', () => {
+    expect(swatchFill('#1B1A19')).toBe('#1B1A19');
+    expect(swatchFill('#000000,#FFFFFF')).toBe('linear-gradient(90deg, #000000 0% 50%, #FFFFFF 50% 100%)');
+    expect(swatchFill('#111111,#222222,#333333')).toBe(
+      'linear-gradient(90deg, #111111 0% 33.33%, #222222 33.33% 66.67%, #333333 66.67% 100%)',
+    );
   });
 });
 

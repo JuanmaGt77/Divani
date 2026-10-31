@@ -49,14 +49,20 @@ export default function Categories() {
                 data-reveal=""
                 style={{ '--d': i % 4 }}
               >
-                <img
-                  src={cdn(c.image, { w: i === 0 ? 1200 : 800 })}
-                  alt={`${c.name} de mujer`}
-                  width={800}
-                  height={1000}
-                  loading="lazy"
-                  decoding="async"
-                />
+                {c.image ? (
+                  <img
+                    src={cdn(c.image, { w: i === 0 ? 1200 : 800 })}
+                    alt={`${c.name} de mujer`}
+                    width={800}
+                    height={1000}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ) : (
+                  <span className="tile__initial" aria-hidden="true">
+                    {c.name.slice(0, 1)}
+                  </span>
+                )}
                 <span className="tile__label glass">
                   <span className="tile__name">{c.name}</span>
                   <span className="tile__count">{plural(c.productCount, 'pieza', 'piezas')}</span>

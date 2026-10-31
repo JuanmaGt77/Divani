@@ -257,6 +257,7 @@ type SelectFieldProps = Omit<SelectHTMLAttributes<HTMLSelectElement>, 'value' | 
   onValue?: (v: string) => void;
   options?: Option[];
   placeholder?: string;
+  action?: ReactNode;
 };
 
 export function SelectField({
@@ -268,11 +269,12 @@ export function SelectField({
   options = [],
   placeholder,
   className,
+  action,
   ...rest
 }: SelectFieldProps) {
   const id = useId();
   return (
-    <Field label={label} hint={hint} error={error} htmlFor={id} className={className}>
+    <Field label={label} hint={hint} error={error} htmlFor={id} className={className} action={action}>
       <select
         id={id}
         className="input"

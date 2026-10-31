@@ -1,8 +1,9 @@
 /**
  * Sitio web: fotos, textos y promociones de la tienda con vista previa en vivo.
- * Portada (cada sección con su editor), banners, categorías, «Arma tu look» y preguntas.
+ * Portada (cada sección con su editor), banners, «Arma tu look» y preguntas. Las categorías
+ * tienen su propia sección (/categorias).
  */
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useStore } from '@nanostores/react';
 import {
   Baby,
@@ -29,7 +30,6 @@ import { cdn } from '@/lib/model';
 import type { Banner, Faq, Lookbook, Settings, SiteContent, Taxonomy } from '@/lib/types';
 import { api } from '../api';
 import { BannersTab } from '../components/site/BannersTab';
-import { CategoriesTab } from '../components/site/CategoriesTab';
 import { FaqTab } from '../components/site/FaqTab';
 import {
   AboutEditor,
@@ -52,12 +52,11 @@ import { Button, LinkButton } from '../ui/controls';
 import { Sheet } from '../ui/overlays';
 import { Card, PageHeader, Tabs } from '../ui/surfaces';
 
-type Tab = 'portada' | 'banners' | 'categorias' | 'look' | 'preguntas';
+type Tab = 'portada' | 'banners' | 'look' | 'preguntas';
 
 const TABS = [
   { value: 'portada' as Tab, label: 'Secciones', icon: House },
   { value: 'banners' as Tab, label: 'Portada', icon: GalleryHorizontal },
-  { value: 'categorias' as Tab, label: 'Categorías', icon: LayoutGrid },
   { value: 'look' as Tab, label: 'Arma tu look', icon: Shirt },
   { value: 'preguntas' as Tab, label: 'Preguntas', icon: CircleHelp },
 ];
@@ -83,7 +82,7 @@ export default function Website() {
   const tab: Tab = TABS.some((t) => t.value === query.tab) ? (query.tab as Tab) : 'portada';
   const settings = useStore(settingsStore);
   const { data, loading } = useData(['content'], () => api.content.all(), ['content']);
-  const { data: tax, loading: taxLoading } = useData(['taxonomy'], () => api.catalog.taxonomy(), ['taxonomy']);
+  const { data: tax } = useData(['taxonomy'], () => api.catalog.taxonomy(), ['taxonomy']);
   const { data: products } = useData(['products'], () => api.catalog.products(), ['products', 'inventory']);
   const [version, setVersion] = useState(0);
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -92,6 +91,10 @@ export default function Website() {
   const go = (t: Tab) => {
     if (t !== tab) setQuery({ tab: t === 'portada' ? '' : t });
   };
+  // Las categorías ahora tienen su propia sección
+  useEffect(() => {
+    if (query.tab === 'categorias') navigate('/categorias', { replace: true });
+  }, [query.tab]);
 
   return (
     <main className="page page--wide">
@@ -129,7 +132,6 @@ export default function Website() {
         />
       )}
       {tab === 'banners' && <BannersTab data={data} tax={tax} products={products} loading={loading} onSaved={bump} />}
-      {tab === 'categorias' && <CategoriesTab tax={tax} products={products} loading={taxLoading} onSaved={bump} />}
       {tab === 'look' && <LookTab data={data} products={products} loading={loading || !products} onSaved={bump} />}
       {tab === 'preguntas' && <FaqTab data={data} loading={loading} onSaved={bump} />}
     </main>
@@ -164,6 +166,10 @@ function HomeTab({
   const open = (id: string) => {
     if (id === 'products') {
       navigate('/productos');
+      return;
+    }
+    if (id === 'categories') {
+      navigate('/categorias');
       return;
     }
     if (id === 'store') {

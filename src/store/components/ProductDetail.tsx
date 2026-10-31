@@ -4,7 +4,7 @@
  */
 import { useRef, useState, type UIEvent } from 'react';
 import { money } from '@/lib/format';
-import { cdn } from '@/lib/model';
+import { cdn, swatchFill } from '@/lib/model';
 import type { PublicSettings, StoreProduct } from '@/lib/types';
 import { useHydrated } from '../lib/hydration';
 import { CATALOG, colorStock, discountPct, firstAvailableColor, sizesOf, totalStock } from '../lib/product';
@@ -219,7 +219,7 @@ export function ProductDetail({
                   aria-label={out ? `${c.name} (agotado)` : c.name}
                   onClick={() => pickColor(i)}
                 >
-                  <span className="swatch" style={{ '--c': c.hex }} />
+                  <span className="swatch" style={{ '--c': swatchFill(c.hex) }} />
                 </button>
               );
             })}

@@ -18,7 +18,7 @@ export interface HomeSection {
   title: string;
   sub: string;
   /** La sección se edita en otra pestaña de Sitio web. */
-  tab?: 'categorias' | 'banners' | 'look' | 'preguntas';
+  tab?: 'banners' | 'look' | 'preguntas';
   thumb?: (c: SiteContent) => string | undefined;
 }
 
@@ -31,7 +31,7 @@ export const HOME_SECTIONS: HomeSection[] = [
     tab: 'banners',
   },
   { id: 'ribbons', title: 'Cintas cruzadas', sub: 'Frases que se deslizan debajo de la portada' },
-  { id: 'categories', title: 'Compra por categoría', sub: 'Fotos y nombres de las categorías', tab: 'categorias' },
+  { id: 'categories', title: 'Compra por categoría', sub: 'Fotos y nombres de las categorías (en Categorías)' },
   { id: 'look', title: 'Arma tu look', sub: 'Foto con puntos que llevan a cada prenda', tab: 'look' },
   {
     id: 'editorial',

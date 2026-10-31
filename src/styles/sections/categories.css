@@ -30,6 +30,18 @@
 @media (hover: hover) {
   .tile:hover img { transform: scale(1.06); }
 }
+/* Categoría sin foto todavía: su inicial en grande sobre arena */
+.tile__initial {
+  position: absolute;
+  inset: 0 0 18%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-size: clamp(5rem, 3rem + 6vw, 9rem);
+  line-height: 1;
+  color: var(--mocha);
+  opacity: 0.35;
+}
 .tile::after {
   content: "";
   position: absolute;

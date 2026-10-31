@@ -25,7 +25,16 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { money, plural } from '@/lib/format';
-import { cdn, methodLabel, orderTotals, productStock, round2, sizeRank, type OrderTotals } from '@/lib/model';
+import {
+  cdn,
+  methodLabel,
+  orderTotals,
+  productStock,
+  round2,
+  sizeRank,
+  swatchFill,
+  type OrderTotals,
+} from '@/lib/model';
 import type { Order, Product, Settings } from '@/lib/types';
 import { api } from '../api';
 import { OpenCashSheet } from '../components/CashSheets';
@@ -604,7 +613,10 @@ function VariantPicker({
                       setVariantId(null);
                     }}
                   >
-                    <span className="swatch" style={{ '--c': c.hex, '--s': '14px', opacity: any ? 1 : 0.4 }} />
+                    <span
+                      className="swatch"
+                      style={{ '--c': swatchFill(c.hex), '--s': '14px', opacity: any ? 1 : 0.4 }}
+                    />
                     {c.name}
                   </Chip>
                 );

@@ -5,7 +5,7 @@
  */
 import { useRef, useState, type MouseEvent } from 'react';
 import { money } from '@/lib/format';
-import { cdn } from '@/lib/model';
+import { cdn, swatchFill } from '@/lib/model';
 import type { StoreProduct } from '@/lib/types';
 import { badgesOf, firstAvailableColor, sizesOf, totalStock } from '../lib/product';
 import { productPath } from '../lib/url';
@@ -192,14 +192,14 @@ export function ProductCard({
                 aria-label={`Color ${c.name}`}
                 onClick={() => setColorIdx(i)}
               >
-                <span className="swatch" style={{ '--c': c.hex || '#ccc' }} />
+                <span className="swatch" style={{ '--c': swatchFill(c.hex) }} />
               </button>
             ))}
             <small>{p.colors.length} colores</small>
           </div>
         ) : (
           <div className="card__swatches">
-            <span className="swatch" style={{ '--c': color?.hex || '#ccc' }} />
+            <span className="swatch" style={{ '--c': swatchFill(color?.hex) }} />
             <small>{color?.name}</small>
           </div>
         )}

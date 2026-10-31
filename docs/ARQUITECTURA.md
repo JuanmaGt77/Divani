@@ -70,6 +70,8 @@ producto/[slug].astro ─┘          │
 - `src/admin/routes.tsx`: React Router con `basename: '/admin'`; cada sección se carga al abrirla. Las direcciones viejas con `#/` se redirigen.
 - `src/admin/api/`: cliente de Supabase (`client.ts`), conversión de filas a objetos (`mappers.ts`) y la interfaz `api` (`index.ts`) que usan las páginas.
 - Datos: `useData(clave, fn, temas)` + `invalidate(tema)` (`lib/query.ts`); avisos con `toast()`; hojas con `<Sheet>` (`ui/overlays.tsx`); cambios sin guardar con `useUnsavedChanges` (`lib/navigation.ts`).
+- Categorías (`pages/Categories.tsx`, `/admin/categorias`): tarjetas con foto de portada por departamento, ordenar, ocultar y eliminar (solo sin productos). Cada categoría activa sale como filtro en `/tienda`; las de Mujer, también en «Compra por categoría» de la portada.
+- Colores de prenda: selector propio (`ui/color.tsx`) con área de saturación, tono, código, gotero (Chrome y Edge de escritorio) y tonos de temporada; o multicolor de 2 a 6 rayas. Se guarda en `product_colors.hex` como `#RRGGBB` o `#RRGGBB,#RRGGBB,…`; tienda y panel lo pintan con `swatchFill()` (`src/lib/model.ts`). La familia del filtro de color se calcula sola (`guessFamily`).
 
 ## Base de datos (Supabase)
 

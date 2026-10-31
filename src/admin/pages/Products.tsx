@@ -17,7 +17,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { money, plural, relative } from '@/lib/format';
-import { COLOR_FAMILIES, lowStockOf, productStock } from '@/lib/model';
+import { COLOR_FAMILIES, lowStockOf, productStock, swatchFill } from '@/lib/model';
 import type { Product, ProductStatus, ProductVariant, ProductColor, Tone } from '@/lib/types';
 import { api, type ProductPayload } from '../api';
 import { exportCsv, fileStamp } from '../lib/csv';
@@ -430,7 +430,12 @@ export default function Products() {
                     <td>
                       <div className="row" style={{ '--gap': '4px' }}>
                         {p.colors.slice(0, 5).map((c) => (
-                          <span key={c.id} className="swatch" title={c.name} style={{ '--c': c.hex, '--s': '16px' }} />
+                          <span
+                            key={c.id}
+                            className="swatch"
+                            title={c.name}
+                            style={{ '--c': swatchFill(c.hex), '--s': '16px' }}
+                          />
                         ))}
                         {p.colors.length > 5 && <span className="xsmall muted">+{p.colors.length - 5}</span>}
                       </div>

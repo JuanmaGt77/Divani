@@ -46,9 +46,10 @@ Para verificar a mano: `npm run verify`, abrir tienda y panel sin errores en la 
 - `src/lib/`: tipos (`types.ts`), reglas puras de presentación y validación (`model.ts`: SKU, regiones, `DEFAULT_SETTINGS`, `cdn()`…), formato (`format.ts`), filtros del catálogo (`catalog-query.ts`), `rpc.ts` y `env.ts`. Pruebas en `*.test.ts` (vitest).
 
 **Panel** (`src/pages/admin/[...ruta].astro` → `src/admin/App.tsx`, `client:only`):
-- React Router con `basename '/admin'` (`routes.tsx`): `/` resumen, `/pedidos`, `/vender`, `/caja`, `/productos`, `/inventario`, `/clientes`, `/reportes`, `/visitas` (contador de visitas; la franja «Visitas de hoy» del resumen está en `components/VisitsToday.tsx`), `/sitio`, `/ajustes` (`?seccion=tienda|region|pedidos|caja|inventario|integraciones|cuenta|datos`).
+- React Router con `basename '/admin'` (`routes.tsx`): `/` resumen, `/pedidos`, `/vender`, `/caja`, `/productos`, `/categorias` (categorías con foto de portada; hojas de crear/editar en `components/CategorySheets.tsx`, también usadas por «Nueva» en el editor de productos), `/inventario`, `/clientes`, `/reportes`, `/visitas` (contador de visitas; la franja «Visitas de hoy» del resumen está en `components/VisitsToday.tsx`), `/sitio`, `/ajustes` (`?seccion=tienda|region|pedidos|caja|inventario|integraciones|cuenta|datos`).
 - Datos con TanStack Query: `useData(clave, fn, temas)` + `invalidate(tema)` (`lib/query.ts`); avisos con `toast()`; hojas con `<Sheet>` (`ui/overlays.tsx`).
 - `api/index.ts` es la única puerta a Supabase (supabase-js); `api/mappers.ts` convierte filas.
+- Colores de prenda: `product_colors.hex` es un tono (`#RRGGBB`) o multicolor (2 a 6 tonos separados por coma, se pintan como rayas). Usa `colorStops`/`swatchFill` de `src/lib/model.ts` para mostrarlos (nunca `hex` directo en `--c`); la familia del filtro de la tienda se calcula sola con `guessFamily` (multicolor = estampado). Selector propio con gotero en `src/admin/ui/color.tsx`.
 - Ya **no existe modo demostración**.
 
 **Supabase** (`supabase/`):
@@ -82,6 +83,8 @@ Pendiente:
 5. Completar `src/pages/aviso-de-privacidad.astro` (datos marcados con `<mark>`).
 
 **Publicada** en Cloudflare Workers: https://divani.divani.workers.dev (cuenta con sesión de wrangler en esta computadora; para actualizar: `npm run deploy`, que usa `.env.local` con `PUBLIC_SITE_URL=https://divani.divani.workers.dev`). Supabase Auth: Site URL esa dirección; Redirect URLs `…/**` y `http://localhost:5173/**`.
+
+Ya aplicado en Supabase (31 de octubre de 2026): `save_product` acepta colores multicolor (rayas), además de `delete_order` y la corrección de `delete_product`.
 
 Ya aplicado en Supabase (20 de octubre de 2026): bloque de visitas de `schema.sql` (tabla `page_views` y funciones `track_visit`, `visits_summary`, `visits_live`, `visits_forget`), probado de punta a punta en la tienda publicada.
 

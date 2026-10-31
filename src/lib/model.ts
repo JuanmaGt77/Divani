@@ -92,8 +92,38 @@ export const COLOR_FAMILIES: ColorFamily[] = [
   { id: 'estampado', name: 'Estampados', hex: 'pattern' },
 ];
 
-/** Sugiere la familia de color (para el filtro de la tienda) a partir del hex. */
+/**
+ * Un color de prenda es liso («#D9C6A6») o multicolor: de 2 a 6 tonos separados por coma
+ * («#1B1A19,#F0E8D8,#B8895B»), que se muestran como rayas. Se guarda así en product_colors.hex.
+ */
+export const MAX_STRIPES = 6;
+const DEFAULT_HEX = '#D9C6A6';
+
+/** Tonos de un color guardado: uno si es liso, de 2 a 6 si es multicolor (siempre #RRGGBB). */
+export function colorStops(hex: unknown): string[] {
+  const stops = String(hex ?? '')
+    .split(',')
+    .map((s) => s.trim().toUpperCase())
+    .filter((s) => /^#(?:[0-9A-F]{3}){1,2}$/.test(s))
+    .map((s) => (s.length === 4 ? `#${s[1]}${s[1]}${s[2]}${s[2]}${s[3]}${s[3]}` : s))
+    .slice(0, MAX_STRIPES);
+  return stops.length ? stops : [DEFAULT_HEX];
+}
+
+export const isMulticolor = (hex: unknown): boolean => colorStops(hex).length > 1;
+
+/** Fondo CSS de una muestra de color: el tono liso o una raya vertical por tono. */
+export function swatchFill(hex: unknown): string {
+  const stops = colorStops(hex);
+  if (stops.length === 1) return stops[0] as string;
+  const step = 100 / stops.length;
+  const bands = stops.map((c, i) => `${c} ${round2(i * step)}% ${round2((i + 1) * step)}%`);
+  return `linear-gradient(90deg, ${bands.join(', ')})`;
+}
+
+/** Sugiere la familia de color (para el filtro de la tienda) a partir del hex. Multicolor = estampado. */
 export function guessFamily(hex: unknown): string {
+  if (isMulticolor(hex)) return 'estampado';
   const m = /^#?([0-9a-f]{6})$/i.exec(String(hex || '').trim());
   if (!m?.[1]) return 'beige';
   const n = parseInt(m[1], 16);
