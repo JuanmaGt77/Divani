@@ -1330,9 +1330,12 @@ begin
   perform private.require_staff(true);
   delete from public.products where id = p_id returning slug into v_slug;
   if v_slug is null then raise exception 'Ese producto ya no existe.'; end if;
-  update public.lookbooks set hotspots = coalesce((
-    select jsonb_agg(h) from jsonb_array_elements(hotspots) h where h->>'product' <> v_slug
-  ), '[]'::jsonb);
+  -- Quita la prenda de los looks que la tenían. Solo esos: Supabase rechaza un UPDATE sin WHERE
+  update public.lookbooks l set hotspots = coalesce((
+    select jsonb_agg(h) from jsonb_array_elements(l.hotspots) h where h->>'product' is distinct from v_slug
+  ), '[]'::jsonb)
+  where jsonb_typeof(l.hotspots) = 'array'
+    and exists (select 1 from jsonb_array_elements(l.hotspots) h where h->>'product' = v_slug);
   return jsonb_build_object('id', p_id);
 end $$;
 
