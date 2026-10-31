@@ -56,7 +56,7 @@ import {
   cx,
   type MoneyValue,
 } from '../ui/controls';
-import { Sheet, toast, toastError } from '../ui/overlays';
+import { Sheet, confirmDialog, promptDialog, toast, toastError } from '../ui/overlays';
 import { DateRangePicker, resolveRange, type RangeValue } from '../ui/pickers';
 import { Badge, Card, Empty, PageHeader, SkeletonRows, Stat, Tabs, Thumb } from '../ui/surfaces';
 
@@ -227,6 +227,92 @@ function StockView({
       else n.add(key);
       return n;
     });
+
+  // Cada fila es una talla; al eliminar se borra el producto completo de cada fila elegida
+  const [removing, setRemoving] = useState<{ done: number; total: number } | null>(null);
+  const picked = useMemo(() => {
+    const byProduct = new Map<string, { product: VariantEntry['product']; rows: number }>();
+    for (const x of index) {
+      if (!selected.has(x.key)) continue;
+      const p = byProduct.get(x.product.id);
+      if (p) p.rows++;
+      else byProduct.set(x.product.id, { product: x.product, rows: 1 });
+    }
+    return [...byProduct.values()];
+  }, [index, selected]);
+
+  const removeSelected = async () => {
+    const n = picked.length;
+    if (!n || removing) return;
+    const names =
+      picked
+        .slice(0, 5)
+        .map((p) => p.product.name)
+        .join(', ') + (n > 5 ? ` y ${plural(n - 5, 'otro', 'otros')}` : '');
+    const partial = picked.filter((p) => p.rows < p.product.variants.length).length;
+    const message =
+      (n === 1
+        ? 'Se borra definitivamente de Inventario, de Productos y de la tienda, con todos sus colores y tallas. '
+        : `${names}. Se borran definitivamente de Inventario, de Productos y de la tienda, con todos sus colores y tallas. `) +
+      'Los pedidos anteriores conservan sus datos. No se puede deshacer.' +
+      (partial
+        ? ` Ojo: de ${plural(partial, 'producto', 'productos')} elegiste solo algunas tallas, pero se elimina el producto completo.`
+        : '');
+    const title = n === 1 ? `¿Eliminar «${picked[0]!.product.name}»?` : `¿Eliminar ${n} productos?`;
+    // Borrar muchos de una vez pide escribir la palabra, para que no pase por un clic de más
+    if (n >= 5) {
+      const word = await promptDialog({
+        title,
+        message: `${message} Para confirmar, escribe ELIMINAR.`,
+        placeholder: 'ELIMINAR',
+        confirm: 'Eliminar',
+        required: true,
+        danger: true,
+      });
+      if (word === null) return;
+      if (word.toUpperCase() !== 'ELIMINAR') {
+        toast({ title: 'No se eliminó nada', sub: 'Para confirmar hay que escribir ELIMINAR.' });
+        return;
+      }
+    } else if (!(await confirmDialog({ title, message, confirm: 'Eliminar', danger: true }))) {
+      return;
+    }
+
+    const queue = picked.map((p) => p.product.id);
+    const failed = new Set<string>();
+    let firstError: unknown = null;
+    let done = 0;
+    setRemoving({ done, total: n });
+    // De 4 en 4: rápido sin saturar la base
+    await Promise.all(
+      Array.from({ length: Math.min(4, n) }, async () => {
+        for (let id = queue.shift(); id; id = queue.shift()) {
+          try {
+            await api.catalog.remove(id);
+          } catch (err) {
+            // Si otra persona ya lo borró, cuenta como eliminado
+            if (!/ya no existe/i.test(err instanceof Error ? err.message : String(err))) {
+              failed.add(id);
+              firstError ??= err;
+            }
+          }
+          setRemoving({ done: ++done, total: n });
+        }
+      }),
+    );
+    setRemoving(null);
+    invalidate('products', 'inventory');
+    // Quedan seleccionadas solo las filas de lo que no se pudo eliminar, para reintentar
+    setSelected(new Set(index.filter((x) => selected.has(x.key) && failed.has(x.product.id)).map((x) => x.key)));
+    const ok = n - failed.size;
+    if (ok) {
+      toast({
+        title: plural(ok, 'producto eliminado', 'productos eliminados'),
+        sub: 'Ya no aparecen en Inventario, en Productos ni en la tienda.',
+      });
+    }
+    if (failed.size) toastError(firstError, `No se pudieron eliminar ${plural(failed.size, 'producto', 'productos')}`);
+  };
   const exportRows = () =>
     exportCsv(`inventario-${fileStamp()}`, rows, [
       { label: 'Producto', value: (x) => x.product.name },
@@ -269,6 +355,13 @@ function StockView({
             }
           >
             Etiquetas de {selected.size}
+          </Button>
+        )}
+        {picked.length > 0 && (
+          <Button variant="danger" icon={Trash2} loading={!!removing} onClick={() => void removeSelected()}>
+            {removing
+              ? `Eliminando ${removing.done} de ${removing.total}…`
+              : `Eliminar ${plural(picked.length, 'producto', 'productos')}`}
           </Button>
         )}
         <Button icon={Download} onClick={exportRows} disabled={!rows.length}>
@@ -322,10 +415,11 @@ function StockView({
                   <th style={{ width: '44px' }}>
                     <input
                       type="checkbox"
-                      aria-label="Seleccionar todas"
-                      checked={shown.length > 0 && shown.every((x) => selected.has(x.key))}
+                      aria-label={`Seleccionar las ${rows.length} filas`}
+                      title={`Seleccionar las ${rows.length} filas (también las que no se ven)`}
+                      checked={rows.length > 0 && rows.every((x) => selected.has(x.key))}
                       onChange={(e) =>
-                        setSelected(e.currentTarget.checked ? new Set(shown.map((x) => x.key)) : new Set())
+                        setSelected(e.currentTarget.checked ? new Set(rows.map((x) => x.key)) : new Set())
                       }
                     />
                   </th>
