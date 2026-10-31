@@ -799,6 +799,27 @@ begin
   return jsonb_build_object('id', o.id, 'status', p_status);
 end $$;
 
+-- Eliminar un pedido: solo administración y solo si está cancelado (al cancelarlo ya se devolvieron
+-- sus prendas al inventario y, si estaba pagado, el efectivo). Se borran sus prendas e historial;
+-- el kardex conserva sus movimientos con el folio en la referencia. El folio no se vuelve a usar.
+create or replace function public.delete_order(p_id uuid) returns jsonb
+language plpgsql security definer set search_path = public, pg_temp as $$
+declare
+  o public.orders;
+begin
+  perform private.require_staff(true);
+  select * into o from public.orders where id = p_id for update;
+  if not found then raise exception 'Ese pedido ya no existe.'; end if;
+  if o.status <> 'cancelado' then
+    raise exception 'Solo se pueden eliminar pedidos cancelados. Cancela el pedido % primero.', o.number;
+  end if;
+  if o.stock_applied then raise exception 'El pedido % todavía tiene prendas descontadas del inventario.', o.number; end if;
+  delete from public.orders where id = p_id;
+  return jsonb_build_object('id', p_id, 'number', o.number);
+end $$;
+revoke execute on function public.delete_order(uuid) from public, anon;
+grant execute on function public.delete_order(uuid) to authenticated;
+
 create or replace function public.order_set_payment(
   p_order uuid, p_status text, p_method text default null, p_payments jsonb default null, p_note text default ''
 ) returns jsonb

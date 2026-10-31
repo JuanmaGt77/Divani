@@ -21,6 +21,7 @@ import {
   ShoppingBag,
   StickyNote,
   Store,
+  Trash2,
   Undo2,
   Wallet,
 } from 'lucide-react';
@@ -32,7 +33,7 @@ import { printOrderSlip, printTicket } from '../lib/documents';
 import { navigate } from '../lib/navigation';
 import { FLOW, appliesStock, deliveryName, discountTotal, nextStep, paymentName } from '../lib/orders';
 import { invalidate, useData } from '../lib/query';
-import { settingsStore } from '../lib/session';
+import { session, settingsStore } from '../lib/session';
 import { orderTemplates, ticketMessage, waLink } from '../lib/whatsapp';
 import { Button, IconButton, MoneyField, SelectField, Stepper, TextField, cx, type MoneyValue } from '../ui/controls';
 import { Sheet, confirmDialog, promptDialog, toast, toastError, type ToastOptions } from '../ui/overlays';
@@ -53,6 +54,7 @@ import {
 export default function OrderDetail() {
   const { id = '' } = useParams();
   const settings = useStore(settingsStore);
+  const isAdmin = useStore(session).user?.role === 'admin';
   const { data: order, loading, error } = useData(['orders', 'detail', id], () => api.orders.get(id), ['orders']);
   const [busy, setBusy] = useState(false);
   const [paySheet, setPaySheet] = useState(false);
@@ -147,6 +149,29 @@ export default function OrderDetail() {
     });
   };
 
+  // Solo un pedido cancelado se puede eliminar: sus prendas y su pago ya se devolvieron al cancelarlo
+  const remove = async () => {
+    const what = isPos ? 'la venta' : 'el pedido';
+    const ok = await confirmDialog({
+      title: `¿Eliminar ${what} ${order.number}?`,
+      message:
+        'Se borra definitivamente con sus prendas y su historial. El inventario no cambia (las piezas regresaron al cancelarlo) y el folio no se vuelve a usar. No se puede deshacer.',
+      confirm: 'Eliminar',
+      danger: true,
+    });
+    if (!ok) return;
+    setBusy(true);
+    try {
+      await api.orders.remove(order.id);
+      navigate('/pedidos', { replace: true });
+      invalidate('orders', 'cash');
+      toast({ title: `${isPos ? 'Venta' : 'Pedido'} ${order.number} eliminado` });
+    } catch (err) {
+      toastError(err);
+      setBusy(false);
+    }
+  };
+
   const saveNotes = () => run(() => api.orders.update(order.id, { internalNotes: notes }), { title: 'Nota guardada' });
   const copy = async (text: string, label: string) => {
     try {
@@ -215,7 +240,17 @@ export default function OrderDetail() {
 
       {!isPos && !closed && <FlowBar order={order} />}
       {closed && (
-        <Banner tone="danger" icon={Ban}>
+        <Banner
+          tone="danger"
+          icon={Ban}
+          action={
+            isAdmin && (
+              <Button size="sm" variant="danger" icon={Trash2} loading={busy} onClick={() => void remove()}>
+                Eliminar
+              </Button>
+            )
+          }
+        >
           <strong>{isPos ? 'Venta cancelada' : 'Pedido cancelado'}</strong>{' '}
           {order.cancelledAt && `· ${relative(order.cancelledAt)}`}
           {order.cancelReason ? ` · «${order.cancelReason}»` : ''}
@@ -440,11 +475,18 @@ export default function OrderDetail() {
             </Card>
           )}
 
-          {!closed && (
+          {!closed ? (
             <button type="button" className="danger-link" onClick={() => void setStatus('cancelado')}>
               <Ban aria-hidden="true" />
               {isPos ? 'Cancelar venta (devolución)' : 'Cancelar pedido'}
             </button>
+          ) : (
+            isAdmin && (
+              <button type="button" className="danger-link" disabled={busy} onClick={() => void remove()}>
+                <Trash2 aria-hidden="true" />
+                {isPos ? 'Eliminar venta' : 'Eliminar pedido'}
+              </button>
+            )
           )}
         </aside>
       </div>

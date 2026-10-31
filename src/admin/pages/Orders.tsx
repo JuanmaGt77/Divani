@@ -2,18 +2,20 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { useStore } from '@nanostores/react';
-import { ChevronRight, Download, Globe, ScanBarcode, ShoppingBag, Store } from 'lucide-react';
+import { ChevronRight, Download, Globe, ScanBarcode, ShoppingBag, Store, Trash2 } from 'lucide-react';
 import { dateTime, money, phone, plural, relative } from '@/lib/format';
 import { ORDER_STATUSES, channelInfo, paymentInfo, statusInfo } from '@/lib/model';
 import type { Order } from '@/lib/types';
 import { api } from '../api';
+import { confirmDelete, eachInBatches } from '../lib/bulk';
 import { exportCsv, fileStamp } from '../lib/csv';
 import { matches, useIsMobile } from '../lib/hooks';
 import { navigate, useSearch } from '../lib/navigation';
 import { deliveryName, paymentName } from '../lib/orders';
-import { useData } from '../lib/query';
-import { settingsStore } from '../lib/session';
+import { invalidate, useData } from '../lib/query';
+import { session, settingsStore } from '../lib/session';
 import { Button, Chip, SearchField, Segmented } from '../ui/controls';
+import { toast, toastError } from '../ui/overlays';
 import { DateRangePicker, resolveRange, type RangeValue } from '../ui/pickers';
 import { Card, Empty, PageHeader, PaymentBadge, SkeletonRows, StatusBadge, Thumb } from '../ui/surfaces';
 
@@ -75,6 +77,37 @@ export default function Orders() {
   const pending = rows
     .filter((o) => o.status !== 'cancelado' && o.paymentStatus === 'pendiente')
     .reduce((a, o) => a + o.total, 0);
+
+  // Eliminar de una vez los cancelados que están a la vista (solo administración)
+  const isAdmin = useStore(session).user?.role === 'admin';
+  const cancelled = rows.filter((o) => o.status === 'cancelado');
+  const [removing, setRemoving] = useState<{ done: number; total: number } | null>(null);
+  const removeCancelled = async () => {
+    const n = cancelled.length;
+    if (!n || removing) return;
+    const folios = cancelled
+      .slice(0, 6)
+      .map((o) => o.number)
+      .join(', ');
+    const ok = await confirmDelete({
+      count: n,
+      title: n === 1 ? `¿Eliminar el pedido cancelado ${cancelled[0]!.number}?` : `¿Eliminar ${n} pedidos cancelados?`,
+      message:
+        `${n > 1 ? `${folios}${n > 6 ? ` y ${plural(n - 6, 'otro', 'otros')}` : ''}. ` : ''}` +
+        'Se borran definitivamente con sus prendas y su historial. El inventario no cambia (las piezas regresaron al cancelarlos). No se puede deshacer.',
+    });
+    if (!ok) return;
+    setRemoving({ done: 0, total: n });
+    const { failed, error } = await eachInBatches(
+      cancelled.map((o) => o.id),
+      (id) => api.orders.remove(id),
+      { onProgress: (done) => setRemoving({ done, total: n }) },
+    );
+    setRemoving(null);
+    invalidate('orders', 'cash');
+    if (n - failed.size) toast({ title: plural(n - failed.size, 'pedido eliminado', 'pedidos eliminados') });
+    if (failed.size) toastError(error, `No se pudieron eliminar ${plural(failed.size, 'pedido', 'pedidos')}`);
+  };
 
   const exportRows = () =>
     exportCsv<Order>(`pedidos-${fileStamp()}`, rows, [
@@ -157,16 +190,33 @@ export default function Orders() {
         </select>
       </div>
       {orders && (
-        <p className="muted small" style={{ margin: '-4px 0 12px' }}>
-          {plural(rows.length, 'pedido', 'pedidos')} ·{' '}
-          {money(rows.filter((o) => o.status !== 'cancelado').reduce((a, o) => a + o.total, 0))}
-          {pending > 0 && (
-            <>
-              {' '}
-              · <span style={{ color: 'var(--amber)' }}>{money(pending)} por cobrar</span>
-            </>
+        <div className="row row--between row--wrap orders-summary">
+          <p className="muted small">
+            {plural(rows.length, 'pedido', 'pedidos')} ·{' '}
+            {money(rows.filter((o) => o.status !== 'cancelado').reduce((a, o) => a + o.total, 0))}
+            {pending > 0 && (
+              <>
+                {' '}
+                · <span style={{ color: 'var(--amber)' }}>{money(pending)} por cobrar</span>
+              </>
+            )}
+          </p>
+          {isAdmin && cancelled.length > 0 && (
+            <Button
+              size="sm"
+              variant="danger"
+              icon={Trash2}
+              loading={!!removing}
+              onClick={() => void removeCancelled()}
+            >
+              {removing
+                ? `Eliminando ${removing.done} de ${removing.total}…`
+                : cancelled.length === 1
+                  ? 'Eliminar el cancelado'
+                  : `Eliminar los ${cancelled.length} cancelados`}
+            </Button>
           )}
-        </p>
+        </div>
       )}
 
       <Card bodyClass={false} className={refreshing && orders ? 'is-refreshing' : ''}>

@@ -145,6 +145,7 @@ details.advanced[open] summary::before { content: "－ "; }
 .hint-box svg { width: 20px; height: 20px; flex: none; color: var(--accent-ink); }
 
 /* ---------- Pedidos ---------- */
+.orders-summary { margin: -4px 0 12px; --gap: 8px 12px; min-height: 34px; }
 .order-num { display: flex; align-items: center; gap: 10px; }
 .order-num__icon { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; background: var(--fill); color: var(--text-2); flex: none; }
 .order-num__icon svg { width: 16px; height: 16px; }

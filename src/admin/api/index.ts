@@ -339,6 +339,8 @@ export const api = {
     },
     setStatus: (id: string, status: string, { note = '', reason = '' }: { note?: string; reason?: string } = {}) =>
       rpc('order_set_status', { p_order: id, p_status: status, p_note: reason || note }),
+    /** Elimina un pedido cancelado (solo administración). */
+    remove: (id: string) => rpc('delete_order', { p_id: id }),
     setPayment: (
       id: string,
       {

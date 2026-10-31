@@ -73,7 +73,7 @@ producto/[slug].astro ─┘          │
 
 ## Base de datos (Supabase)
 
-- `supabase/schema.sql`: tablas, seguridad por fila (RLS) y **todas** las reglas del negocio como funciones: `storefront`, `product_page`, `storefront_sitemap`, `place_order`, `track_visit` (públicas) y `pos_checkout`, `order_set_status`, `order_set_payment`, `order_update`, `cash_*`, `inventory_*`, `save_product`, `delete_product`, `save_category`, `delete_category`, `save_department`, `reorder_rows`, `set_integration_secret`, `integrations_status`, `cloudinary_signature`, `whoami`, `visits_summary`, `visits_live`, `visits_forget` (equipo). Las visitas viven en `page_views` (solo lectura para el equipo; se borran solas a los 13 meses). Se puede volver a ejecutar.
+- `supabase/schema.sql`: tablas, seguridad por fila (RLS) y **todas** las reglas del negocio como funciones: `storefront`, `product_page`, `storefront_sitemap`, `place_order`, `track_visit` (públicas) y `pos_checkout`, `order_set_status`, `order_set_payment`, `order_update`, `delete_order` (solo pedidos cancelados), `cash_*`, `inventory_*`, `save_product`, `delete_product`, `save_category`, `delete_category`, `save_department`, `reorder_rows`, `set_integration_secret`, `integrations_status`, `cloudinary_signature`, `whoami`, `visits_summary`, `visits_live`, `visits_forget` (equipo). Las visitas viven en `page_views` (solo lectura para el equipo; se borran solas a los 13 meses). Se puede volver a ejecutar.
 - `private.store_products` (vista): cada prenda a la venta ya en el formato de la tienda; la usan `storefront()` y `product_page()`.
 - `supabase/datos/*.json` → `npm run seed:build` → `supabase/seed.sql` (no se edita a mano).
 - `supabase/actualizaciones/*.sql`: correcciones de datos para bases que ya existían.

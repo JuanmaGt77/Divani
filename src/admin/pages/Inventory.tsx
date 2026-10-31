@@ -34,13 +34,14 @@ import {
   type LabelItem,
   type VariantEntry,
 } from '../lib/catalog';
+import { confirmDelete, eachInBatches } from '../lib/bulk';
 import { exportCsv, fileStamp } from '../lib/csv';
 import { useIsMobile } from '../lib/hooks';
 import { useSearch } from '../lib/navigation';
 import { printDocument } from '../lib/print';
 import { invalidate, useData } from '../lib/query';
 import { inventoryValue } from '../lib/reports';
-import { settingsStore } from '../lib/session';
+import { session, settingsStore } from '../lib/session';
 import {
   Button,
   Checkbox,
@@ -56,7 +57,7 @@ import {
   cx,
   type MoneyValue,
 } from '../ui/controls';
-import { Sheet, confirmDialog, promptDialog, toast, toastError } from '../ui/overlays';
+import { Sheet, toast, toastError } from '../ui/overlays';
 import { DateRangePicker, resolveRange, type RangeValue } from '../ui/pickers';
 import { Badge, Card, Empty, PageHeader, SkeletonRows, Stat, Tabs, Thumb } from '../ui/surfaces';
 
@@ -228,7 +229,9 @@ function StockView({
       return n;
     });
 
-  // Cada fila es una talla; al eliminar se borra el producto completo de cada fila elegida
+  // Cada fila es una talla; al eliminar se borra el producto completo de cada fila elegida.
+  // Solo administración puede eliminar (lo exige también la base).
+  const isAdmin = useStore(session).user?.role === 'admin';
   const [removing, setRemoving] = useState<{ done: number; total: number } | null>(null);
   const picked = useMemo(() => {
     const byProduct = new Map<string, { product: VariantEntry['product']; rows: number }>();
@@ -259,46 +262,13 @@ function StockView({
         ? ` Ojo: de ${plural(partial, 'producto', 'productos')} elegiste solo algunas tallas, pero se elimina el producto completo.`
         : '');
     const title = n === 1 ? `¿Eliminar «${picked[0]!.product.name}»?` : `¿Eliminar ${n} productos?`;
-    // Borrar muchos de una vez pide escribir la palabra, para que no pase por un clic de más
-    if (n >= 5) {
-      const word = await promptDialog({
-        title,
-        message: `${message} Para confirmar, escribe ELIMINAR.`,
-        placeholder: 'ELIMINAR',
-        confirm: 'Eliminar',
-        required: true,
-        danger: true,
-      });
-      if (word === null) return;
-      if (word.toUpperCase() !== 'ELIMINAR') {
-        toast({ title: 'No se eliminó nada', sub: 'Para confirmar hay que escribir ELIMINAR.' });
-        return;
-      }
-    } else if (!(await confirmDialog({ title, message, confirm: 'Eliminar', danger: true }))) {
-      return;
-    }
+    if (!(await confirmDelete({ title, message, count: n }))) return;
 
-    const queue = picked.map((p) => p.product.id);
-    const failed = new Set<string>();
-    let firstError: unknown = null;
-    let done = 0;
-    setRemoving({ done, total: n });
-    // De 4 en 4: rápido sin saturar la base
-    await Promise.all(
-      Array.from({ length: Math.min(4, n) }, async () => {
-        for (let id = queue.shift(); id; id = queue.shift()) {
-          try {
-            await api.catalog.remove(id);
-          } catch (err) {
-            // Si otra persona ya lo borró, cuenta como eliminado
-            if (!/ya no existe/i.test(err instanceof Error ? err.message : String(err))) {
-              failed.add(id);
-              firstError ??= err;
-            }
-          }
-          setRemoving({ done: ++done, total: n });
-        }
-      }),
+    setRemoving({ done: 0, total: n });
+    const { failed, error: firstError } = await eachInBatches(
+      picked.map((p) => p.product.id),
+      (id) => api.catalog.remove(id),
+      { onProgress: (done) => setRemoving({ done, total: n }) },
     );
     setRemoving(null);
     invalidate('products', 'inventory');
@@ -357,7 +327,7 @@ function StockView({
             Etiquetas de {selected.size}
           </Button>
         )}
-        {picked.length > 0 && (
+        {isAdmin && picked.length > 0 && (
           <Button variant="danger" icon={Trash2} loading={!!removing} onClick={() => void removeSelected()}>
             {removing
               ? `Eliminando ${removing.done} de ${removing.total}…`
