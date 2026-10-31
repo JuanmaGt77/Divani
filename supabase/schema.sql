@@ -1508,10 +1508,14 @@ begin
   v_root := coalesce(nullif(cfg->>'folder', ''), 'divani');
   v_folder := coalesce(nullif(p_params->>'folder', ''), v_root);
   if v_folder <> v_root and v_folder not like v_root || '/%' then raise exception 'Carpeta no permitida.'; end if;
-  -- Solo se firman parámetros conocidos
+  -- Solo se firman parámetros conocidos. «format» y «transformation» sirven para que Cloudinary
+  -- guarde en WebP y achique las fotos que el navegador no pudo convertir (Safari, HEIC).
   select coalesce(jsonb_object_agg(key, value), '{}'::jsonb) into params
   from jsonb_each_text(coalesce(p_params, '{}'::jsonb))
-  where key in ('public_id', 'tags', 'overwrite', 'unique_filename', 'use_filename', 'context') and value <> '';
+  where value <> ''
+    and (key in ('public_id', 'tags', 'overwrite', 'unique_filename', 'use_filename', 'context')
+         or (key = 'format' and value = 'webp')
+         or (key = 'transformation' and value ~ '^c_limit,w_[0-9]{2,4},h_[0-9]{2,4}$'));
   params := params || jsonb_build_object('folder', v_folder, 'timestamp', v_ts::text);
   select string_agg(key || '=' || value, '&' order by key) into to_sign from jsonb_each_text(params);
   return jsonb_build_object(

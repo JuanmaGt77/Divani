@@ -17,6 +17,7 @@ import {
   Download,
   ExternalLink,
   Globe,
+  ImageDown,
   Info,
   KeyRound,
   LogOut,
@@ -48,6 +49,7 @@ import type {
 import { api } from '../api';
 import { download, fileStamp } from '../lib/csv';
 import { printTicket } from '../lib/documents';
+import { MAX_SIDE, savingsText } from '../lib/images';
 import { useIsMobile } from '../lib/hooks';
 import { useSearch, useUnsavedChanges } from '../lib/navigation';
 import { invalidate, useData } from '../lib/query';
@@ -1088,11 +1090,11 @@ function IntegrationsSection() {
       }
       const blob = await new Promise<Blob | null>((r) => c.toBlob(r, 'image/png'));
       if (!blob) throw new Error('No se pudo preparar la foto de prueba.');
-      const url = await api.media.upload(new File([blob], 'prueba-divani.png', { type: 'image/png' }), {
+      const res = await api.media.upload(new File([blob], 'prueba-divani.png', { type: 'image/png' }), {
         kind: 'image',
         folder: `${cl?.folder || 'divani'}/pruebas`,
       });
-      toast({ title: 'Conexión correcta', sub: url.replace(/^https:\/\//, '').slice(0, 60) });
+      toast({ title: 'Conexión correcta', sub: savingsText(res) });
     } catch (err) {
       toastError(err, 'La prueba falló');
     } finally {
@@ -1142,6 +1144,19 @@ function IntegrationsSection() {
                   {ready
                     ? `Carpeta «${cl?.folder}» en la nube «${cl?.cloudName}».`
                     : 'Copia los datos de tu cuenta en Cloudinary → Settings → API Keys.'}
+                </p>
+              </div>
+            </div>
+            <div className="conn-row">
+              <span className="conn-row__dot is-ok" aria-hidden="true">
+                <ImageDown />
+              </span>
+              <div className="grow">
+                <strong>Fotos ligeras automáticamente</strong>
+                <p className="small muted">
+                  Cada foto se convierte a WebP y se reduce a {MAX_SIDE} px como máximo al subirla: una foto de 3 MB
+                  queda en unos 100 a 300 KB sin que se note la diferencia. Además, la tienda le envía a cada clienta la
+                  versión del tamaño justo para su pantalla.
                 </p>
               </div>
             </div>

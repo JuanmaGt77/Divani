@@ -1,9 +1,38 @@
 /**
  * Fotos y videos: compresión en el navegador antes de subir y subida firmada a Cloudinary
  * (con progreso). La firma la hace Supabase: el API Secret nunca llega a la página.
+ * Las fotos se guardan en WebP y con el lado mayor de hasta MAX_SIDE px: las convierte el
+ * navegador y, si no puede (Safari, fotos HEIC), Cloudinary al recibirlas.
  */
+import { number } from '@/lib/format';
 
 export type MediaKind = 'image' | 'video';
+
+/** Lado mayor máximo de las fotos que se guardan. */
+export const MAX_SIDE = 2000;
+
+/** Lo que devuelve una subida: dirección y pesos antes y después. */
+export interface UploadedMedia {
+  url: string;
+  /** Bytes del archivo que se eligió. */
+  before: number;
+  /** Bytes que guardó Cloudinary. */
+  after: number;
+  /** Formato guardado (webp, jpg, mp4…). */
+  format: string;
+}
+
+/** 2 870 000 → «2,7 MB»; 112 000 → «109 KB». */
+export const fileSize = (bytes: number): string =>
+  bytes >= 1048576 ? `${number(bytes / 1048576, 1)} MB` : `${number(Math.max(1, bytes / 1024))} KB`;
+
+/** «2,7 MB → 109 KB en WebP (96 % menos)» para los avisos al subir fotos. */
+export function savingsText({ before, after, format }: Pick<UploadedMedia, 'before' | 'after' | 'format'>): string {
+  const name = format === 'webp' ? 'WebP' : format.toUpperCase();
+  const fmt = name ? ` en ${name}` : '';
+  if (!before || !after || after >= before) return `Guardada${fmt} (${fileSize(after || before)})`;
+  return `${fileSize(before)} → ${fileSize(after)}${fmt} (${Math.round((1 - after / before) * 100)} % menos)`;
+}
 
 export interface SignedUpload {
   signature: string;
@@ -27,7 +56,7 @@ function canEncodeWebp(): boolean {
 }
 
 /** Reduce una foto (lado mayor ≤ maxSide) y la convierte a WebP (o JPEG si el navegador no puede). */
-export async function compressImage(file: File, { maxSide = 2000, quality = 0.86 } = {}): Promise<File> {
+export async function compressImage(file: File, { maxSide = MAX_SIDE, quality = 0.86 } = {}): Promise<File> {
   if (!file?.type?.startsWith('image/') || /svg|gif/.test(file.type)) return file;
   let bitmap: ImageBitmap;
   try {
@@ -76,7 +105,7 @@ export function cloudinaryUpload(
   file: Blob,
   signed: SignedUpload,
   { kind = 'image', onProgress }: { kind?: MediaKind; onProgress?: (p: number) => void } = {},
-): Promise<{ secure_url: string }> {
+): Promise<{ secure_url: string; bytes: number; format: string }> {
   return new Promise((resolve, reject) => {
     const fd = new FormData();
     fd.append('file', file);
@@ -92,7 +121,7 @@ export function cloudinaryUpload(
       if (e.lengthComputable) onProgress?.(Math.min(0.98, e.loaded / e.total));
     };
     xhr.onload = () => {
-      let data: { secure_url?: string; error?: { message?: string } } | null = null;
+      let data: { secure_url?: string; bytes?: number; format?: string; error?: { message?: string } } | null = null;
       try {
         data = JSON.parse(xhr.responseText);
       } catch {
@@ -100,7 +129,7 @@ export function cloudinaryUpload(
       }
       if (xhr.status >= 200 && xhr.status < 300 && data?.secure_url) {
         onProgress?.(1);
-        resolve({ secure_url: data.secure_url });
+        resolve({ secure_url: data.secure_url, bytes: Number(data.bytes) || 0, format: String(data.format || '') });
       } else {
         reject(
           new Error(

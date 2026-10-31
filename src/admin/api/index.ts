@@ -21,7 +21,15 @@ import type {
   Taxonomy,
   VisitsSummary,
 } from '@/lib/types';
-import { compressImage, cloudinaryUpload, validateFile, type MediaKind, type SignedUpload } from '../lib/images';
+import {
+  MAX_SIDE,
+  compressImage,
+  cloudinaryUpload,
+  validateFile,
+  type MediaKind,
+  type SignedUpload,
+  type UploadedMedia,
+} from '../lib/images';
 import { all, client, friendly, q, rpc } from './client';
 import {
   bannerFromRow,
@@ -499,13 +507,19 @@ export const api = {
         folder = 'divani',
         onProgress,
       }: { kind?: MediaKind; folder?: string; onProgress?: (p: number) => void } = {},
-    ): Promise<string> {
+    ): Promise<UploadedMedia> {
       validateFile(file, { kind });
       onProgress?.(0.02);
       const body = kind === 'video' ? file : await compressImage(file);
-      const signed = await rpc<SignedUpload>('cloudinary_signature', { p_params: { folder } });
+      // Si el navegador no pudo dejarla en WebP (Safari, fotos HEIC), la convierte y achica Cloudinary
+      const convert = kind === 'image' && body.type !== 'image/webp' && !/svg|gif/.test(body.type);
+      const signed = await rpc<SignedUpload>('cloudinary_signature', {
+        p_params: convert
+          ? { folder, format: 'webp', transformation: `c_limit,w_${MAX_SIDE},h_${MAX_SIDE}` }
+          : { folder },
+      });
       const res = await cloudinaryUpload(body, signed, { kind, ...(onProgress ? { onProgress } : {}) });
-      return res.secure_url;
+      return { url: res.secure_url, before: file.size, after: res.bytes || body.size, format: res.format };
     },
   },
 

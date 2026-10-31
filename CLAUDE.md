@@ -58,7 +58,7 @@ Para verificar a mano: `npm run verify`, abrir tienda y panel sin errores en la 
 - `actualizaciones/*.sql`: correcciones de datos para la base que ya existe (idempotentes, en orden por fecha).
 - Administradores: los correos de `private.bootstrap_admins` (incluye `somosdivani@gmail.com`) reciben acceso al crear su usuario.
 
-**Cloudinary**: subidas firmadas. El API Secret vive cifrado en `private.secrets` (se guarda con `set_integration_secret` desde Configuración → Conexiones); `cloudinary_signature` firma en el servidor. Fotos en la carpeta `divani/…`. Cloud name: `ompbjpp9`.
+**Cloudinary**: subidas firmadas. El API Secret vive cifrado en `private.secrets` (se guarda con `set_integration_secret` desde Configuración → Conexiones); `cloudinary_signature` firma en el servidor. Fotos en la carpeta `divani/…`. Cloud name: `ompbjpp9`. Las fotos se guardan en WebP de máximo 2000 px: las convierte el navegador (`compressImage` en `src/admin/lib/images.ts`) y, si no puede (Safari, HEIC), Cloudinary con `format=webp` y `c_limit` (los únicos extras que acepta firmar `cloudinary_signature`). Al subir, el aviso dice cuánto pesaba y cuánto quedó (`savingsText`).
 
 ## Reglas al cambiar código
 
@@ -84,7 +84,7 @@ Pendiente:
 
 **Publicada** en Cloudflare Workers: https://divani.divani.workers.dev (cuenta con sesión de wrangler en esta computadora; para actualizar: `npm run deploy`, que usa `.env.local` con `PUBLIC_SITE_URL=https://divani.divani.workers.dev`). Supabase Auth: Site URL esa dirección; Redirect URLs `…/**` y `http://localhost:5173/**`.
 
-Ya aplicado en Supabase (31 de octubre de 2026): `save_product` acepta colores multicolor (rayas), además de `delete_order` y la corrección de `delete_product`.
+Ya aplicado en Supabase (31 de octubre de 2026): `cloudinary_signature` firma la conversión a WebP; `save_product` acepta colores multicolor (rayas), además de `delete_order` y la corrección de `delete_product`.
 
 Ya aplicado en Supabase (20 de octubre de 2026): bloque de visitas de `schema.sql` (tabla `page_views` y funciones `track_visit`, `visits_summary`, `visits_live`, `visits_forget`), probado de punta a punta en la tienda publicada.
 

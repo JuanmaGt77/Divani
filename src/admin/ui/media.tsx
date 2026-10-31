@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { cdn } from '@/lib/model';
 import { api } from '../api';
-import type { MediaKind } from '../lib/images';
+import { savingsText, type MediaKind, type UploadedMedia } from '../lib/images';
 import { cx, IconButton } from './controls';
 import { promptDialog, toast, toastError } from './overlays';
 
@@ -26,7 +26,7 @@ const isVideoUrl = (u: string | null | undefined): boolean =>
 
 function useUploader({ kind = 'image', folder = 'divani' }: { kind?: MediaKind; folder?: string } = {}) {
   const [progress, setProgress] = useState<number | null>(null);
-  const run = async (file: File): Promise<string> => {
+  const run = async (file: File): Promise<UploadedMedia> => {
     setProgress(0.02);
     try {
       return await api.media.upload(file, { kind, folder, onProgress: (p) => setProgress(p) });
@@ -85,9 +85,13 @@ export function MediaField({
   const pick = async (file: File | null | undefined) => {
     if (!file) return;
     try {
-      const url = await upload(file);
-      onChange(url);
-      toast({ title: kind === 'video' ? 'Video listo' : 'Foto lista', sub: 'Recuerda guardar los cambios.' });
+      const res = await upload(file);
+      onChange(res.url);
+      toast(
+        kind === 'video'
+          ? { title: 'Video listo', sub: 'Recuerda guardar los cambios.' }
+          : { title: 'Foto lista', sub: `${savingsText(res)}. Recuerda guardar los cambios.` },
+      );
     } catch (err) {
       toastError(err, 'No se pudo subir');
     }
@@ -197,22 +201,35 @@ export function Gallery({
     const list = Array.from(files || []).slice(0, Math.max(0, max - images.length));
     if (!list.length) return;
     let current = [...images];
+    const done: UploadedMedia[] = [];
     for (let i = 0; i < list.length; i++) {
       const file = list[i]!;
       setBusy({ i: i + 1, n: list.length, p: 0 });
       try {
-        const url = await api.media.upload(file, {
+        const res = await api.media.upload(file, {
           kind: 'image',
           folder,
           onProgress: (p) => setBusy({ i: i + 1, n: list.length, p }),
         });
-        current = [...current, url];
+        done.push(res);
+        current = [...current, res.url];
         onChange(current);
       } catch (err) {
         toastError(err, `No se pudo subir ${file.name}`);
       }
     }
     setBusy(null);
+    if (done.length) {
+      const formats = new Set(done.map((d) => d.format));
+      toast({
+        title: done.length === 1 ? 'Foto lista' : `${done.length} fotos listas`,
+        sub: savingsText({
+          before: done.reduce((a, d) => a + d.before, 0),
+          after: done.reduce((a, d) => a + d.after, 0),
+          format: formats.size === 1 ? [...formats][0]! : '',
+        }),
+      });
+    }
   };
   const move = (from: number, to: number) => {
     if (to < 0 || to >= images.length || from === to) return;
