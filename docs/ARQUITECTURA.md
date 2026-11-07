@@ -9,13 +9,15 @@ Un solo proyecto de **Astro 7** con **React 19** y **TypeScript** estricto, publ
 | Panel: `/admin/…` | En el Worker (cualquier dirección abre la aplicación) + React en el navegador | `src/pages/admin/[...ruta].astro`, `src/admin/` |
 | `sitemap.xml`, `robots.txt` | En el Worker | `src/pages/*.ts` |
 | `/api/visita` (contador de visitas) | En el Worker | `src/pages/api/visita.ts` |
+| `/api/estudio/…` (Estudio IA, solo administradores) | En el Worker + cola de Cloudflare | `src/pages/api/estudio/`, `src/estudio/`, `src/worker.ts` |
 
 ## Configuración y variables
 
 - `astro.config.mjs`: adaptador de Cloudflare, React, direcciones limpias (`build.format: 'file'`, sin `/` final) y el esquema de variables `astro:env`. Si falta `PUBLIC_SUPABASE_URL` o `PUBLIC_SUPABASE_PUBLISHABLE_KEY`, la compilación falla.
 - `PUBLIC_SITE_URL` (opcional) es la dirección pública: se usa en las vistas previas al compartir, la dirección canónica y el mapa del sitio.
 - `src/lib/env.ts` lee las variables; `src/lib/rpc.ts` llama a las funciones públicas de Supabase con `fetch` (sirve en el navegador y en el Worker).
-- `wrangler.jsonc`: nombre del Worker, fecha de compatibilidad y `nodejs_compat`. El adaptador agrega el resto al compilar.
+- `wrangler.jsonc`: nombre del Worker, entrada propia (`src/worker.ts`), fecha de compatibilidad, `nodejs_compat` y la cola `divani-estudio`. El adaptador agrega el resto al compilar.
+- `src/worker.ts`: `fetch` pasa cada petición a Astro y `queue` atiende la cola de Estudio IA.
 
 ## Tienda
 
@@ -73,9 +75,30 @@ producto/[slug].astro ─┘          │
 - Categorías (`pages/Categories.tsx`, `/admin/categorias`): tarjetas con foto de portada por departamento, ordenar, ocultar y eliminar (solo sin productos). Cada categoría activa sale como filtro en `/tienda`; las de Mujer, también en «Compra por categoría» de la portada.
 - Colores de prenda: selector propio (`ui/color.tsx`) con área de saturación, tono, código, gotero (Chrome y Edge de escritorio) y tonos de temporada; o multicolor de 2 a 6 rayas. Se guarda en `product_colors.hex` como `#RRGGBB` o `#RRGGBB,#RRGGBB,…`; tienda y panel lo pintan con `swatchFill()` (`src/lib/model.ts`). La familia del filtro de color se calcula sola (`guessFamily`).
 
+### Estudio IA (Productos → Crear con IA)
+
+Con la foto de una prenda genera la foto en gancho, la foto con modelo y la ficha, usando la API de OpenAI. Viene del proyecto `divani-estudio`, que era un servidor aparte con los trabajos en memoria.
+
+```
+Teléfono ── fotos (JPG 2048 px) ──► Cloudinary  divani/estudio/originales
+Teléfono ── direcciones ──► /api/estudio/trabajos ──► estudio_crear + 2 mensajes en la cola
+Cola:  prenda ──────────────► OpenAI ─► Cloudinary (WebP) ─► Supabase
+       ficha ─► Supabase ─► modelo ─► OpenAI ─► Cloudinary (WebP) ─► Supabase
+Teléfono ◄── estudio_estado cada 2.5 s (directo a Supabase, sin pasar por el Worker)
+```
+
+- **Por qué una cola**: una foto tarda 1–2 minutos. Una petición de Workers se puede cancelar cuando el teléfono se desconecta y `waitUntil` solo da 30 s más; la memoria tampoco se conserva entre peticiones. Un consumidor de cola dura hasta 15 minutos sin depender del teléfono. Necesita el plan **Workers Paid**: en el gratis, 10 ms de CPU no alcanzan para leer la imagen que devuelve OpenAI.
+- **Estado**: todo vive en `estudio_trabajos`. Cada paso (`ficha`, `prenda`, `modelo`) tiene estado e `intento`; `estudio_worker_tomar` lo reserva, así que un mensaje repetido no vuelve a generar ni a cobrar. La cola corta cada paso a los 11 minutos y `estudio_estado` da por cortado el que lleve 12 (o 15 en espera). Se reintenta a mano: la cola tiene `max_retries: 0` porque cada intento cuesta dinero.
+- **Llave de la cola**: la cola no tiene sesión de usuario. Entra a las funciones `estudio_worker_*` con `ESTUDIO_WORKER_TOKEN`, que solo sirve para ellas; `estudio_worker_firma` firma únicamente dentro de `divani/estudio`. La secret key de Supabase no se usa.
+- **Fotos**: a OpenAI se le pasan por dirección (`image_url`), así el Worker no las carga. Lo generado llega en base64 y se manda tal cual a Cloudinary, que lo convierte a WebP con `format=webp` y `c_limit` (`src/estudio/cloudinary.ts`). Las referencias de las modelos están en `divani/estudio/modelos` (`npm run estudio:modelos`) y sus miniaturas en `public/estudio/modelos`.
+- **Ficha**: `src/estudio/prompts.ts` arma el prompt y el JSON schema con los departamentos y las categorías reales de la base, y las familias de `COLOR_FAMILIES`. `PROMPT_PRENDA` y `PROMPT_MODELO` no se tocan sin probar. La cuenta de uso de cada modelo está en `estudio_modelos_uso`.
+- **Importar al producto**: abre `/admin/productos/nuevo?estudio=<id>`, que llena el formulario con `importarTrabajo` (`src/admin/lib/estudio.ts`). Nunca guarda: el usuario revisa y toca «Crear producto». Precio, costo, SKU y existencias quedan para llenar.
+- **Modo demostración**: `ESTUDIO_DEMO=1` en `.dev.vars` no llama a OpenAI (`src/estudio/mock.ts`); lo demás funciona igual.
+- **Código**: `src/estudio/` es del servidor, salvo `tipos.ts` y `modelos.ts`, que también usa el panel. La pantalla es `src/admin/pages/Estudio.tsx`.
+
 ## Base de datos (Supabase)
 
-- `supabase/schema.sql`: tablas, seguridad por fila (RLS) y **todas** las reglas del negocio como funciones: `storefront`, `product_page`, `storefront_sitemap`, `place_order`, `track_visit` (públicas) y `pos_checkout`, `order_set_status`, `order_set_payment`, `order_update`, `delete_order` (solo pedidos cancelados), `cash_*`, `inventory_*`, `save_product`, `delete_product`, `save_category`, `delete_category`, `save_department`, `reorder_rows`, `set_integration_secret`, `integrations_status`, `cloudinary_signature`, `whoami`, `visits_summary`, `visits_live`, `visits_forget` (equipo). Las visitas viven en `page_views` (solo lectura para el equipo; se borran solas a los 13 meses). Se puede volver a ejecutar.
+- `supabase/schema.sql`: tablas, seguridad por fila (RLS) y **todas** las reglas del negocio como funciones: `storefront`, `product_page`, `storefront_sitemap`, `place_order`, `track_visit` (públicas) y `pos_checkout`, `order_set_status`, `order_set_payment`, `order_update`, `delete_order` (solo pedidos cancelados), `cash_*`, `inventory_*`, `save_product`, `delete_product`, `save_category`, `delete_category`, `save_department`, `reorder_rows`, `set_integration_secret`, `integrations_status`, `cloudinary_signature`, `whoami`, `visits_summary`, `visits_live`, `visits_forget` (equipo), `estudio_crear`, `estudio_estado`, `estudio_regenerar`, `estudio_guardar_ficha` (administradores) y `estudio_worker_*` (la cola, con su llave). Las visitas viven en `page_views` (solo lectura para el equipo; se borran solas a los 13 meses). Se puede volver a ejecutar.
 - `private.store_products` (vista): cada prenda a la venta ya en el formato de la tienda; la usan `storefront()` y `product_page()`.
 - `supabase/datos/*.json` → `npm run seed:build` → `supabase/seed.sql` (no se edita a mano).
 - `supabase/actualizaciones/*.sql`: correcciones de datos para bases que ya existían.

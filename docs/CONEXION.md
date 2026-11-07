@@ -14,6 +14,8 @@ La tienda y el panel usan **Supabase** (base de datos e inicio de sesión), **Cl
 | Secret key (`sb_secret_…`) y token personal (`sbp_…`) | Solo en tu computadora, para `npm run setup:supabase` (opcional) | **Sí.** Nunca en la página, en Cloudflare ni en GitHub |
 | Cloud name y API Key de Cloudinary | Panel → Configuración → Conexiones | No |
 | API Secret de Cloudinary | Panel → Configuración → Conexiones (se guarda cifrado en la base de datos) | **Sí.** El panel nunca lo vuelve a mostrar |
+| Clave de OpenAI (`OPENAI_API_KEY`) | Secreto del Worker, con `npx wrangler secret put` | **Sí.** Nunca llega al navegador. No la pegues en chats |
+| Llave de la cola (`ESTUDIO_WORKER_TOKEN`) | Secreto del Worker y `private.secrets` en Supabase | **Sí** |
 | Contraseña del administrador | Solo tú la escribes | **Sí** |
 
 > Solo las variables que empiezan con `PUBLIC_` llegan a la página. Si alguna llave secreta o contraseña se compartió por chat o correo, cámbiala: en Supabase → Project Settings → API Keys puedes crear una secret key nueva y borrar la anterior; en Cloudinary → Settings → API Keys puedes generar un nuevo API Secret.
@@ -66,6 +68,51 @@ Luego `npm run dev` y abre `http://localhost:5173` (tienda) o `http://localhost:
 3. Presiona **Probar subida**: si sale «Conexión correcta», todas las fotos nuevas se suben a tu Cloudinary, comprimidas y en la carpeta `divani/`.
 
 Si sale «Invalid Signature», el API Secret no coincide con esa API Key: genera una API Key nueva en Cloudinary y pega **los dos** datos de esa misma fila.
+
+## Paso 6 · Conectar Estudio IA
+
+Estudio IA (Productos → Crear con IA) genera fotos y fichas con la API de OpenAI. Necesita el plan **Workers Paid** de Cloudflare y saldo en OpenAI; la suscripción de ChatGPT no incluye la API.
+
+1. En Supabase → **SQL Editor**, ejecuta `supabase/schema.sql` completo. Crea las tablas de Estudio y su llave.
+2. En el mismo SQL Editor, ejecuta esto y copia el resultado:
+
+   ```sql
+   select value from private.secrets where name = 'estudio_worker_token';
+   ```
+
+3. En la terminal, en la carpeta del proyecto, crea la cola una sola vez y guarda los dos secretos. Cada comando te pide el valor y no lo muestra:
+
+   ```bash
+   npx wrangler queues create divani-estudio
+   npx wrangler secret put ESTUDIO_WORKER_TOKEN
+   npx wrangler secret put OPENAI_API_KEY
+   ```
+
+4. Publica con `npm run deploy` y prueba con una prenda.
+
+Las fotos de referencia de las modelos ya están en Cloudinary. Si cambias o agregas una modelo, pon su foto en una carpeta como `modelo-6.jpg`, agrégala en `src/estudio/modelos.ts` con su miniatura en `public/estudio/modelos/` y corre `npm run estudio:modelos -- <carpeta>`.
+
+**Para probar en tu computadora sin gastar saldo**, crea el archivo `.dev.vars` (no se sube a GitHub):
+
+```
+ESTUDIO_DEMO=1
+ESTUDIO_WORKER_TOKEN=el-valor-del-paso-2
+```
+
+**Ajustes opcionales** (con `npx wrangler secret put`, o en `.dev.vars` en tu computadora):
+
+| Variable | Por defecto | Para qué sirve |
+| --- | --- | --- |
+| `IMAGE_MODEL` | `gpt-image-2.6-sunburst` | Modelo de imagen. `gpt-image-2.6-flare` es más rápido. |
+| `IMAGE_QUALITY` | `high` | `low`, `medium`, `high`, `xhigh` o `max`. Más calidad cuesta más y tarda más. |
+| `IMAGE_SIZE` | `1152x1440` | Formato 4:5 vertical, en múltiplos de 16. |
+| `IMAGE_COMPLEXITY_PRENDA` / `IMAGE_COMPLEXITY_MODELO` | `medium` / `high` | Cuánto planea la IA antes de dibujar. |
+| `IMAGE_MODERATION` | `low` | `low` evita bloqueos falsos con tops deportivos o trajes de baño; `auto` es el estándar. |
+| `TEXT_MODEL` / `TEXT_REASONING` | `gpt-6.1-terra` / `low` | Modelo que lee la prenda y escribe la ficha. |
+| `ORIGEN` | `Importado de EE. UU.` | Texto fijo del campo Origen. |
+| `MAX_TRABAJOS_ACTIVOS` | `3` | Cuántas prendas pueden procesarse a la vez. |
+
+**Costos**: cada prenda hace 2 imágenes y 1 ficha. Calcula alrededor de US$0.50 por prenda en calidad alta y confírmalo en platform.openai.com → Usage. Cada ↻ es una imagen más. Si dejas apagada la recarga automática de OpenAI, nunca se gasta más que el saldo cargado.
 
 ---
 
@@ -161,3 +208,9 @@ Opciones: `npm run setup:supabase -- --reset-password` cambia la contraseña de 
 | «Correo o contraseña incorrectos» | Revisa la contraseña o cámbiala en Authentication → Users. |
 | «Cloudinary no está configurado» al subir una foto | Completa el paso 5. |
 | «Invalid Signature» al probar Cloudinary | API Key y API Secret no son de la misma fila: genera una nueva y pega los dos. |
+| Estudio IA: «La clave de OpenAI no es válida» | Vuelve a guardarla con `npx wrangler secret put OPENAI_API_KEY`. |
+| Estudio IA: «Tu organización de OpenAI debe estar verificada» | Verifícala en platform.openai.com → Settings → Organization → General. |
+| Estudio IA: «Se quedó sin saldo o llegó a su límite de gasto» | Recarga créditos en OpenAI o sube el límite. |
+| Estudio IA: «El filtro de seguridad de OpenAI bloqueó esta imagen» | Intenta otra vez, con otra modelo o con otra foto. Si pasa seguido, revisa que `IMAGE_MODERATION` sea `low`. |
+| Estudio IA: un paso dice «se cortó antes de terminar» | Toca «Intentar de nuevo». Si se repite, revisa los registros del Worker en Cloudflare. |
+| Estudio IA: se queda en espera y no avanza | Revisa que `ESTUDIO_WORKER_TOKEN` sea el mismo en Cloudflare y en Supabase, y que exista la cola `divani-estudio`. |

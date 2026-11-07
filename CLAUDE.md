@@ -26,6 +26,7 @@ npm run preview          # prueba dist/ con el motor de Cloudflare (workerd)
 npm run deploy           # build + wrangler deploy
 npm run seed:build       # regenera supabase/seed.sql desde supabase/datos/*.json
 npm run setup:supabase   # prepara Supabase (schema, seed si está vacía, actualizaciones, admin, Cloudinary); lee .env.local
+npm run estudio:modelos -- <carpeta>   # sube a Cloudinary las fotos de referencia de las modelos de Estudio IA
 ```
 
 Para verificar a mano: `npm run verify`, abrir tienda y panel sin errores en la consola y revisar en celular (390 px) que no haya scroll horizontal.
@@ -50,10 +51,18 @@ Para verificar a mano: `npm run verify`, abrir tienda y panel sin errores en la 
 - Datos con TanStack Query: `useData(clave, fn, temas)` + `invalidate(tema)` (`lib/query.ts`); avisos con `toast()`; hojas con `<Sheet>` (`ui/overlays.tsx`).
 - `api/index.ts` es la única puerta a Supabase (supabase-js); `api/mappers.ts` convierte filas.
 - Colores de prenda: `product_colors.hex` es un tono (`#RRGGBB`) o multicolor (2 a 6 tonos separados por coma, se pintan como rayas). Usa `colorStops`/`swatchFill` de `src/lib/model.ts` para mostrarlos (nunca `hex` directo en `--c`); la familia del filtro de la tienda se calcula sola con `guessFamily` (multicolor = estampado). Selector propio con gotero en `src/admin/ui/color.tsx`.
-- Ya **no existe modo demostración**.
+- Ya **no existe modo demostración** del panel (el de Estudio IA es otra cosa: `ESTUDIO_DEMO=1`, solo para no gastar saldo de OpenAI).
+
+**Estudio IA** (`/admin/estudio`, botón «Crear con IA» en Productos): fotos y ficha de una prenda con la API de OpenAI. Detalle en `docs/ARQUITECTURA.md`.
+- Corre en una **cola de Cloudflare** (`divani-estudio`, plan Workers Paid), no en la petición: Cloudflare puede cancelar la petición si el teléfono se desconecta. `src/worker.ts` es la entrada del Worker (`fetch` para Astro, `queue` para Estudio).
+- `src/estudio/`: código del servidor (`prompts`, `openai`, `pasos`, `cola`, `mock`…). El panel solo importa `tipos.ts` y `modelos.ts`. Pantalla en `src/admin/pages/Estudio.tsx`.
+- El estado vive en `estudio_trabajos`; las reglas, en las funciones `estudio_*` de `schema.sql`. La cola entra con `ESTUDIO_WORKER_TOKEN`, no con la secret key de Supabase.
+- `PROMPT_PRENDA` y `PROMPT_MODELO` están probados: no los cambies sin probar.
+- «Importar al producto» llena `/admin/productos/nuevo?estudio=<id>` y **nunca guarda solo**.
+- Secretos del Worker (`npx wrangler secret put`): `OPENAI_API_KEY`, `ESTUDIO_WORKER_TOKEN`. En local van en `.dev.vars`. `divani-estudio/` es solo referencia: no entra en el build.
 
 **Supabase** (`supabase/`):
-- `schema.sql`: tablas, RLS y **todas las reglas del negocio** (la tienda y el panel solo llaman funciones): `storefront, product_page, storefront_sitemap, place_order, pos_checkout, order_set_status, order_set_payment, order_update, delete_order, cash_open, cash_movement, cash_close, cash_session_summary, inventory_adjust, inventory_receive, save_product, delete_product, save_category, delete_category, save_department, reorder_rows, set_integration_secret, integrations_status, cloudinary_signature, whoami, track_visit, visits_summary, visits_live, visits_forget`. Vista `private.store_products`. Es idempotente. El bloque de visitas (`-- >>> visitas` … `-- <<< visitas`) se puede ejecutar solo en el SQL Editor.
+- `schema.sql`: tablas, RLS y **todas las reglas del negocio** (la tienda y el panel solo llaman funciones): `storefront, product_page, storefront_sitemap, place_order, pos_checkout, order_set_status, order_set_payment, order_update, delete_order, cash_open, cash_movement, cash_close, cash_session_summary, inventory_adjust, inventory_receive, save_product, delete_product, save_category, delete_category, save_department, reorder_rows, set_integration_secret, integrations_status, cloudinary_signature, whoami, track_visit, visits_summary, visits_live, visits_forget, estudio_crear, estudio_estado, estudio_regenerar, estudio_guardar_ficha, estudio_worker_*`. Vista `private.store_products`. Es idempotente. El bloque de visitas (`-- >>> visitas` … `-- <<< visitas`) se puede ejecutar solo en el SQL Editor.
 - `seed.sql`: **generado** por `scripts/build-seed.ts`; no editarlo a mano.
 - `actualizaciones/*.sql`: correcciones de datos para la base que ya existe (idempotentes, en orden por fecha).
 - Administradores: los correos de `private.bootstrap_admins` (incluye `somosdivani@gmail.com`) reciben acceso al crear su usuario.
@@ -81,8 +90,13 @@ Pendiente:
 3. **Seguridad** (lo hace el dueño): quitar de `.env.local` `SUPABASE_ACCESS_TOKEN`, `ADMIN_PASSWORD` y `CLOUDINARY_API_SECRET`; borrar el token personal «divani» en Supabase; cambiar la contraseña del administrador.
 4. **Datos reales**: cambiar las 45 prendas de ejemplo por las reales; configurar WhatsApp, horario y redes en Configuración → Tienda y contacto.
 5. Completar `src/pages/aviso-de-privacidad.astro` (datos marcados con `<mark>`).
+6. **Estudio IA**: falta solo la clave de OpenAI (`npx wrangler secret put OPENAI_API_KEY`) y probar la primera prenda real. Aún no hay ninguna llamada real a OpenAI. Hasta entonces no borres `divani-estudio/`.
+
+**No correr `npm run setup:supabase` sin revisar `.env.local`**: su `SUPABASE_ACCESS_TOKEN` venció y su `CLOUDINARY_API_SECRET` no corresponde a la llave en uso; el script lo guardaría encima del bueno y se romperían las subidas de fotos. El SQL se pega en el SQL Editor.
 
 **Publicada** en Cloudflare Workers: https://divani.divani.workers.dev (cuenta con sesión de wrangler en esta computadora; para actualizar: `npm run deploy`, que usa `.env.local` con `PUBLIC_SITE_URL=https://divani.divani.workers.dev`). Supabase Auth: Site URL esa dirección; Redirect URLs `…/**` y `http://localhost:5173/**`.
+
+Ya aplicado y publicado (6 de noviembre de 2026): `schema.sql` con Estudio IA, cola `divani-estudio` en Cloudflare, plan Workers Paid y secreto `ESTUDIO_WORKER_TOKEN`. Probado de punta a punta en la tienda publicada en modo demostración (sin OpenAI).
 
 Ya aplicado en Supabase (31 de octubre de 2026): `cloudinary_signature` firma la conversión a WebP; `save_product` acepta colores multicolor (rayas), además de `delete_order` y la corrección de `delete_product`.
 

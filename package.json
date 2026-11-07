@@ -16,7 +16,8 @@
     "verify": "npm run check && npm run lint && npm run test && npm run build",
     "deploy": "astro build && wrangler deploy",
     "seed:build": "tsx scripts/build-seed.ts",
-    "setup:supabase": "node scripts/setup-supabase.mjs"
+    "setup:supabase": "node scripts/setup-supabase.mjs",
+    "estudio:modelos": "node scripts/subir-modelos-estudio.mjs"
   },
   "engines": {
     "node": ">=22.22.0"

@@ -1,9 +1,25 @@
 // Cloudflare Workers: la tienda se publica aquí (Workers & Pages en el panel de Cloudflare).
-// Las páginas estáticas las sirve Cloudflare directo; el Worker solo atiende /producto/… y /admin.
+// Las páginas estáticas las sirve Cloudflare directo; el Worker solo atiende /producto/…, /admin
+// y /api/…. Estudio IA genera en segundo plano con una cola: src/worker.ts recibe sus mensajes.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "divani",
+  "main": "./src/worker.ts",
   "compatibility_date": "2026-10-01",
   "compatibility_flags": ["nodejs_compat"],
   "observability": { "enabled": true },
+  "queues": {
+    "producers": [{ "binding": "ESTUDIO_COLA", "queue": "divani-estudio" }],
+    "consumers": [
+      {
+        "queue": "divani-estudio",
+        // Un mensaje por invocación y sin reintentos automáticos: cada intento cuesta dinero.
+        // Si un paso se corta, se marca como fallido y se reintenta a mano desde la pantalla.
+        "max_batch_size": 1,
+        "max_batch_timeout": 0,
+        "max_retries": 0,
+        "max_concurrency": 6,
+      },
+    ],
+  },
 }

@@ -5,6 +5,7 @@ node_modules
 public
 supabase
 docs
+divani-estudio
 package-lock.json
 *.css
 *.md

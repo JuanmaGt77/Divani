@@ -1488,7 +1488,7 @@ begin
 end $$;
 
 -- Firma una subida a Cloudinary. El secreto nunca sale de la base de datos.
-create or replace function public.cloudinary_signature(p_params jsonb default '{}'::jsonb) returns jsonb
+create or replace function private.cloudinary_sign(p_params jsonb default '{}'::jsonb) returns jsonb
 language plpgsql volatile security definer set search_path = public, pg_temp as $$
 declare
   cfg      jsonb;
@@ -1499,7 +1499,6 @@ declare
   params   jsonb;
   to_sign  text;
 begin
-  perform private.require_staff();
   select coalesce(private->'cloudinary', '{}'::jsonb) into cfg from public.settings where id = 1;
   select value into v_secret from private.secrets where name = 'cloudinary_api_secret';
   if coalesce(cfg->>'cloudName', '') = '' or coalesce(cfg->>'apiKey', '') = '' or v_secret is null then
@@ -1525,6 +1524,13 @@ begin
     'cloudName', cfg->>'cloudName',
     'params', params
   );
+end $$;
+
+create or replace function public.cloudinary_signature(p_params jsonb default '{}'::jsonb) returns jsonb
+language plpgsql volatile security definer set search_path = public, pg_temp as $$
+begin
+  perform private.require_staff();
+  return private.cloudinary_sign(p_params);
 end $$;
 
 create or replace function public.whoami() returns jsonb
@@ -1748,6 +1754,381 @@ grant execute on function public.visits_forget(uuid) to authenticated;
 grant select on public.page_views to authenticated;
 -- <<< visitas
 
+-- >>> estudio
+-- =============================================================================
+--  Estudio IA (Panel → Productos → Crear con IA)
+--
+--  Cada prenda es un «trabajo» con 3 pasos: ficha, prenda (foto en gancho) y modelo.
+--  La generación corre en una cola de Cloudflare, sin sesión de usuario: por eso las funciones
+--  estudio_worker_* piden una llave propia en lugar de un usuario. Esa llave solo sirve para
+--  estas funciones y se crea aquí mismo (ver docs/CONEXION.md).
+-- =============================================================================
+create table if not exists public.estudio_trabajos (
+  id            uuid primary key default gen_random_uuid(),
+  created_at    timestamptz not null default now(),
+  updated_at    timestamptz not null default now(),
+  created_by    uuid references auth.users (id) on delete set null,
+  fotos         text[] not null,
+  ficha         jsonb,
+  modelo_id     text,
+  modelo_por_ia boolean not null default true,
+  motivo_modelo text,
+  imagenes      jsonb not null default '{}'::jsonb,
+  pasos         jsonb not null
+);
+create index if not exists estudio_trabajos_updated_idx on public.estudio_trabajos (updated_at desc);
+
+-- Cuántas fotos lleva cada modelo: la IA prefiere a la menos usada para variar el catálogo
+create table if not exists public.estudio_modelos_uso (
+  modelo_id text primary key,
+  usos      int not null default 0
+);
+
+alter table public.estudio_trabajos enable row level security;
+alter table public.estudio_modelos_uso enable row level security;
+drop policy if exists divani_admin_read on public.estudio_trabajos;
+drop policy if exists divani_admin_read on public.estudio_modelos_uso;
+create policy divani_admin_read on public.estudio_trabajos for select to authenticated using (public.is_admin());
+create policy divani_admin_read on public.estudio_modelos_uso for select to authenticated using (public.is_admin());
+
+-- La llave de la cola se crea una sola vez; no se regenera al repetir este bloque
+insert into private.secrets (name, value)
+values ('estudio_worker_token', encode(extensions.gen_random_bytes(32), 'hex'))
+on conflict (name) do nothing;
+
+create or replace function private.estudio_worker(p_token text) returns void
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+declare
+  v_token text;
+begin
+  select value into v_token from private.secrets where name = 'estudio_worker_token';
+  if v_token is null or coalesce(p_token, '') = '' or p_token <> v_token then
+    raise exception 'No autorizado.' using errcode = '42501';
+  end if;
+end $$;
+
+create or replace function private.estudio_paso_nuevo(p_intento int default 1, p_version int default 0) returns jsonb
+language sql stable as $$
+  select jsonb_build_object('estado', 'en_cola', 'error', null, 'nota', null, 'version', p_version,
+                            'intento', p_intento, 'desde', now(), 'inicio', null, 'fin', null);
+$$;
+
+create or replace function private.estudio_ocupado(p_pasos jsonb) returns boolean
+language sql immutable as $$
+  select exists (select 1 from jsonb_each(p_pasos) e where e.value->>'estado' in ('en_cola', 'trabajando'));
+$$;
+
+-- Un paso que se cortó no debe quedar «trabajando» para siempre: se marca como fallido y se puede
+-- reintentar. El Worker corta cada paso a los 11 minutos, así que aquí no se pierde nada ya pagado.
+create or replace function private.estudio_vencer(p_id uuid) returns void
+language plpgsql security definer set search_path = public, pg_temp as $$
+declare
+  v_pasos  jsonb;
+  v_paso   jsonb;
+  v_nombre text;
+  v_cambio boolean := false;
+begin
+  select pasos into v_pasos from public.estudio_trabajos where id = p_id for update;
+  if not found then return; end if;
+  foreach v_nombre in array array['ficha', 'prenda', 'modelo'] loop
+    v_paso := v_pasos->v_nombre;
+    if (v_paso->>'estado' = 'trabajando' and (v_paso->>'inicio')::timestamptz < now() - interval '12 minutes')
+       or (v_paso->>'estado' = 'en_cola' and (v_paso->>'desde')::timestamptz < now() - interval '15 minutes') then
+      v_pasos := jsonb_set(v_pasos, array[v_nombre], v_paso || jsonb_build_object(
+        'estado', 'error', 'error', 'Este paso se cortó antes de terminar. Vuelve a intentarlo.', 'fin', now()));
+      v_cambio := true;
+    end if;
+  end loop;
+  if v_cambio then
+    update public.estudio_trabajos set pasos = v_pasos, updated_at = now() where id = p_id;
+  end if;
+end $$;
+
+-- Lo que ve el panel de un trabajo
+create or replace function private.estudio_publico(t public.estudio_trabajos) returns jsonb
+language sql stable set search_path = public, pg_temp as $$
+  select jsonb_build_object(
+    'id', t.id,
+    'creado', t.created_at,
+    'fotos', to_jsonb(t.fotos),
+    'pasos', (
+      select jsonb_object_agg(e.key, jsonb_build_object(
+        'estado', e.value->>'estado',
+        'error', e.value->>'error',
+        'nota', e.value->>'nota',
+        'version', coalesce((e.value->>'version')::int, 0),
+        'intento', coalesce((e.value->>'intento')::int, 1),
+        'segundos', case when e.value->>'inicio' is null then 0 else greatest(0, round(extract(epoch from
+          coalesce((e.value->>'fin')::timestamptz, now()) - (e.value->>'inicio')::timestamptz))::int) end
+      ))
+      from jsonb_each(t.pasos) e
+    ),
+    'ficha', t.ficha,
+    'modelo', case when t.modelo_id is null then null else jsonb_build_object(
+      'id', t.modelo_id, 'porIA', t.modelo_por_ia, 'motivo', t.motivo_modelo) end,
+    'imagenes', jsonb_build_object('prenda', t.imagenes->>'prenda', 'modelo', t.imagenes->>'modelo'),
+    'terminado', not private.estudio_ocupado(t.pasos)
+  );
+$$;
+
+create or replace function public.estudio_crear(p_fotos text[], p_max int default 3) returns jsonb
+language plpgsql security definer set search_path = public, pg_temp as $$
+declare
+  v_cloud  text;
+  v_foto   text;
+  v_id     uuid;
+  v_activo int;
+  t        public.estudio_trabajos;
+begin
+  perform private.require_staff(true);
+  if coalesce(array_length(p_fotos, 1), 0) not between 1 and 4 then
+    raise exception 'Sube de 1 a 4 fotos de la prenda.';
+  end if;
+  select private->'cloudinary'->>'cloudName' into v_cloud from public.settings where id = 1;
+  foreach v_foto in array p_fotos loop
+    if v_foto not like 'https://res.cloudinary.com/' || coalesce(v_cloud, '') || '/image/upload/%' then
+      raise exception 'Foto no válida.';
+    end if;
+  end loop;
+  for v_id in
+    select id from public.estudio_trabajos
+    where updated_at > now() - interval '1 day' and private.estudio_ocupado(pasos)
+  loop
+    perform private.estudio_vencer(v_id);
+  end loop;
+  select count(*) into v_activo from public.estudio_trabajos
+  where updated_at > now() - interval '1 day' and private.estudio_ocupado(pasos);
+  if v_activo >= greatest(1, least(coalesce(p_max, 3), 10)) then
+    raise exception 'Ya hay varias prendas procesándose. Espera a que terminen y vuelve a intentar.';
+  end if;
+  insert into public.estudio_trabajos (created_by, fotos, pasos)
+  values (auth.uid(), p_fotos, jsonb_build_object(
+    'ficha', private.estudio_paso_nuevo(), 'prenda', private.estudio_paso_nuevo(), 'modelo', private.estudio_paso_nuevo()))
+  returning * into t;
+  return private.estudio_publico(t);
+end $$;
+
+create or replace function public.estudio_estado(p_id uuid) returns jsonb
+language plpgsql security definer set search_path = public, pg_temp as $$
+declare
+  t public.estudio_trabajos;
+begin
+  perform private.require_staff(true);
+  perform private.estudio_vencer(p_id);
+  select * into t from public.estudio_trabajos where id = p_id;
+  if not found then return null; end if;
+  return private.estudio_publico(t);
+end $$;
+
+-- Vuelve a poner en la cola una parte del trabajo. El Worker manda el mensaje después de esto.
+create or replace function public.estudio_regenerar(p_id uuid, p_tipo text, p_modelo text default null) returns jsonb
+language plpgsql security definer set search_path = public, pg_temp as $$
+declare
+  t      public.estudio_trabajos;
+  v_paso jsonb;
+begin
+  perform private.require_staff(true);
+  if p_tipo not in ('ficha', 'prenda', 'modelo') then raise exception 'Tipo no válido.'; end if;
+  perform private.estudio_vencer(p_id);
+  select * into t from public.estudio_trabajos where id = p_id for update;
+  if not found then raise exception 'Ese trabajo ya no existe.'; end if;
+  v_paso := t.pasos->p_tipo;
+  if v_paso->>'estado' in ('en_cola', 'trabajando') then
+    raise exception 'Eso todavía se está generando.';
+  end if;
+  if p_tipo = 'modelo' then
+    if coalesce(p_modelo, '') <> '' then
+      if p_modelo !~ '^modelo-[0-9]+$' then raise exception 'Esa modelo no existe.'; end if;
+      t.modelo_id := p_modelo;
+      t.modelo_por_ia := false;
+      t.motivo_modelo := null;
+    end if;
+    if t.modelo_id is null then raise exception 'Elige una modelo primero.'; end if;
+  end if;
+  update public.estudio_trabajos set
+    modelo_id = t.modelo_id,
+    modelo_por_ia = t.modelo_por_ia,
+    motivo_modelo = t.motivo_modelo,
+    pasos = jsonb_set(pasos, array[p_tipo], private.estudio_paso_nuevo(
+      coalesce((v_paso->>'intento')::int, 1) + 1, coalesce((v_paso->>'version')::int, 0))),
+    updated_at = now()
+  where id = p_id
+  returning * into t;
+  return private.estudio_publico(t);
+end $$;
+
+-- Guarda lo que se corrigió a mano en la ficha (solo los campos de texto)
+create or replace function public.estudio_guardar_ficha(p_id uuid, p_ficha jsonb) returns jsonb
+language plpgsql security definer set search_path = public, pg_temp as $$
+declare
+  t       public.estudio_trabajos;
+  v_ficha jsonb;
+  v_campo text;
+  v_max   int;
+begin
+  perform private.require_staff(true);
+  select * into t from public.estudio_trabajos where id = p_id for update;
+  if not found then raise exception 'Ese trabajo ya no existe.'; end if;
+  if t.ficha is null then raise exception 'La ficha todavía no está lista.'; end if;
+  if t.pasos->'ficha'->>'estado' in ('en_cola', 'trabajando') then
+    raise exception 'La ficha se está volviendo a escribir.';
+  end if;
+  v_ficha := t.ficha;
+  foreach v_campo in array array['nombre', 'descripcion', 'material', 'cuidados', 'origen', 'color', 'talla', 'marca_visible'] loop
+    if p_ficha ? v_campo then
+      v_max := case v_campo when 'nombre' then 140 when 'descripcion' then 4000 else 300 end;
+      v_ficha := jsonb_set(v_ficha, array[v_campo], to_jsonb(private.clean_text(p_ficha->>v_campo, v_max)));
+    end if;
+  end loop;
+  if jsonb_typeof(p_ficha->'detalles') = 'array' then
+    v_ficha := jsonb_set(v_ficha, '{detalles}', coalesce((
+      select jsonb_agg(private.clean(value, 200)) from jsonb_array_elements_text(p_ficha->'detalles')
+      where private.clean(value, 200) <> ''
+    ), '[]'::jsonb));
+  end if;
+  update public.estudio_trabajos set ficha = v_ficha, updated_at = now() where id = p_id returning * into t;
+  return private.estudio_publico(t);
+end $$;
+
+-- ---- Funciones de la cola (llave propia, sin usuario) ----
+create or replace function public.estudio_worker_contexto(p_token text, p_id uuid) returns jsonb
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+declare
+  t public.estudio_trabajos;
+begin
+  perform private.estudio_worker(p_token);
+  select * into t from public.estudio_trabajos where id = p_id;
+  if not found then return null; end if;
+  return jsonb_build_object(
+    'id', t.id,
+    'fotos', to_jsonb(t.fotos),
+    'ficha', t.ficha,
+    'modeloId', t.modelo_id,
+    'modeloPorIA', t.modelo_por_ia,
+    'pasos', t.pasos,
+    'departamentos', coalesce((
+      select jsonb_agg(jsonb_build_object('slug', d.slug, 'name', d.name) order by d.sort)
+      from public.departments d where d.active), '[]'::jsonb),
+    'categorias', coalesce((
+      select jsonb_agg(jsonb_build_object('slug', c.slug, 'name', c.name, 'department', c.department) order by c.sort)
+      from public.categories c where c.active), '[]'::jsonb),
+    'uso', coalesce((select jsonb_object_agg(u.modelo_id, u.usos) from public.estudio_modelos_uso u), '{}'::jsonb)
+  );
+end $$;
+
+-- Reserva un paso. Si la cola entrega el mismo mensaje dos veces, el segundo no hace nada: así
+-- una foto nunca se cobra doble.
+create or replace function public.estudio_worker_tomar(p_token text, p_id uuid, p_paso text, p_intento int) returns boolean
+language plpgsql security definer set search_path = public, pg_temp as $$
+begin
+  perform private.estudio_worker(p_token);
+  update public.estudio_trabajos set
+    pasos = jsonb_set(pasos, array[p_paso], (pasos->p_paso) || jsonb_build_object(
+      'estado', 'trabajando', 'inicio', now(), 'fin', null, 'error', null, 'nota', null)),
+    updated_at = now()
+  where id = p_id and pasos->p_paso->>'estado' = 'en_cola' and (pasos->p_paso->>'intento')::int = p_intento;
+  return found;
+end $$;
+
+-- Elige la modelo sin pisar la que alguien haya elegido a mano
+create or replace function public.estudio_worker_elegir(p_token text, p_id uuid, p_modelo text, p_motivo text) returns void
+language plpgsql security definer set search_path = public, pg_temp as $$
+begin
+  perform private.estudio_worker(p_token);
+  update public.estudio_trabajos set
+    modelo_id = p_modelo, motivo_modelo = private.clean(p_motivo, 300), updated_at = now()
+  where id = p_id and modelo_por_ia and modelo_id is null;
+end $$;
+
+-- Cierra un paso. p_datos: { estado: listo|error|omitido, error?, nota?, url?, ficha?, modeloId?, motivo? }
+create or replace function public.estudio_worker_terminar(
+  p_token text, p_id uuid, p_paso text, p_intento int, p_datos jsonb
+) returns boolean
+language plpgsql security definer set search_path = public, pg_temp as $$
+declare
+  t        public.estudio_trabajos;
+  v_paso   jsonb;
+  v_estado text := p_datos->>'estado';
+begin
+  perform private.estudio_worker(p_token);
+  if v_estado not in ('listo', 'error', 'omitido') then raise exception 'Estado no válido.'; end if;
+  select * into t from public.estudio_trabajos where id = p_id for update;
+  if not found then return false; end if;
+  v_paso := t.pasos->p_paso;
+  -- Un paso que ya se dio por cortado, o un intento viejo, no puede pisar uno más nuevo
+  if (v_paso->>'intento')::int <> p_intento or v_paso->>'estado' not in ('en_cola', 'trabajando') then
+    return false;
+  end if;
+  if v_estado = 'listo' then
+    if p_paso = 'ficha' then
+      t.ficha := p_datos->'ficha';
+      -- La IA elige modelo solo si nadie la cambió a mano y aún no hay foto con modelo
+      if t.modelo_por_ia and coalesce((t.pasos->'modelo'->>'version')::int, 0) = 0
+         and t.pasos->'modelo'->>'estado' <> 'trabajando' then
+        t.modelo_id := nullif(p_datos->>'modeloId', '');
+        t.motivo_modelo := nullif(private.clean(p_datos->>'motivo', 300), '');
+      end if;
+    else
+      t.imagenes := jsonb_set(t.imagenes, array[p_paso], to_jsonb(p_datos->>'url'));
+      if p_paso = 'modelo' then
+        insert into public.estudio_modelos_uso (modelo_id, usos) values (t.modelo_id, 1)
+        on conflict (modelo_id) do update set usos = public.estudio_modelos_uso.usos + 1;
+      end if;
+    end if;
+  end if;
+  update public.estudio_trabajos set
+    ficha = t.ficha,
+    modelo_id = t.modelo_id,
+    motivo_modelo = t.motivo_modelo,
+    imagenes = t.imagenes,
+    pasos = jsonb_set(pasos, array[p_paso], v_paso || jsonb_build_object(
+      'estado', v_estado,
+      'error', p_datos->>'error',
+      'nota', p_datos->>'nota',
+      'fin', now(),
+      'version', coalesce((v_paso->>'version')::int, 0) + case when v_estado = 'listo' then 1 else 0 end)),
+    updated_at = now()
+  where id = p_id;
+  return true;
+end $$;
+
+-- Firma las subidas de la cola, solo dentro de la carpeta de Estudio
+create or replace function public.estudio_worker_firma(p_token text, p_params jsonb) returns jsonb
+language plpgsql volatile security definer set search_path = public, pg_temp as $$
+begin
+  perform private.estudio_worker(p_token);
+  if coalesce(p_params->>'folder', '') !~ '/estudio(/|$)' then raise exception 'Carpeta no permitida.'; end if;
+  return private.cloudinary_sign(p_params);
+end $$;
+
+revoke all on function private.estudio_worker(text) from public, anon, authenticated;
+revoke all on function private.estudio_paso_nuevo(int, int) from public, anon, authenticated;
+revoke all on function private.estudio_ocupado(jsonb) from public, anon, authenticated;
+revoke all on function private.estudio_vencer(uuid) from public, anon, authenticated;
+revoke all on function private.estudio_publico(public.estudio_trabajos) from public, anon, authenticated;
+revoke all on function private.cloudinary_sign(jsonb) from public, anon, authenticated;
+revoke execute on function public.estudio_crear(text[], int) from public, anon;
+revoke execute on function public.estudio_estado(uuid) from public, anon;
+revoke execute on function public.estudio_regenerar(uuid, text, text) from public, anon;
+revoke execute on function public.estudio_guardar_ficha(uuid, jsonb) from public, anon;
+revoke execute on function public.estudio_worker_contexto(text, uuid) from public;
+revoke execute on function public.estudio_worker_tomar(text, uuid, text, int) from public;
+revoke execute on function public.estudio_worker_elegir(text, uuid, text, text) from public;
+revoke execute on function public.estudio_worker_terminar(text, uuid, text, int, jsonb) from public;
+revoke execute on function public.estudio_worker_firma(text, jsonb) from public;
+grant execute on function public.estudio_crear(text[], int) to authenticated;
+grant execute on function public.estudio_estado(uuid) to authenticated;
+grant execute on function public.estudio_regenerar(uuid, text, text) to authenticated;
+grant execute on function public.estudio_guardar_ficha(uuid, jsonb) to authenticated;
+-- La cola entra con la clave pública: lo que la protege es la llave estudio_worker_token
+grant execute on function public.estudio_worker_contexto(text, uuid) to anon;
+grant execute on function public.estudio_worker_tomar(text, uuid, text, int) to anon;
+grant execute on function public.estudio_worker_elegir(text, uuid, text, text) to anon;
+grant execute on function public.estudio_worker_terminar(text, uuid, text, int, jsonb) to anon;
+grant execute on function public.estudio_worker_firma(text, jsonb) to anon;
+grant select on public.estudio_trabajos, public.estudio_modelos_uso to authenticated;
+-- <<< estudio
+
 -- =============================================================================
 --  Seguridad: políticas por fila y permisos
 -- =============================================================================
@@ -1796,6 +2177,11 @@ grant execute on function public.storefront_sitemap() to anon, authenticated;
 grant execute on function public.place_order(jsonb) to anon, authenticated;
 grant execute on function public.track_visit(jsonb) to anon, authenticated;
 grant execute on function public.size_rank(text) to anon, authenticated;
+grant execute on function public.estudio_worker_contexto(text, uuid) to anon;
+grant execute on function public.estudio_worker_tomar(text, uuid, text, int) to anon;
+grant execute on function public.estudio_worker_elegir(text, uuid, text, text) to anon;
+grant execute on function public.estudio_worker_terminar(text, uuid, text, int, jsonb) to anon;
+grant execute on function public.estudio_worker_firma(text, jsonb) to anon;
 
 -- Avisos en tiempo real de pedidos nuevos para el panel
 do $$

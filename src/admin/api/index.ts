@@ -4,6 +4,7 @@
  */
 import { mergeSettings, normalizeBanner, normalizeFaq, normalizeLookbook } from '@/lib/model';
 import { SUPABASE } from '@/lib/env';
+import type { EstudioPublico, Ficha, NombrePaso, Trabajo } from '@/estudio/tipos';
 import type {
   Banner,
   CashSummary,
@@ -220,6 +221,24 @@ async function getOrder(id: string): Promise<Order | null> {
 
 async function integrationsStatus(): Promise<IntegrationsStatus> {
   return rpc<IntegrationsStatus>('integrations_status');
+}
+
+/** Las direcciones de Estudio IA corren en el Worker: responden solo con la sesión del panel. */
+async function apiEstudio<T>(ruta: string, cuerpo?: object): Promise<T> {
+  const { data } = await client().auth.getSession();
+  const res = await fetch(ruta, {
+    method: cuerpo ? 'POST' : 'GET',
+    headers: {
+      Authorization: `Bearer ${data.session?.access_token || ''}`,
+      ...(cuerpo ? { 'Content-Type': 'application/json' } : {}),
+    },
+    ...(cuerpo ? { body: JSON.stringify(cuerpo) } : {}),
+  }).catch(() => {
+    throw new Error('Sin conexión. Revisa tu internet e intenta de nuevo.');
+  });
+  const respuesta = (await res.json().catch(() => null)) as (T & { error?: string }) | null;
+  if (!res.ok || !respuesta) throw new Error(respuesta?.error || `Error ${res.status}`);
+  return respuesta;
 }
 
 export const api = {
@@ -521,6 +540,23 @@ export const api = {
       const res = await cloudinaryUpload(body, signed, { kind, ...(onProgress ? { onProgress } : {}) });
       return { url: res.secure_url, before: file.size, after: res.bytes || body.size, format: res.format };
     },
+  },
+
+  /** Estudio IA: la generación corre en el Worker; el avance se lee directo de Supabase. */
+  estudio: {
+    config: () => apiEstudio<EstudioPublico>('/api/estudio/config'),
+    /** La foto original, tal como se preparó en el teléfono (JPG de 2048 px) para que la lea la IA. */
+    async subirFoto(foto: Blob): Promise<string> {
+      const signed = await rpc<SignedUpload>('cloudinary_signature', {
+        p_params: { folder: 'divani/estudio/originales' },
+      });
+      return (await cloudinaryUpload(foto, signed)).secure_url;
+    },
+    crear: (fotos: string[]) => apiEstudio<Trabajo>('/api/estudio/trabajos', { fotos }),
+    estado: (id: string) => rpc<Trabajo | null>('estudio_estado', { p_id: id }),
+    regenerar: (id: string, tipo: NombrePaso, modeloId?: string) =>
+      apiEstudio<Trabajo>(`/api/estudio/trabajos/${encodeURIComponent(id)}/regenerar`, { tipo, modeloId }),
+    guardarFicha: (id: string, ficha: Ficha) => rpc<Trabajo>('estudio_guardar_ficha', { p_id: id, p_ficha: ficha }),
   },
 
   /** Avisa de pedidos nuevos o cambios hechos desde otro lugar (Supabase Realtime). */

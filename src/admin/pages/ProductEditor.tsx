@@ -28,6 +28,7 @@ import { SIZE_PRESETS, cdn, guessFamily, makeSku, round2, sizeRank, slugify, swa
 import type { Product, ProductStatus } from '@/lib/types';
 import { api, type ProductPayload } from '../api';
 import { CategorySheet, type CategoryDraft } from '../components/CategorySheets';
+import { importarTrabajo } from '../lib/estudio';
 import { navigate, useSearch, useUnsavedChanges } from '../lib/navigation';
 import { invalidate, useData } from '../lib/query';
 import { settingsStore } from '../lib/session';
@@ -48,7 +49,7 @@ import {
 import { ColorPicker, SUGGESTED_NAMES } from '../ui/color';
 import { Gallery } from '../ui/media';
 import { confirmDialog, promptDialog, toast, toastError } from '../ui/overlays';
-import { Badge, Card, Empty, Menu, PageHeader, SkeletonRows } from '../ui/surfaces';
+import { Badge, Banner, Card, Empty, Menu, PageHeader, SkeletonRows } from '../ui/surfaces';
 import { duplicatePayload } from './Products';
 
 interface DraftColor {
@@ -231,6 +232,7 @@ export default function ProductEditor() {
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [newCat, setNewCat] = useState<CategoryDraft | null>(null);
+  const [avisosEstudio, setAvisosEstudio] = useState<string[] | null>(null);
   const formRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -243,6 +245,57 @@ export default function ProductEditor() {
 
   const dirty = !!draft && base !== JSON.stringify(draft);
   const { allowNext } = useUnsavedChanges(dirty);
+
+  // «Importar al producto» de Estudio IA: llena el formulario, pero no guarda nada. `base` sigue
+  // en blanco, así que cuenta como cambios sin guardar y funciona el aviso normal al salir.
+  const estudioId = isNew ? query.estudio : undefined;
+  const importado = useRef<string | null>(null);
+  const draftActual = useRef(draft);
+  draftActual.current = draft;
+  useEffect(() => {
+    if (!estudioId || !tax || importado.current === estudioId) return;
+    importado.current = estudioId;
+    void (async () => {
+      try {
+        const trabajo = await api.estudio.estado(estudioId);
+        if (!trabajo?.ficha) throw new Error('Ese trabajo ya no existe o su ficha no está lista.');
+        if (JSON.stringify(draftActual.current) !== JSON.stringify(blank(query.depto))) {
+          const reemplazar = await confirmDialog({
+            title: '¿Reemplazar lo que ya escribiste?',
+            message: 'El formulario ya tiene datos. Si importas, se cambian por los de Estudio IA.',
+            confirm: 'Reemplazar',
+            danger: true,
+          });
+          if (!reemplazar) return;
+        }
+        const datos = importarTrabajo(trabajo, trabajo.ficha, tax);
+        const colorKey = newKey();
+        setDraft((d) =>
+          d
+            ? {
+                ...d,
+                name: datos.name,
+                description: datos.description,
+                detailsText: datos.detailsText,
+                material: datos.material,
+                care: datos.care,
+                origin: datos.origin,
+                department: datos.department ?? d.department,
+                category: datos.category,
+                tags: datos.tags,
+                colors: [{ key: colorKey, ...datos.color }],
+                variants: datos.size
+                  ? [{ key: newKey(), colorKey, size: datos.size, sku: '', stock: 0, minStock: '', active: true }]
+                  : [],
+              }
+            : d,
+        );
+        setAvisosEstudio(datos.avisos);
+      } catch (err) {
+        toastError(err, 'No se pudo importar');
+      }
+    })();
+  }, [estudioId, tax, query.depto]);
 
   const set = (patch: Partial<Draft> | ((d: Draft) => Partial<Draft>)) =>
     setDraft((d) => (d ? { ...d, ...(typeof patch === 'function' ? patch(d) : patch) } : d));
@@ -561,7 +614,11 @@ export default function ProductEditor() {
             : `${draft.code || ''} · ${plural(totalStock, 'pieza', 'piezas')} en existencia`
         }
         actions={
-          !isNew && (
+          isNew ? (
+            <Button icon={Sparkles} onClick={() => navigate('/estudio')}>
+              Crear con IA
+            </Button>
+          ) : (
             <>
               {draft.status === 'activo' && (
                 <Button
@@ -587,6 +644,19 @@ export default function ProductEditor() {
           )
         }
       />
+
+      {avisosEstudio && (
+        <Banner tone="info" icon={Sparkles}>
+          <p>Información importada desde Estudio IA. Revisa precio, tallas y existencias antes de guardar.</p>
+          {avisosEstudio.length > 0 && (
+            <ul className="editor__avisos">
+              {avisosEstudio.map((aviso, i) => (
+                <li key={`${aviso}-${i}`}>{aviso}</li>
+              ))}
+            </ul>
+          )}
+        </Banner>
+      )}
 
       <div className="editor__grid">
         <div className="stack editor__main">

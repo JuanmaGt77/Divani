@@ -14,6 +14,7 @@ import {
   Pencil,
   Plus,
   Shirt,
+  Sparkles,
   Trash2,
 } from 'lucide-react';
 import { money, plural, relative } from '@/lib/format';
@@ -269,6 +270,9 @@ export default function Products() {
           <>
             <Button icon={Download} onClick={exportAll} disabled={!rows.length}>
               Exportar
+            </Button>
+            <Button variant="tinted" icon={Sparkles} onClick={() => navigate('/estudio')}>
+              Crear con IA
             </Button>
             <Button variant="primary" icon={Plus} onClick={() => navigate('/productos/nuevo')}>
               Nuevo producto
