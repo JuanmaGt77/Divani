@@ -54,7 +54,13 @@ export default function SiteHeader() {
 
   return (
     <>
-      <div className="announce" role="region" aria-label="Avisos de la tienda" data-edit="announcements">
+      <div
+        className="announce"
+        role="region"
+        aria-label="Avisos de la tienda"
+        data-edit="announcements"
+        data-section="announcements"
+      >
         <div className="announce__viewport">
           <Marquee className="announce__track" itemClassName="announce__item" items={announcements} />
         </div>

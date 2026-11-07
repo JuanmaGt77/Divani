@@ -1,7 +1,7 @@
 {
   "extends": "astro/tsconfigs/strict",
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist", "node_modules", ".wrangler", "public", "divani-estudio"],
+  "exclude": ["dist", "node_modules", ".wrangler", "public"],
   "compilerOptions": {
     "jsx": "react-jsx",
     "jsxImportSource": "react",

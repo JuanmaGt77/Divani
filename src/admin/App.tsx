@@ -31,8 +31,15 @@ function Root() {
   // Pedidos nuevos de la tienda en línea y cambios hechos desde otra pestaña o dispositivo
   useEffect(() => {
     if (s.status !== 'signedIn') return undefined;
-    return api.subscribe((topic, meta) => {
+    let espera: ReturnType<typeof setTimeout> | undefined;
+    const quitar = api.subscribe((topic, meta) => {
       if (!meta.remote) return;
+      if (topic === 'catalog') {
+        // Un guardado avisa varias veces: se juntan. Solo listas, nunca un formulario abierto.
+        clearTimeout(espera);
+        espera = setTimeout(() => invalidate('products', 'inventory', 'taxonomy'), 800);
+        return;
+      }
       invalidate(topic, 'inventory', 'products', 'cash');
       if (meta.newOrder) {
         const order = meta.newOrder;
@@ -46,6 +53,10 @@ function Root() {
         });
       }
     });
+    return () => {
+      clearTimeout(espera);
+      quitar();
+    };
   }, [s.status]);
 
   return (

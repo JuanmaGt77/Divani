@@ -19,6 +19,10 @@ export interface HomeSection {
   sub: string;
   /** La sección se edita en otra pestaña de Sitio web. */
   tab?: 'banners' | 'look' | 'preguntas';
+  /** La sección se edita en otro lugar del panel; en la vista previa se llama así. */
+  edit?: 'products';
+  /** No tiene nada que editar: solo se puede ocultar. */
+  fixed?: boolean;
   thumb?: (c: SiteContent) => string | undefined;
 }
 
@@ -32,6 +36,13 @@ export const HOME_SECTIONS: HomeSection[] = [
   },
   { id: 'ribbons', title: 'Cintas cruzadas', sub: 'Frases que se deslizan debajo de la portada' },
   { id: 'categories', title: 'Compra por categoría', sub: 'Fotos y nombres de las categorías (en Categorías)' },
+  { id: 'novedades', title: 'Novedades', sub: 'Las prendas marcadas como «Nuevo» (en Productos)', edit: 'products' },
+  {
+    id: 'favoritas',
+    title: 'Las favoritas',
+    sub: 'Las prendas marcadas como «Lo más deseado» (en Productos)',
+    edit: 'products',
+  },
   { id: 'look', title: 'Arma tu look', sub: 'Foto con puntos que llevan a cada prenda', tab: 'look' },
   {
     id: 'editorial',
@@ -46,6 +57,7 @@ export const HOME_SECTIONS: HomeSection[] = [
     thumb: (c) => c.kids?.girlsImage,
   },
   { id: 'about', title: 'Acerca de nosotros', sub: 'Historia de la marca y su foto', thumb: (c) => c.about?.image },
+  { id: 'howto', title: 'Cómo comprar', sub: 'Los cuatro pasos para comprar por WhatsApp', fixed: true },
   { id: 'men', title: 'Hombre', sub: 'Banner y título de la sección de hombre', thumb: (c) => c.men?.image },
   { id: 'faq', title: 'Preguntas frecuentes', sub: 'Dudas sobre compras, envíos y pagos', tab: 'preguntas' },
   { id: 'vip', title: 'Lista VIP', sub: 'Invitación a la lista de difusión de WhatsApp', thumb: (c) => c.vip?.image },

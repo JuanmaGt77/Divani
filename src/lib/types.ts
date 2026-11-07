@@ -352,6 +352,8 @@ export interface PublicSettings {
   popularSearches: string[];
   store: StoreInfo;
   region: RegionSettings;
+  /** Secciones de la tienda ocultas desde Sitio web. */
+  hiddenSections: string[];
 }
 
 export interface PrivateSettings {

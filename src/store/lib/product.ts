@@ -27,15 +27,18 @@ export const discountPct = (p: Pick<StoreProduct, 'price' | 'compareAtPrice'> | 
   p?.compareAtPrice && p.compareAtPrice > p.price ? Math.round((1 - p.price / p.compareAtPrice) * 100) : 0;
 
 export interface ProductBadge {
-  id: 'agotado' | 'oferta' | 'nuevo' | 'ultimas';
+  id: 'oferta' | 'nuevo' | 'ultimas';
   label: string;
 }
 
-/** Etiquetas visibles de un producto, en orden de prioridad (máximo dos). */
+/**
+ * Etiquetas visibles de un producto, en orden de prioridad (máximo dos). Una prenda sin existencias
+ * no lleva ninguna: la tarjeta le pone el listón «Vendido».
+ */
 export function badgesOf(p: StoreProduct): ProductBadge[] {
   const out: ProductBadge[] = [];
   const stock = totalStock(p);
-  if (stock === 0) out.push({ id: 'agotado', label: 'Agotado' });
+  if (stock === 0) return out;
   const pct = discountPct(p);
   if (pct) out.push({ id: 'oferta', label: `−${pct}%` });
   if (p.isNew) out.push({ id: 'nuevo', label: 'Nuevo' });

@@ -74,3 +74,6 @@
   stroke-linejoin: round;
 }
 .icon--fill { fill: currentColor; stroke: none; }
+
+/* Secciones de la portada: la envoltura solo sirve para ocultarlas desde el panel */
+main > [data-section] { display: contents; }

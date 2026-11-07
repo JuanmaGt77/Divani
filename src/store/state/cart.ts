@@ -41,6 +41,21 @@ function commit(items: CartLine[]) {
 export const cartCount = (items: CartLine[]): number => items.reduce((a, i) => a + i.qty, 0);
 export const cartSubtotal = (items: CartLine[]): number => items.reduce((a, i) => a + i.price * i.qty, 0);
 
+/**
+ * Pone la bolsa al día con el catálogo: nombre, precio y existencias de cada línea. Si la talla se
+ * agotó no la quita: place_order avisa al enviar el pedido. Lo que ya no está a la venta queda igual.
+ */
+export function syncLines(items: CartLine[], products: StoreProduct[]): CartLine[] {
+  const bySlug = new Map(products.map((p) => [p.slug, p]));
+  return items.map((line) => {
+    const p = bySlug.get(line.slug);
+    if (!p) return line;
+    const info = sizesOf(p, line.color).find((s) => s.label === line.size);
+    const max = info ? info.stock : line.max;
+    return { ...line, name: p.name, price: p.price, max, qty: max > 0 ? Math.min(line.qty, max) : line.qty };
+  });
+}
+
 export const cart = {
   /** Agrega un producto. Devuelve la línea resultante (o null si esa talla se agotó). */
   add(
@@ -90,6 +105,13 @@ export const cart = {
 
   clear() {
     commit([]);
+  },
+
+  /** Lo llaman los cambios en vivo cada vez que llega el catálogo. */
+  sync(products: StoreProduct[]) {
+    const items = $cart.get();
+    const next = syncLines(items, products);
+    if (JSON.stringify(next) !== JSON.stringify(items)) commit(next);
   },
 };
 

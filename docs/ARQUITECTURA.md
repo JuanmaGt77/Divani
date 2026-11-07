@@ -61,6 +61,20 @@ producto/[slug].astro ─┘          │
 4. No se cuentan: navegadores automatizados, la vista previa del panel (`?editar=1`) ni el equipo. Al entrar al panel, `excludeThisBrowser()` (`src/admin/lib/visits.ts`) marca el navegador (`divani.no-contar`) y borra sus vistas anteriores con `visits_forget`.
 5. El panel lee `visits_summary` (totales, comparación, por día, por hora, orígenes, dispositivos, ciudades, páginas y prendas) y `visits_live` (personas en los últimos 5 minutos). Las reglas compartidas (orígenes, dispositivos, robots, nombres de lugares) están en `src/lib/visits.ts`.
 
+### Cambios en vivo (sin recargar la página)
+
+- **Panel → tienda**: disparadores en todas las tablas que devuelve `storefront()` actualizan `tienda_version`, una fila pública que solo guarda la hora del último cambio. El público no puede leer las tablas del negocio y Realtime respeta esas reglas; por eso existe esta señal en lugar de escuchar `products`. `src/store/data/live.ts` la escucha con `@supabase/realtime-js` (se descarga cuando el navegador está libre) y vuelve a pedir `storefront()`. Espera entre 0.8 y 2 s, al azar, para juntar los avisos de un mismo guardado y para que no todas las visitas pidan a la vez. Si la respuesta no cambió, no se vuelve a pintar.
+- **La bolsa** también se pone al día (`cart.sync`): nombre, precio y existencias. Una talla agotada no se quita: `place_order` lo avisa al enviar.
+- **Pestaña oculta**: tras 60 s suelta la conexión; al volver se conecta y se pone al día.
+- **Tienda → panel**: los pedidos nuevos llegan por `orders`. `tienda_version` refresca las listas de productos, inventario y categorías, también entre dos dispositivos del equipo. Nunca recarga un formulario abierto: se perdería lo escrito.
+
+### Ocultar secciones (Sitio web → interruptor de cada sección)
+
+- Cada sección de la portada va envuelta en `data-section` (`src/pages/index.astro`; la cinta de avisos, en `SiteHeader.tsx`). Las ocultas se guardan en `settings.public.hiddenSections`: no hizo falta cambiar la base y se aplican en vivo.
+- `src/store/lib/sections.ts` las oculta con CSS, no con React: las islas `client:visible` no arrancan hasta acercarse a la pantalla, pero su HTML ya está en la página. También oculta los enlaces que llevan a ellas (`#nosotros`, `#como-comprar`, `#preguntas`).
+- La regla se guarda en `divani.ocultas` y un script del `<head>` la aplica antes de pintar. En la primera visita de un navegador no existe todavía: una sección oculta puede verse un instante hasta que llegan los datos.
+- El pie de página no se puede ocultar: ahí está el contacto.
+
 ### Contenido editable y vista previa
 
 - Cada sección lleva `data-edit="…"`. Con `?editar=1` dentro del panel (`src/store/lib/edit-bridge.ts`), tocar una sección abre su editor; la comunicación con el panel es por `postMessage`.
@@ -77,7 +91,7 @@ producto/[slug].astro ─┘          │
 
 ### Estudio IA (Productos → Crear con IA)
 
-Con la foto de una prenda genera la foto en gancho, la foto con modelo y la ficha, usando la API de OpenAI. Viene del proyecto `divani-estudio`, que era un servidor aparte con los trabajos en memoria.
+Con la foto de una prenda genera la foto en gancho, la foto con modelo y la ficha, usando la API de OpenAI. Empezó como un servidor aparte con los trabajos en memoria; las fotos de referencia de las modelos quedaron en Cloudinary.
 
 ```
 Teléfono ── fotos (JPG 2048 px) ──► Cloudinary  divani/estudio/originales

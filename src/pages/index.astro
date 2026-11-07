@@ -1,5 +1,8 @@
 ---
-/** Portada. Cada sección es una «isla» de React que se activa al acercarse a la pantalla. */
+/**
+ * Portada. Cada sección es una «isla» de React que se activa al acercarse a la pantalla.
+ * data-section permite ocultarla desde el panel (src/store/lib/sections.ts).
+ */
 import StoreLayout from '@/layouts/StoreLayout.astro';
 import Hero from '@/store/islands/home/Hero';
 import Ribbons from '@/store/islands/home/Ribbons';
@@ -32,18 +35,18 @@ import Vip from '@/store/islands/home/Vip';
   }}
 >
   <main id="contenido">
-    <Hero client:load />
-    <Ribbons client:visible />
-    <Categories client:visible />
-    <NewArrivals client:visible />
-    <Bestsellers client:visible />
-    <Lookbook client:visible />
-    <Editorial client:visible />
-    <Kids client:visible />
-    <About client:visible />
-    <HowTo client:visible />
-    <Men client:visible />
-    <Faq client:visible />
-    <Vip client:visible />
+    <div data-section="banners"><Hero client:load /></div>
+    <div data-section="ribbons"><Ribbons client:visible /></div>
+    <div data-section="categories"><Categories client:visible /></div>
+    <div data-section="novedades"><NewArrivals client:visible /></div>
+    <div data-section="favoritas"><Bestsellers client:visible /></div>
+    <div data-section="look"><Lookbook client:visible /></div>
+    <div data-section="editorial"><Editorial client:visible /></div>
+    <div data-section="kids"><Kids client:visible /></div>
+    <div data-section="about"><About client:visible /></div>
+    <div data-section="howto"><HowTo client:visible /></div>
+    <div data-section="men"><Men client:visible /></div>
+    <div data-section="faq"><Faq client:visible /></div>
+    <div data-section="vip"><Vip client:visible /></div>
   </main>
 </StoreLayout>

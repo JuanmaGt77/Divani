@@ -40,7 +40,25 @@
   .card:hover .card__img--alt { opacity: 1; }
   .card:hover .card__img--main { transform: scale(1.045); }
 }
-.card.is-soldout .card__media img { filter: grayscale(0.4); opacity: 0.75; }
+
+/* Prenda vendida: solo la foto principal, opaca, con un listón de satén (SoldRibbon.tsx) */
+.card.is-soldout .card__img--main { filter: saturate(0.7); opacity: 0.5; transform: none; }
+.card__sold {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  filter: drop-shadow(0 3px 2px rgb(40 26 14 / 0.3)) drop-shadow(0 10px 12px rgb(40 26 14 / 0.34));
+}
+.card__sold-text {
+  fill: var(--on-ink);
+  font-family: var(--font-sans);
+  font-size: 25px;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+}
 
 .card__badges {
   position: absolute;
@@ -66,7 +84,6 @@
   white-space: nowrap;
 }
 .badge--oferta { background: var(--sale); color: #fff; letter-spacing: 0.04em; }
-.badge--agotado { background: var(--ink); color: var(--on-ink); }
 .badge--nuevo, .badge--ultimas { color: var(--ink); }
 
 .card__fav {

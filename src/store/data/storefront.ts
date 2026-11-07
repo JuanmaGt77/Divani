@@ -15,6 +15,7 @@ import { SUPABASE } from '@/lib/env';
 import { rpc } from '@/lib/rpc';
 import type { PublicSettings, StoreCategory, StoreProduct, StorefrontPayload } from '@/lib/types';
 import { isEditMode, useHydrated } from '../lib/hydration';
+import { applyHiddenSections } from '../lib/sections';
 import { STORAGE_KEYS, load, save } from '../lib/storage';
 
 export interface StorefrontState {
@@ -39,11 +40,12 @@ function normalize(raw: Partial<StorefrontPayload> | null | undefined): Storefro
   };
 }
 
-/** Aplica la región (moneda e idioma) de la tienda. */
+/** Aplica la región (moneda e idioma) y las secciones ocultas de la tienda. */
 export function applySettings(settings: PublicSettings): void {
   setRegion(settings.region);
-  if (typeof document !== 'undefined' && settings.region?.locale)
-    document.documentElement.lang = settings.region.locale;
+  if (typeof document === 'undefined') return;
+  if (settings.region?.locale) document.documentElement.lang = settings.region.locale;
+  applyHiddenSections(settings.hiddenSections);
 }
 
 interface Cached {
@@ -58,6 +60,8 @@ function readCache(): StorefrontPayload | null {
 }
 
 let pending: Promise<StorefrontPayload> | null = null;
+/** Lo último que llegó: si un aviso en vivo no cambió nada de la tienda, no se vuelve a pintar. */
+let lastRaw = '';
 
 /** Pide el paquete de la tienda (una sola vez, salvo que se pida de nuevo con force). */
 export function loadStorefront({ force = false }: { force?: boolean } = {}): Promise<StorefrontPayload> {
@@ -73,6 +77,10 @@ export function loadStorefront({ force = false }: { force?: boolean } = {}): Pro
   if (!$storefront.get().data) $storefront.set({ status: 'loading', data: null, error: null });
   pending = rpc<Partial<StorefrontPayload>>('storefront')
     .then((raw) => {
+      const text = JSON.stringify(raw);
+      const shown = $storefront.get().data;
+      if (text === lastRaw && shown) return shown;
+      lastRaw = text;
       const data = normalize(raw);
       save(STORAGE_KEYS.storefront, { at: Date.now(), url: SUPABASE.url, data: raw } satisfies Cached);
       applySettings(data.settings);
@@ -90,7 +98,7 @@ export function loadStorefront({ force = false }: { force?: boolean } = {}): Pro
   return pending;
 }
 
-/** Las existencias cambiaron (se registró un pedido): la próxima consulta trae lo más reciente. */
+/** Algo cambió (un pedido o un aviso en vivo): vuelve a pedir lo más reciente. */
 export const refreshStorefront = (): void => {
   pending = null;
   void loadStorefront({ force: true }).catch(() => {});

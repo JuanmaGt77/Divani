@@ -3,7 +3,7 @@ import { Icon } from '../components/Icon';
 import { SocialLinks } from '../components/Social';
 import { useStorefront, useSettings } from '../data/storefront';
 import { useHydrated } from '../lib/hydration';
-import { visibleDepartments, whatsappDisplay } from '../lib/site';
+import { TELEFONO_VISIBLE, visibleDepartments } from '../lib/site';
 import { greetingMessage, waLink } from '../lib/whatsapp';
 import { openSizeGuide } from '../state/ui';
 
@@ -75,7 +75,7 @@ export default function SiteFooter({ year }: { year: number }) {
                 <li>
                   <Icon name="whatsapp" />
                   <a href={wa} target="_blank" rel="noopener">
-                    {whatsappDisplay(settings.whatsapp)}
+                    {TELEFONO_VISIBLE}
                   </a>
                 </li>
                 <li>

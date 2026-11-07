@@ -32,4 +32,5 @@ export const STORAGE_KEYS = {
   recentSearches: 'divani.recent-searches.v1',
   customer: 'divani.customer.v1',
   storefront: 'divani.storefront.v2',
+  hiddenSections: 'divani.ocultas',
 } as const;

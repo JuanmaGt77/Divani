@@ -2129,6 +2129,58 @@ grant execute on function public.estudio_worker_firma(text, jsonb) to anon;
 grant select on public.estudio_trabajos, public.estudio_modelos_uso to authenticated;
 -- <<< estudio
 
+-- >>> en vivo
+-- =============================================================================
+--  Cambios en vivo: la tienda y el panel se actualizan sin recargar la página
+--  Este bloque se puede ejecutar solo en el SQL Editor. Se puede repetir sin perder datos.
+--
+--  El público no puede leer las tablas, y Realtime respeta esas reglas. Por eso hay una sola
+--  fila pública que solo guarda la hora del último cambio: cuando cambia, la tienda vuelve a
+--  pedir storefront(). No expone ningún dato del negocio.
+-- =============================================================================
+create table if not exists public.tienda_version (
+  id     int primary key default 1 check (id = 1),
+  cambio timestamptz not null default now()
+);
+insert into public.tienda_version (id) values (1) on conflict do nothing;
+
+alter table public.tienda_version enable row level security;
+drop policy if exists divani_public_read on public.tienda_version;
+create policy divani_public_read on public.tienda_version for select to anon, authenticated using (true);
+grant select on public.tienda_version to anon, authenticated;
+
+create or replace function private.tienda_cambio() returns trigger
+language plpgsql security definer set search_path = public, pg_temp as $$
+begin
+  update public.tienda_version set cambio = clock_timestamp() where id = 1;
+  return null;
+end $$;
+revoke all on function private.tienda_cambio() from public, anon, authenticated;
+
+-- Todo lo que devuelve storefront(). Una vez por instrucción, no por fila.
+do $$
+declare
+  t text;
+begin
+  foreach t in array array['products', 'product_colors', 'product_variants', 'departments', 'categories',
+                           'banners', 'lookbooks', 'faq', 'site_content', 'settings'] loop
+    execute format('drop trigger if exists divani_tienda_cambio on public.%I', t);
+    execute format('create trigger divani_tienda_cambio after insert or update or delete on public.%I
+                    for each statement execute function private.tienda_cambio()', t);
+  end loop;
+end $$;
+
+do $$
+begin
+  if exists (select 1 from pg_publication where pubname = 'supabase_realtime')
+     and not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'tienda_version') then
+    execute 'alter publication supabase_realtime add table public.tienda_version';
+  end if;
+exception when others then
+  raise notice 'No se activó realtime para la tienda: %', sqlerrm;
+end $$;
+-- <<< en vivo
+
 -- =============================================================================
 --  Seguridad: políticas por fila y permisos
 -- =============================================================================
@@ -2177,6 +2229,7 @@ grant execute on function public.storefront_sitemap() to anon, authenticated;
 grant execute on function public.place_order(jsonb) to anon, authenticated;
 grant execute on function public.track_visit(jsonb) to anon, authenticated;
 grant execute on function public.size_rank(text) to anon, authenticated;
+grant select on public.tienda_version to anon, authenticated;
 grant execute on function public.estudio_worker_contexto(text, uuid) to anon;
 grant execute on function public.estudio_worker_tomar(text, uuid, text, int) to anon;
 grant execute on function public.estudio_worker_elegir(text, uuid, text, text) to anon;

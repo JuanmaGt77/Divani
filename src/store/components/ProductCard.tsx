@@ -14,6 +14,7 @@ import { favorites, useFavorites } from '../state/favorites';
 import { notify, openProduct, openSheet } from '../state/ui';
 import { cx } from './cx';
 import { Icon } from './Icon';
+import { SoldRibbon } from './SoldRibbon';
 
 /** Abre la vista rápida salvo que se quiera abrir la página en otra pestaña. */
 export function onProductLink(e: MouseEvent, slug: string, color?: string): void {
@@ -108,7 +109,7 @@ export function ProductCard({
             loading="lazy"
             decoding="async"
           />
-          {img2 && (
+          {img2 && stock > 0 && (
             <img
               className="card__img--alt"
               src={img2}
@@ -120,6 +121,7 @@ export function ProductCard({
             />
           )}
         </a>
+        {stock === 0 && <SoldRibbon />}
         <div className="card__badges">
           {badges.map((b) => (
             <span

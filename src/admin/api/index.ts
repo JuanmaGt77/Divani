@@ -113,7 +113,7 @@ export interface IntegrationsStatus {
   cloudinary: { cloudName: string; apiKey: string; folder: string; hasSecret: boolean };
 }
 
-export type RealtimeTopic = 'orders';
+export type RealtimeTopic = 'orders' | 'catalog';
 export interface RealtimeMeta {
   remote: boolean;
   newOrder: { id: string; number: string; name: string; total: number } | null;
@@ -570,6 +570,10 @@ export const api = {
             ? { id: row.id, number: row.number, name: row.customer_name || '', total: Number(row.total) || 0 }
             : null;
         fn('orders', { remote: true, newOrder });
+      })
+      // Catálogo cambiado desde otro dispositivo o por un pedido de la tienda
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'tienda_version' }, () => {
+        fn('catalog', { remote: true, newOrder: null });
       })
       .subscribe();
     return () => {

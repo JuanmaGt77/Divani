@@ -14,13 +14,16 @@ import {
   ExternalLink,
   Eye,
   GalleryHorizontal,
+  Heart,
   House,
   Image as ImageIcon,
   LayoutGrid,
+  ListOrdered,
   Megaphone,
   MousePointerClick,
   Ribbon,
   Shirt,
+  Sparkles,
   Store,
   User,
   type LucideIcon,
@@ -48,9 +51,9 @@ import { useMedia } from '../lib/hooks';
 import { navigate, useSearch } from '../lib/navigation';
 import { useData } from '../lib/query';
 import { settingsStore } from '../lib/session';
-import { Button, LinkButton } from '../ui/controls';
-import { Sheet } from '../ui/overlays';
-import { Card, PageHeader, Tabs } from '../ui/surfaces';
+import { Button, LinkButton, Switch, cx } from '../ui/controls';
+import { Sheet, toast, toastError } from '../ui/overlays';
+import { Badge, Card, PageHeader, Tabs } from '../ui/surfaces';
 
 type Tab = 'portada' | 'banners' | 'look' | 'preguntas';
 
@@ -65,11 +68,14 @@ const ICONS: Record<string, LucideIcon> = {
   announcements: Megaphone,
   ribbons: Ribbon,
   categories: LayoutGrid,
+  novedades: Sparkles,
+  favoritas: Heart,
   banners: GalleryHorizontal,
   look: Shirt,
   editorial: ImageIcon,
   kids: Baby,
   about: BookHeart,
+  howto: ListOrdered,
   men: User,
   faq: CircleHelp,
   vip: Crown,
@@ -187,6 +193,26 @@ function HomeTab({
     if (saved) onSaved();
   };
 
+  // Ocultar no borra nada: la sección sigue aquí y se puede volver a mostrar
+  const hidden = settings?.public?.hiddenSections || [];
+  const setVisible = async (s: HomeSection, visible: boolean) => {
+    const before = settingsStore.get();
+    if (!before) return;
+    const hiddenSections = visible ? hidden.filter((id) => id !== s.id) : [...hidden, s.id];
+    settingsStore.set({ ...before, public: { ...before.public, hiddenSections } });
+    try {
+      settingsStore.set(await api.settings.save({ public: { hiddenSections } }));
+      onSaved();
+      toast({
+        title: visible ? `«${s.title}» ya se ve en la tienda` : `«${s.title}» quedó oculta`,
+        sub: visible ? undefined : 'No se borró nada: vuelve a activarla cuando quieras.',
+      });
+    } catch (err) {
+      settingsStore.set(before);
+      toastError(err, 'No se pudo cambiar');
+    }
+  };
+
   const thumb = (s: HomeSection) => {
     if (s.id === 'banners') return data?.banners?.find((b) => b.active !== false)?.image;
     if (s.id === 'categories')
@@ -220,7 +246,7 @@ function HomeTab({
         <div className="hint-box">
           <MousePointerClick aria-hidden="true" />
           <p>
-            Toca una sección para cambiar sus fotos y textos.
+            Toca una sección para cambiar sus fotos y textos, o apaga su interruptor para ocultarla de la tienda.
             {wide ? ' También puedes tocarla directo en la vista previa.' : ''}
           </p>
         </div>
@@ -230,30 +256,42 @@ function HomeTab({
               const Icon = ICONS[s.id] || ImageIcon;
               const src = thumb(s);
               const m = meta(s);
+              const oculta = hidden.includes(s.id);
+              const destino = s.edit || s.id;
               return (
-                <button
-                  key={s.id}
-                  type="button"
-                  className="list__row section-row"
-                  style={{ '--inset': '92px' }}
-                  onClick={() => open(s.id)}
-                  onMouseEnter={() => wide && scrollPreviewTo(frame.current, s.id)}
-                  onFocus={() => wide && scrollPreviewTo(frame.current, s.id)}
-                >
-                  <span className="section-row__thumb">
-                    {src ? (
-                      <img src={cdn(src, { w: 200 })} alt="" loading={i > 6 ? 'lazy' : undefined} />
-                    ) : (
-                      <Icon aria-hidden="true" />
-                    )}
+                <div key={s.id} className={cx('section-item', oculta && 'is-hidden')} style={{ '--inset': '92px' }}>
+                  <button
+                    type="button"
+                    className="list__row section-row"
+                    disabled={s.fixed}
+                    onClick={() => open(destino)}
+                    onMouseEnter={() => wide && scrollPreviewTo(frame.current, destino)}
+                    onFocus={() => wide && scrollPreviewTo(frame.current, destino)}
+                  >
+                    <span className="section-row__thumb">
+                      {src ? (
+                        <img src={cdn(src, { w: 200 })} alt="" loading={i > 6 ? 'lazy' : undefined} />
+                      ) : (
+                        <Icon aria-hidden="true" />
+                      )}
+                    </span>
+                    <span className="list__body">
+                      <span className="list__title">
+                        {s.title} {oculta && <Badge tone="amber">Oculta</Badge>}
+                      </span>
+                      <span className="list__sub section-row__sub">{s.sub}</span>
+                    </span>
+                    {m && <span className="list__end small muted section-row__meta">{m}</span>}
+                    {!s.fixed && <ChevronRight className="list__chev" aria-hidden="true" />}
+                  </button>
+                  <span className="section-item__switch">
+                    <Switch
+                      checked={!oculta}
+                      label={`Mostrar «${s.title}» en la tienda`}
+                      onChange={(v) => void setVisible(s, v)}
+                    />
                   </span>
-                  <span className="list__body">
-                    <span className="list__title">{s.title}</span>
-                    <span className="list__sub section-row__sub">{s.sub}</span>
-                  </span>
-                  {m && <span className="list__end small muted">{m}</span>}
-                  <ChevronRight className="list__chev" aria-hidden="true" />
-                </button>
+                </div>
               );
             })}
             <button

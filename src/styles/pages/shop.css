@@ -168,4 +168,3 @@
 .legal h2 { font-size: var(--fs-lg); margin-top: 18px; }
 .legal p, .legal li { color: var(--ink-soft); max-width: 68ch; }
 .legal ul { padding-left: 1.2em; display: grid; gap: 6px; }
-.legal mark { background: rgb(216 199 171 / 0.5); padding: 0 4px; border-radius: 4px; color: var(--ink); }

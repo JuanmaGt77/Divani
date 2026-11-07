@@ -40,6 +40,8 @@ Para verificar a mano: `npm run verify`, abrir tienda y panel sin errores en la 
 - `src/layouts/StoreLayout.astro`: `<head>` (SEO, og, JSON-LD), `Sprite.astro` (íconos `#i-…`), `SiteHeader` (`client:load`), `SiteFooter` (`client:visible`), `StoreOverlays` (`client:load`) y `initEditBridge/initReveal/initGlassLight`.
 - `src/store/islands/`: islas de React (`home/*` con `client:visible`, `ShopPage`, `ProductPage`, encabezado, pie y hojas). La portada (`home/Hero.tsx`, `client:load`) es un carrusel de «vitrinas» hecho con los banners: color, foto opcional y prendas con precio, editable en Sitio web → Portada. El color y las prendas se guardan juntos en la columna `banners.theme` como JSON (`readBannerTheme`/`writeBannerTheme` en `src/lib/model.ts`); así no hizo falta cambiar la estructura de la base.
 - `src/store/data/storefront.ts`: el «paquete» de la rpc `storefront` (una vez por página, caché en localStorage), `useStorefront()` (sin datos hasta hidratar), `useSettings()`, `applySettings()` (región/moneda).
+- `src/store/data/live.ts`: cambios en vivo. Escucha `tienda_version` (una fila pública con la hora del último cambio) y vuelve a pedir el paquete sin recargar. Si agregas una tabla a `storefront()`, agrégala también a los disparadores del bloque `-- >>> en vivo` de `schema.sql`.
+- Secciones ocultas: `settings.public.hiddenSections` y `src/store/lib/sections.ts` (por CSS, con `data-section`). Si agregas una sección a la portada, envuélvela en `index.astro` y agrégala a `HOME_SECTIONS`.
 - `src/store/data/content.ts`: textos y fotos editables de la portada (`useContent().get(seccion, campo)`); los de fábrica salen de `supabase/datos/content.json`.
 - `src/store/state/`: `cart`, `favorites`, `ui` (nanostores compartidos entre islas). `src/store/lib/hydration.ts`: `useHydrated()` evita diferencias al hidratar.
 - `src/store/lib/edit-bridge.ts`: con `?editar=1` dentro del panel, tocar una sección (`data-edit="…"`) abre su editor.
@@ -59,7 +61,7 @@ Para verificar a mano: `npm run verify`, abrir tienda y panel sin errores en la 
 - El estado vive en `estudio_trabajos`; las reglas, en las funciones `estudio_*` de `schema.sql`. La cola entra con `ESTUDIO_WORKER_TOKEN`, no con la secret key de Supabase.
 - `PROMPT_PRENDA` y `PROMPT_MODELO` están probados: no los cambies sin probar.
 - «Importar al producto» llena `/admin/productos/nuevo?estudio=<id>` y **nunca guarda solo**.
-- Secretos del Worker (`npx wrangler secret put`): `OPENAI_API_KEY`, `ESTUDIO_WORKER_TOKEN`. En local van en `.dev.vars`. `divani-estudio/` es solo referencia: no entra en el build.
+- Secretos del Worker (`npx wrangler secret put`): `OPENAI_API_KEY`, `ESTUDIO_WORKER_TOKEN`. En local van en `.dev.vars`.
 
 **Supabase** (`supabase/`):
 - `schema.sql`: tablas, RLS y **todas las reglas del negocio** (la tienda y el panel solo llaman funciones): `storefront, product_page, storefront_sitemap, place_order, pos_checkout, order_set_status, order_set_payment, order_update, delete_order, cash_open, cash_movement, cash_close, cash_session_summary, inventory_adjust, inventory_receive, save_product, delete_product, save_category, delete_category, save_department, reorder_rows, set_integration_secret, integrations_status, cloudinary_signature, whoami, track_visit, visits_summary, visits_live, visits_forget, estudio_crear, estudio_estado, estudio_regenerar, estudio_guardar_ficha, estudio_worker_*`. Vista `private.store_products`. Es idempotente. El bloque de visitas (`-- >>> visitas` … `-- <<< visitas`) se puede ejecutar solo en el SQL Editor.
@@ -89,12 +91,14 @@ Pendiente:
 2. ~~Cloudinary~~ Listo (19 de octubre de 2026): API Key «divani-tienda» guardada en el panel y subida de prueba correcta. La llave «Root» no se usa (Cloudinary no permite borrarla).
 3. **Seguridad** (lo hace el dueño): quitar de `.env.local` `SUPABASE_ACCESS_TOKEN`, `ADMIN_PASSWORD` y `CLOUDINARY_API_SECRET`; borrar el token personal «divani» en Supabase; cambiar la contraseña del administrador.
 4. **Datos reales**: cambiar las 45 prendas de ejemplo por las reales; configurar WhatsApp, horario y redes en Configuración → Tienda y contacto.
-5. Completar `src/pages/aviso-de-privacidad.astro` (datos marcados con `<mark>`).
-6. **Estudio IA**: falta solo la clave de OpenAI (`npx wrangler secret put OPENAI_API_KEY`) y probar la primera prenda real. Aún no hay ninguna llamada real a OpenAI. Hasta entonces no borres `divani-estudio/`.
+5. ~~Aviso de privacidad~~ Listo (7 de noviembre de 2026). Responsable: Elizabeth Tenas, Escuintla; contacto somosdivani@gmail.com. No menciona el contador de visitas, a pedido del dueño, aunque la tienda sigue contando.
+6. **Estudio IA**: funciona con OpenAI real en la tienda publicada (desde el 6 de noviembre de 2026). Cada prenda tarda unos 65 s y cuesta unos US$0.14–0.20 en calidad alta. Los pasos corren uno tras otro, no en paralelo: la cola entrega un mensaje a la vez, así que la ficha empieza cuando termina la foto en gancho. La clave de OpenAI guardada en Cloudflare es de pruebas y quedó expuesta en un chat: antes del uso real hay que crear otra y guardarla con `npx wrangler secret put OPENAI_API_KEY`.
 
 **No correr `npm run setup:supabase` sin revisar `.env.local`**: su `SUPABASE_ACCESS_TOKEN` venció y su `CLOUDINARY_API_SECRET` no corresponde a la llave en uso; el script lo guardaría encima del bueno y se romperían las subidas de fotos. El SQL se pega en el SQL Editor.
 
 **Publicada** en Cloudflare Workers: https://divani.divani.workers.dev (cuenta con sesión de wrangler en esta computadora; para actualizar: `npm run deploy`, que usa `.env.local` con `PUBLIC_SITE_URL=https://divani.divani.workers.dev`). Supabase Auth: Site URL esa dirección; Redirect URLs `…/**` y `http://localhost:5173/**`.
+
+Ya aplicado y publicado (7 de noviembre de 2026): bloque `en vivo` de `schema.sql` (tabla `tienda_version` y sus disparadores). Probado en la tienda publicada: un cambio en la base aparece en unos 2.6 s en la tienda y en el panel sin recargar.
 
 Ya aplicado y publicado (6 de noviembre de 2026): `schema.sql` con Estudio IA, cola `divani-estudio` en Cloudflare, plan Workers Paid y secreto `ESTUDIO_WORKER_TOKEN`. Probado de punta a punta en la tienda publicada en modo demostración (sin OpenAI).
 

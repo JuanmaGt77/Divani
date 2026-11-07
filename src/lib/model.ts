@@ -469,6 +469,7 @@ export const DEFAULT_SETTINGS: Settings = {
       },
     },
     region: { preset: DEFAULT_REGION, ...pickRegion(DEFAULT_PRESET) },
+    hiddenSections: [],
   },
   private: {
     pos: {

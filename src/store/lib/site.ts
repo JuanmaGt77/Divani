@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react';
 import { AUTH_STORAGE_KEY } from '@/lib/env';
 import type { StorefrontPayload } from '@/lib/types';
-import { phone } from '@/lib/format';
 
 export const DEPARTMENT_LINKS = [
   { slug: 'mujer', label: 'Mujer' },
@@ -22,8 +21,11 @@ export function visibleDepartments(data: StorefrontPayload | null): { slug: stri
 
 export const SOCIAL_LABELS: Record<string, string> = { instagram: 'Instagram', facebook: 'Facebook', tiktok: 'TikTok' };
 
-/** Número de WhatsApp como se muestra en la página: +502 5555 1234 */
-export const whatsappDisplay = (raw: string): string => phone(raw) || 'WhatsApp';
+/**
+ * Número que se ve en el pie de la tienda. Es solo lo visible: el enlace sigue abriendo el WhatsApp
+ * de ventas de Configuración → Tienda y contacto, adonde llegan los pedidos.
+ */
+export const TELEFONO_VISIBLE = '+502 3065 8353';
 
 /** ¿Hay una sesión del panel abierta en este navegador? (para mostrar el acceso directo) */
 export function useAdminSignedIn(): boolean {

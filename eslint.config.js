@@ -8,7 +8,7 @@ import prettier from 'eslint-config-prettier';
 import globals from 'globals';
 
 export default defineConfig(
-  { ignores: ['dist/', '.astro/', '.wrangler/', 'node_modules/', 'public/', 'supabase/', 'divani-estudio/'] },
+  { ignores: ['dist/', '.astro/', '.wrangler/', 'node_modules/', 'public/', 'supabase/'] },
   js.configs.recommended,
   tseslint.configs.recommended,
   astro.configs['flat/recommended'],

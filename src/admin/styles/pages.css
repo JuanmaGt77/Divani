@@ -485,6 +485,25 @@ a.visits-strip:hover { box-shadow: var(--shadow-2); transform: translateY(-1px);
 .site-home { display: grid; grid-template-columns: minmax(340px, 420px) minmax(0, 1fr); gap: 20px; align-items: start; }
 @media (max-width: 1099px) { .site-home { grid-template-columns: minmax(0, 1fr); } }
 .section-row { gap: 14px; padding: 10px 16px; }
+/* Fila de sección con su interruptor para ocultarla de la tienda */
+.section-item { position: relative; display: flex; align-items: center; }
+.section-item > .section-row { flex: 1; min-width: 0; padding-right: 10px; }
+.section-item__switch { flex: none; display: flex; align-items: center; min-height: 44px; padding-right: 16px; }
+.section-item + .section-item::before,
+.section-item + .list__row::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: var(--inset, 20px);
+  right: 0;
+  height: 1px;
+  background: var(--line);
+}
+.section-item.is-hidden .section-row__thumb,
+.section-item.is-hidden .section-row__sub { opacity: 0.45; }
+button.section-row:disabled { cursor: default; opacity: 1; color: inherit; }
+button.section-row:disabled:hover { background: none; }
+@media (max-width: 520px) { .section-row__meta { display: none; } }
 .section-row__thumb { width: 62px; height: 46px; flex: none; border-radius: 10px; overflow: hidden; display: grid; place-items: center; background: var(--fill); color: var(--accent-ink); box-shadow: inset 0 0 0 1px var(--line); }
 .section-row__thumb img { width: 100%; height: 100%; object-fit: cover; }
 .section-row__thumb svg { width: 20px; height: 20px; }
