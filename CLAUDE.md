@@ -78,6 +78,7 @@ Para verificar a mano: `npm run verify`, abrir tienda y panel sin errores en la 
 - **Nunca** subas secretos: `.env`, `.env.local` y `.dev.vars` están en `.gitignore`. Solo las variables `PUBLIC_*` llegan al navegador. Nada de secret key, tokens `sbp_`, API Secret de Cloudinary ni contraseñas en el código, en commits ni en la documentación.
 - Mantén la interfaz en español, el estilo visual existente y las áreas táctiles de 44 px. Usa los tokens de `src/styles/base/tokens.css` (tienda) y `src/admin/styles/base.css` (panel).
 - Islas: nada que dependa del navegador (localStorage, datos, fecha) en el primer render; usa `useHydrated()`/`useStorefront()`.
+- Si la tienda o el panel cargan algo de otro dominio, agrégalo en `src/lib/security-headers.ts` y `public/_headers` (la política de seguridad lo bloquea). Detalle en `docs/ARQUITECTURA.md`, sección Seguridad.
 - Commits en español y descriptivos. Antes de cada commit: `npm run verify`.
 
 ## Estado actual (18 de octubre de 2026)
@@ -93,6 +94,8 @@ Pendiente:
 4. **Datos reales**: cambiar las 45 prendas de ejemplo por las reales; configurar WhatsApp, horario y redes en Configuración → Tienda y contacto.
 5. ~~Aviso de privacidad~~ Listo (7 de noviembre de 2026). Responsable: Elizabeth Tenas, Escuintla; contacto somosdivani@gmail.com. No menciona el contador de visitas, a pedido del dueño, aunque la tienda sigue contando.
 6. **Estudio IA**: funciona con OpenAI real en la tienda publicada (desde el 6 de noviembre de 2026). Cada prenda tarda unos 65 s y cuesta unos US$0.14–0.20 en calidad alta. Los pasos corren uno tras otro, no en paralelo: la cola entrega un mensaje a la vez, así que la ficha empieza cuando termina la foto en gancho. La clave de OpenAI guardada en Cloudflare es de pruebas y quedó expuesta en un chat: antes del uso real hay que crear otra y guardarla con `npx wrangler secret put OPENAI_API_KEY`.
+
+7. **Freno de pedidos**: falta pegar `supabase/actualizaciones/2026-11-07-freno-de-pedidos.sql` en el SQL Editor.
 
 **No correr `npm run setup:supabase` sin revisar `.env.local`**: su `SUPABASE_ACCESS_TOKEN` venció y su `CLOUDINARY_API_SECRET` no corresponde a la llave en uso; el script lo guardaría encima del bueno y se romperían las subidas de fotos. El SQL se pega en el SQL Editor.
 

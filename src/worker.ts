@@ -5,8 +5,16 @@
  */
 import { handle } from '@astrojs/cloudflare/handler';
 import { atenderCola } from './estudio/cola';
+import { SECURITY_HEADERS } from './lib/security-headers';
 
 export default {
-  fetch: handle,
+  fetch: async (...args: Parameters<typeof handle>) => {
+    const respuesta = await handle(...args);
+    // En desarrollo Vite necesita cargar y conectarse a cosas que estas reglas no permiten
+    if (import.meta.env.DEV) return respuesta;
+    const segura = new Response(respuesta.body, respuesta);
+    for (const [nombre, valor] of Object.entries(SECURITY_HEADERS)) segura.headers.set(nombre, valor);
+    return segura;
+  },
   queue: (lote: { messages: readonly { body: unknown }[] }, env: Record<string, unknown>) => atenderCola(lote, env),
 };

@@ -84,7 +84,7 @@ export default function SiteHeader() {
                 className="site-nav__link"
                 href={`/tienda?depto=${d.slug}`}
                 aria-current={current === d.slug ? 'page' : undefined}
-                aria-expanded={mega.enabled ? mega.dept === d.slug : undefined}
+                aria-expanded={mega.enabled && MEGA_DEPARTMENTS.has(d.slug) ? mega.dept === d.slug : undefined}
                 {...mega.linkProps(d.slug)}
               >
                 {d.label}
@@ -152,6 +152,9 @@ export default function SiteHeader() {
   );
 }
 
+/** Departamentos con menú desplegable; los demás llevan directo a la tienda. */
+const MEGA_DEPARTMENTS = new Set(['mujer']);
+
 /** Abrir y cerrar el menú desplegable con el cursor (solo en escritorio con mouse). */
 function useMega(data: StorefrontPayload | null) {
   const [enabled, setEnabled] = useState(false);
@@ -199,21 +202,23 @@ function useMega(data: StorefrontPayload | null) {
       clearTimeout(closeTimer.current);
       closeTimer.current = setTimeout(close, 220);
     },
-    linkProps: (slug: string) =>
-      active
-        ? {
-            onPointerEnter: () => {
-              clearTimeout(openTimer.current);
-              openTimer.current = setTimeout(() => open(slug), 110);
-            },
-            onPointerLeave: () => {
-              clearTimeout(openTimer.current);
-              clearTimeout(closeTimer.current);
-              closeTimer.current = setTimeout(close, 220);
-            },
-            onFocus: () => open(slug),
-          }
-        : {},
+    linkProps: (slug: string) => {
+      if (!active) return {};
+      // Al pasar de Mujer a otro departamento, el menú que estaba abierto se cierra
+      if (!MEGA_DEPARTMENTS.has(slug)) return { onPointerEnter: close };
+      return {
+        onPointerEnter: () => {
+          clearTimeout(openTimer.current);
+          openTimer.current = setTimeout(() => open(slug), 110);
+        },
+        onPointerLeave: () => {
+          clearTimeout(openTimer.current);
+          clearTimeout(closeTimer.current);
+          closeTimer.current = setTimeout(close, 220);
+        },
+        onFocus: () => open(slug),
+      };
+    },
   };
 }
 

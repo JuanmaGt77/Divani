@@ -117,6 +117,13 @@ Teléfono ◄── estudio_estado cada 2.5 s (directo a Supabase, sin pasar por
 - `supabase/datos/*.json` → `npm run seed:build` → `supabase/seed.sql` (no se edita a mano).
 - `supabase/actualizaciones/*.sql`: correcciones de datos para bases que ya existían.
 
+## Seguridad
+
+- **Datos**: el público no lee ninguna tabla salvo `tienda_version`, que solo guarda una hora. Todo pasa por funciones de `schema.sql`; cada función del panel revisa el permiso (`require_staff`) y todas las `security definer` fijan su `search_path`. Los secretos viven en `private.secrets` y en los secretos del Worker.
+- **Cabeceras**: `src/lib/security-headers.ts` para lo que genera el Worker (`src/worker.ts`) y `public/_headers` para los archivos estáticos. Una prueba revisa que coincidan. Si la tienda empieza a cargar algo de otro dominio, hay que agregarlo en los dos lugares. `script-src` lleva `'unsafe-inline'` porque Astro arranca las islas con scripts en línea.
+- **Datos de clientas en el panel**: React los escapa en pantalla; lo que se imprime pasa por `escHtml` (`src/admin/lib/print.ts`) y lo que se exporta a CSV se neutraliza contra fórmulas de Excel (`src/admin/lib/csv.ts`).
+- **Freno de pedidos**: `private.limite_pedidos`, un disparador sobre `orders` que solo aplica a `channel = 'web'`: 12 pedidos por conexión y 120 en total cada 10 minutos, además del límite por teléfono de `place_order`. La IP no se guarda, solo una huella que cambia cada día.
+
 ## Estilos
 
 - Tienda: `src/styles/main.css` importa en orden base → componentes → secciones → páginas. Tokens en `src/styles/base/tokens.css`; vidrio líquido con `class="glass"` (+ `glass--strong`, `glass--dark`, `glass--live`).

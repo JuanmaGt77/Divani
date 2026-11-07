@@ -1,7 +1,13 @@
 /** Exportar a CSV (se abre directo en Excel, Numbers o Google Sheets, con acentos). */
 
+/**
+ * Excel ejecuta como fórmula lo que empieza con = + - @. Los nombres y las notas los escriben las
+ * clientas en la tienda, así que un texto así se neutraliza con un apóstrofo. Los números no se tocan.
+ */
+const neutralize = (s: string): string => (/^[=+\-@\t\r]/.test(s) && Number.isNaN(Number(s)) ? `'${s}` : s);
+
 const esc = (v: unknown): string => {
-  const s = v == null ? '' : String(v);
+  const s = neutralize(v == null ? '' : String(v));
   return /[",\r\n;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 };
 
